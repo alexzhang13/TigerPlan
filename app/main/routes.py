@@ -8,7 +8,7 @@ from app.models import models
 
 cas_client = CASClient(
     version=3,
-    service_url='localhost:5000/login',
+    service_url='http://localhost:80/login',
     server_url='https://fed.princeton.edu/cas/login'
 )
 
