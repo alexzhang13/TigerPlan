@@ -3,25 +3,38 @@ from flask_cors import CORS
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_cas import CAS
+from flask_login import LoginManager
 from config import Config
 
-app = Flask(__name__)
-app.config.from_object(Config)
-app.jinja_env.auto_reload = True
+db = SQLAlchemy()
+migrate = Migrate()
+cors = CORS()
+bootstrap = Bootstrap()
+login = LoginManager()
 
-# configs
-app.config['TEMPLATES_AUTO_RELOAD'] = True
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-app.config['CAS_SERVER'] = "ldap.cs.princeton.edu"
-app.config['CAS_AFTER_LOGIN'] = 'route_root'
+def create_app(config_class=Config):
+    app = Flask(__name__, static_folder='static/')
+    app.config.from_object(config_class)
+    app.jinja_env.auto_reload = True
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+    # load apps 
+    db.init_app(app)
+    migrate.init_app(app, db)
+    cors.init_app(app)
+    bootstrap.init_app(app)
+    login.init_app(app)
 
-CAS(app)
-CORS(app)
-Bootstrap(app)
+    # create db
+    with app.app_context():
+        db.create_all()
 
-from app import routes, models
+    # load blueprints
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
+    from app.main import bp as main_bp
+    app.register_blueprint(main_bp)
+
+    return app
+
+from app import models
 
