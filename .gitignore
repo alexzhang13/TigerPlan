@@ -3,3 +3,5 @@
 *.py[cod]
 # Keep environment variables out of version control
 .env
+# Keep local database copies out of version control
+*.db
