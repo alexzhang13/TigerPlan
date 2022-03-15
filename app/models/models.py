@@ -20,8 +20,8 @@ class Group(db.Model):
     __tablename__ = "group"
     id = db.Column(db.String(64), primary_key=True)
     name = db.Column(db.String(64)) #unique
-    # owner
-    # members
+    owner = db.Column(User)
+    members = db.Column(list(User))
     # events
     def __repr__(self):
         return '<Group {}>'.format(self.id)
@@ -30,10 +30,10 @@ class Event(db.Model):
     __tablename__ = "event"
     id = db.Column(db.String(64), primary_key=True)
     name = db.Column(db.String(64)) #unique
-    # owner
-    # invitees
-    # location
-    # description
+    owner = db.Column(User)
+    invitees = db.Column(list(User))
+    location = db.Column(db.String(64))
+    description = db.Column(db.String(64))
     # time(s)
     # duration
     # status
@@ -45,13 +45,17 @@ class TimeBlock(db.Model):
     name = db.Column(db.String(64)) 
     # start
     # end
-    # user
+    user = db.Column(User)
+    def __repr__(self):
+        return '<TimeBlock {}>'.format(self.id)
 
 class Invitation(db.Model):
     id = db.Column(db.String(64), primary_key=True)
     event = db.Column(Event)
     # metadata
     # response enum
+    def __repr__(self):
+        return '<Invitation {}>'.format(self.id)
 
 @login.user_loader
 def load_user(netid):
