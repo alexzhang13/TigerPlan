@@ -52,6 +52,7 @@ class TimeBlock(db.Model):
 class Invitation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event = db.Column(Event)
+    invitee = db.Column(User)
     # metadata
     # response enum
     def __repr__(self):
