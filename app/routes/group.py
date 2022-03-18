@@ -22,6 +22,8 @@ def update_group(id: int, name: str, members: list(User)) -> Group:
         updated_group.name = name
     if members is not None:
         updated_group.members = members
+    db.session.add(updated_group)
+    db.commit()
     return updated_group
 
 def delete_group(id: int) -> bool:
