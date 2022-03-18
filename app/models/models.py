@@ -3,8 +3,8 @@ from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
-    id = db.Column(db.String(64))
-    netid = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.String(64), primary_key=True)
+    netid = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64))
     name = db.Column(db.String(64))
     # owned groups
