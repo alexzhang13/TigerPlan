@@ -19,6 +19,8 @@ def update_timeblock(id: int, name: str) -> TimeBlock:
     updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
     if name is not None:
         updated_tb.name = name
+    db.session.add(updated_tb)
+    db.session.commit()
     return updated_tb
 
 def delete_timeblock(id: int) -> bool:
