@@ -39,7 +39,7 @@ class Group(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # n-to-n relation fields
-    member = db.relationship("Member_Group", backref='group')
+    members = db.relationship("Member_Group", backref='group')
 
     def __repr__(self):
         return '<Group {}>'.format(self.id)
