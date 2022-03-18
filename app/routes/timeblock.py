@@ -10,7 +10,7 @@ def create_timeblock(name: str, user: User) -> TimeBlock:
     db.session.commit()
     return new_tb
 
-def get_timeblock(id: int) -> Group:
+def get_timeblock(id: int) -> TimeBlock:
     """Get a time block. Returns time block."""
     return db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
 
