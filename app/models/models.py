@@ -3,7 +3,7 @@ from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     netid = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64))
     name = db.Column(db.String(64))
@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
 
 class Group(db.Model):
     __tablename__ = "group"
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64)) #unique
     owner = db.Column(User)
     members = db.Column(list(User))
@@ -28,7 +28,7 @@ class Group(db.Model):
 
 class Event(db.Model):
     __tablename__ = "event"
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64)) #unique
     owner = db.Column(User)
     invitees = db.Column(list(User))
@@ -41,7 +41,7 @@ class Event(db.Model):
         return '<Model {}>'.format(self.id)
 
 class TimeBlock(db.Model):
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64)) 
     # start
     # end
@@ -50,7 +50,7 @@ class TimeBlock(db.Model):
         return '<TimeBlock {}>'.format(self.id)
 
 class Invitation(db.Model):
-    id = db.Column(db.String(64), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     event = db.Column(Event)
     # metadata
     # response enum
