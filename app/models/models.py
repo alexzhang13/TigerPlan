@@ -102,7 +102,7 @@ class Member_Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # n-to-n relation fields
-    member_id = db.Column(db.Integer, db.ForeignKey('users.id')), #not sure why example has a comma
+    member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
 
