@@ -1,3 +1,4 @@
+from logging.config import IDENTIFIER
 from app.routes.timeblock import create_timeblock, delete_timeblock
 from app.routes.user import get_conflicts, user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
@@ -29,22 +30,27 @@ def index():
 def dashboard():
     if 'username' in session:
         user = user_from_netid(session['username'])
-        a = datetime(2018, 11, 28)
-        b = datetime(2018, 12, 28)
-        create_timeblock(name="example", user=user, start=a, end=b)
         conflicts = get_conflicts(user.id)
         return render_template("dashboard.html",
         title='TigerPlan User Dashboard', user=session['username'], conflicts=conflicts)
 
 # ------------------------ DELETE CONFLICT -------------------------- #
-@bp.route("/delete_conflict", methods=['GET', 'POST'])
-def delete_conflict():
+@bp.route("/delete_conflict/<id>", methods=['GET', 'POST'])
+def delete_conflict(id):
+    if 'username' in session:
+        delete_timeblock(id) 
+        return redirect("/dashboard")
+
+# ------------------------ ADD DEFAULT CONFLICT --------------------- #
+@bp.route("/add_conflict/", methods=['GET', 'POST'])
+def add_conflict():
     if 'username' in session:
         user = user_from_netid(session['username'])
-        delete_timeblock(1) # THIS IS MANUAL RIGHT NOW V BAD
-        conflicts = get_conflicts(user.id)
-        return render_template("dashboard.html",
-        title='TigerPlan User Dashboard', user=session['username'], conflicts=conflicts)
+        a = datetime(2018, 11, 28)
+        b = datetime(2018, 12, 28)
+        create_timeblock(name="example", user=user, start=a, end=b)
+        return redirect("/dashboard")
+
 # -------------------------- LOGIN PAGE ----------------------------- #
 
 @bp.route("/login", methods=['GET', 'POST'])
@@ -52,7 +58,7 @@ def login():
     # Already logged in
     if 'username' in session:
         return redirect(url_for('main.index'))
-    
+
     next = request.args.get('next')
     ticket = request.args.get('ticket')
     if not ticket:

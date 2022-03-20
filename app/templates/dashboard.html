@@ -11,18 +11,22 @@
 
     {% if conflicts is defined and conflicts != '' %}
     <div>
-        <strong>{{ conflicts }}</strong>:
         {% for time in conflicts %}
             <div>
-                Conflict name: <strong> {{ time.name }}</strong>
+                Conflict name: <strong> Example Conflict #{{ time.id }}</strong>
                 start: {{ time.start }}
                 end: {{ time.end }}
-                <a href="/delete_conflict?id=time.id">
+                <a href="/delete_conflict/{{ time.id }}">
                     <button> Delete conflict {{ time.id }}</button>
                 </a>
             </div>
         {% endfor %}
     </div>
     {% endif %}
+    <div>
+        <a href="/add_conflict">
+            <button> Add an example conflict with default field values.</button>
+        </a>
+    </div>
 </div>
 {% endblock %}
