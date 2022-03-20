@@ -2,43 +2,52 @@
 
 {% block content %}
 <hr>
+<br>
 
-<div id="main" class="container px-4">
+<div id="main" class="container px-4" style="height: 70%;">
     <div class="row gx-5">
         <div class="col-md-4">
-            <div class="panel panel-primary border border-primary rounded" id="group_panel">
-                <div class="col-md-12">
-                    <br>
-                    <div class="panel-heading">
-                        <h3 class="panel-title center">My Groups</h3>
+            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="group_panel">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <br>
+                        <div class="panel-heading">
+                            <h3 class="panel-title center" style="color: #2728AA">My Groups</h3>
+                        </div>
+                        <div class="btn-group-vertical d-flex justify-content-center">
+                            <a class="btn btn-lg btn-primary rounded" style="margin: 9px 0 5px;" href="#"> Group 1 </a>
+                            <a class="btn btn-lg btn-outline-dark rounded" style="margin: 9px 0 5px;" href="#"> Group 2 </a>
+                            <a class="btn btn-lg btn-outline-dark rounded" style="margin: 9px 0 5px;" href="#"> Group 3 </a>
+                        </div>
                     </div>
-                    <div class="btn-group-vertical d-flex justify-content-center">
-                        <a class="btn btn-lg btn-success" style="margin: 9px 0 5px;" href="#"> Group 1 </a>
-                        <a class="btn btn-lg btn-danger" style="margin: 9px 0 5px;" href="#"> Group 2 </a>
-                        <a class="btn btn-lg btn-danger" style="margin: 9px 0 5px;" href="#"> Group 3 </a>
-                    </div>
+                    <div class="col-md-1"></div>
                 </div>
                 <hr>
-                <div class="col-md-12">
-                    <div class="panel-heading">
-                        <h3 class="panel-title center">Pending Invitations</h3>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-10">
+                        <div class="panel-heading">
+                            <h3 class="panel-title center">Pending Invitations</h3>
+                        </div>
+                        <div class="btn-group-vertical d-flex justify-content-center">
+                            <a class="btn btn-lg btn-success border rounded" style="margin: 9px 1px 5px 1px;" href="#"> Invitation 1 </a>
+                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 1px 5px 1px;" href="#"> Invitation 2 </a>
+                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 1px 5px 1px;" href="#"> Invitation 3 </a>
+                        </div>
                     </div>
-                    <div class="btn-group-vertical d-flex justify-content-center">
-                        <a class="btn btn-lg btn-success" style="margin: 9px 0 5px;" href="#"> Invitation 1 </a>
-                        <a class="btn btn-lg btn-danger" style="margin: 9px 0 5px;" href="#"> Invitation 2 </a>
-                        <a class="btn btn-lg btn-danger" style="margin: 9px 0 5px;" href="#"> Invitation 3 </a>
-                    </div>
+                    <div class="col-md-1"></div>
                 </div>
                 <br>
             </div>
         </div>
         <div class="col-md-8">
-            <div class="panel panel-primary border border-primary rounded" id="event_panel">
+            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="event_panel">
                 <br>
                 <div class="panel-heading">
                     <h3 class="panel-title center">My Events</h3>
                 </div>
-                <div class="filter panel-body scrollable" style="background-color:rgb(224, 224, 224)">
+                <div class="filter panel-body">
                     <div class="container">
                         <meta name="viewport" content="width=1000px, initial-scale=0.5">
                         <table>

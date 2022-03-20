@@ -1,6 +1,5 @@
 body {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: -webkit-fill-available;
 }
 
 html {
@@ -23,4 +22,11 @@ main {
 
 .center {
   text-align: center;
+}
+
+.scrollable {
+  height: -webkit-fill-available;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
