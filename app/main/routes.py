@@ -54,9 +54,9 @@ def login():
     else:  
         # Login successfully, redirect according `next` query parameter
         session['username'] = user
-        user_id = models.User.query.filter_by(id=user).first()
+        user_id = models.User.query.filter_by(netid=user).first()
         if user_id is None:
-            user_id = models.User(netid=user, id=user, 
+            user_id = models.User(netid=user, 
             email=(user + "@princeton.edu"))
             db.session.add(user_id)
             db.session.commit()

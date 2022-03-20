@@ -13,13 +13,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64))
 
     # 1-to-n relation fields
-    owned_groups = db.relationship("Group") # may need backref
+    owned_groups = db.relationship("Group", backref="own") # may need backref
     owned_events = db.relationship("Event")
     conflicts = db.relationship("TimeBlock")
     invitations = db.relationship("Invitation")
 
     # n-to-n relation fields
-    member_groups = db.relationship("Member_Group", backref='member')
+    # member_groups = db.relationship("Group", secondary="Member_Group", backref="member_group")
 
     def __repr__(self):
         return '<User {}>'.format(self.netid)
@@ -37,9 +37,12 @@ class Group(db.Model):
 
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    owner = db.relationship('User')
+    # owner = db.relationship("Group", back_populates="member_groups")
 
-    # n-to-n relation fields
-    members = db.relationship("Member_Group", backref='group')
+    # n-to-n relation fields TODO: FIX
+    # member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # members = db.relationship("User", secondary="Member_Group", backref="member_group")
 
     def __repr__(self):
         return '<Group {}>'.format(self.id)
@@ -109,4 +112,4 @@ class Member_Group(db.Model):
 #---------------------------------------------------------------------#
 @login.user_loader
 def load_user(netid):
-    return User.query.filter_by(id=netid).first()
+    return User.query.filter_by(netid=netid).first()
