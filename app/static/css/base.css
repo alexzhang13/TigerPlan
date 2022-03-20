@@ -1,6 +1,5 @@
 body {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: -webkit-fill-available;
 }
 
 html {
@@ -15,4 +14,19 @@ main {
   max-height: 100vh;
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+.bg-purple {
+  background-color: #5D5FEF!important;
+}
+
+.center {
+  text-align: center;
+}
+
+.scrollable {
+  height: -webkit-fill-available;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
