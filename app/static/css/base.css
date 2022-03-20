@@ -18,8 +18,16 @@ main {
 }
 
 
-.bg-purple {
+.bg-iris {
   background-color: #5D5FEF!important;
+}
+
+.bg-purple {
+  background-color: #C27BEE!important;
+}
+
+.bg-teal {
+  background-color: #4BE6CA!important;
 }
 
 .center {
