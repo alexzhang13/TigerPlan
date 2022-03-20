@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <strong>Scheduling page in progress!</strong>
+    {% if user is defined and user != '' %}
+    <div>
+        Showing scheduling page for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -51,6 +51,27 @@ def add_conflict():
         create_timeblock(name="example", user=user, start=a, end=b)
         return redirect("/dashboard")
 
+# ----------------------- SCHEDULING PAGE --------------------------- #
+@bp.route("/scheduler", methods=['GET', 'POST'])
+def scheduler():
+    if 'username' in session:
+        return render_template("scheduler.html",
+        title='TigerPlan Scheduler', user=session['username'])
+
+# --------------------- MANAGE GROUPS PAGE -------------------------- #
+@bp.route("/mygroups", methods=['GET', 'POST'])
+def groups():
+    if 'username' in session:
+        return render_template("groups.html",
+        title='TigerPlan Manage Groups', user=session['username'])
+
+# -------------------------- ABOUT PAGE ----------------------------- #
+@bp.route("/about", methods=['GET', 'POST'])
+def about():
+    if 'username' in session:
+        return render_template("about.html",
+        title='TigerPlan About', user=session['username'])
+
 # -------------------------- LOGIN PAGE ----------------------------- #
 
 @bp.route("/login", methods=['GET', 'POST'])

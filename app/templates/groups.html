@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <strong>Group Management page in progress!</strong>
+    {% if user is defined and user != '' %}
+    <div>
+        Showing group management page for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
