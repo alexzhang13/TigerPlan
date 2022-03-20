@@ -13,50 +13,6 @@
 </head>
 
 <body style="background-color:rgb(255,255,255);">
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-purple">
-        <div class="container-fluid">
-            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-                <a class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 navbar-brand" href="#">TigerPlan</a>
-            </div>
-            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarCollapse">
-                <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Manage Groups</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Scheduler</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">About</a>
-                    </li>
-                </ul>
-                <div class="nav-item btn-group dropdown">
-                    {% if user is defined and user != '' %}
-                    <button class="btn dropdown-toggle" id="login" role="button" data-bs-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="color:#fff">
-                        {{ user }}  
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="login">
-                        <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
-                    </div>
-                    {% else %}
-                    <a href="{{ url_for('main.login') }}">
-                        <button class="btn btn-primary navbar-btn navbar-right" type="button" style="background-color:rgb(185, 176, 187);">
-                            Login
-                        </button>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
-
     {% block content %} {% endblock %}
     <footer class="site-footer">
         <div class="container fixed-bottom">
