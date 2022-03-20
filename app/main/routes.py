@@ -1,6 +1,9 @@
+from app.routes.timeblock import create_timeblock, delete_timeblock
+from app.routes.user import get_conflicts, user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
 from flask_login import current_user, login_user, logout_user, login_required
 from cas import CASClient
+from datetime import datetime
 
 from app import db
 from app.main import bp
@@ -21,7 +24,27 @@ def index():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+# ------------------------ USER DASHBOARD --------------------------- #
+@bp.route("/dashboard", methods=['GET', 'POST'])
+def dashboard():
+    if 'username' in session:
+        user = user_from_netid(session['username'])
+        a = datetime(2018, 11, 28)
+        b = datetime(2018, 12, 28)
+        create_timeblock(name="example", user=user, start=a, end=b)
+        conflicts = get_conflicts(user.id)
+        return render_template("dashboard.html",
+        title='TigerPlan User Dashboard', user=session['username'], conflicts=conflicts)
 
+# ------------------------ DELETE CONFLICT -------------------------- #
+@bp.route("/delete_conflict", methods=['GET', 'POST'])
+def delete_conflict():
+    if 'username' in session:
+        user = user_from_netid(session['username'])
+        delete_timeblock(1) # THIS IS MANUAL RIGHT NOW V BAD
+        conflicts = get_conflicts(user.id)
+        return render_template("dashboard.html",
+        title='TigerPlan User Dashboard', user=session['username'], conflicts=conflicts)
 # -------------------------- LOGIN PAGE ----------------------------- #
 
 @bp.route("/login", methods=['GET', 'POST'])

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if user is defined and user != '' %}
+    <div>
+        Showing conflicts for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+
+    {% if conflicts is defined and conflicts != '' %}
+    <div>
+        <strong>{{ conflicts }}</strong>:
+        {% for time in conflicts %}
+            <div>
+                Conflict name: <strong> {{ time.name }}</strong>
+                start: {{ time.start }}
+                end: {{ time.end }}
+                <a href="/delete_conflict?id=time.id">
+                    <button> Delete conflict {{ time.id }}</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

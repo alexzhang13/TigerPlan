@@ -1,11 +1,13 @@
+from xmlrpc.client import DateTime
 from app.models.models import TimeBlock, User
 from app import db
-from models import Group
 
-def create_timeblock(name: str, user: User) -> TimeBlock:
+def create_timeblock(name: str, user: User, start: DateTime, end: DateTime) -> TimeBlock:
     """Create a time block. Returns created time block."""
     new_tb = TimeBlock(name=name,
-                      user=user)
+                      user_id=user.id,
+                      start=start,
+                      end=end)
     db.session.add(new_tb)
     db.session.commit()
     return new_tb
