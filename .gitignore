@@ -5,3 +5,4 @@
 .env
 # Keep local database copies out of version control
 *.db
+config.py
