@@ -16,3 +16,11 @@ main {
   overflow-x: auto;
   overflow-y: hidden;
 }
+
+.bg-purple {
+  background-color: #5D5FEF!important;
+}
+
+.center {
+  text-align: center;
+}
