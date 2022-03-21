@@ -5,35 +5,43 @@ var mousedown = false; // If mouse is down
 // mark down cell
 function markd(cell) {
     mousedown = true;
-    marked = !isSet(cell);
+    marked = !isOpen(cell);
     marko(cell);
 }
 
 // mark on mouse over cell
 function marko(cell) {
     if (!mousedown) return;
-    if (setting) {
-        on(cell);
+    if (cell.className == "") return;
+    if (!marked) {
+        close(cell);
     }
     else {
-        off(cell);
+        open(cell);
     }
 }
 
-function isSet(cell) {
-    return td.className.indexOf("open") > -1;
+function isOpen(cell) {
+    return cell.className.indexOf("open") > -1;
 }
 
-function on(cell) {
-    if (!isSet(cell)) {
-        td.className = td.className.replace(" open", "");
-        td.className = td.className + " closed";
+function close(cell) {
+    if (isOpen(cell)) {
+        cell.className = cell.className.replace(" open", "");
+        cell.className = cell.className + " closed";
     }
 }
 
-function off(td) {
-    if (isSet(cell)) {
-        td.className = td.className.replace(" closed", "");
-        td.className = td.className + " open";
+function open(cell) {
+    if (!isOpen(cell)) {
+        cell.className = cell.className.replace(" closed", "");
+        cell.className = cell.className + " open";
     }
+}
+
+document.body.onmousedown = function () {
+    mousedown = true;
+}
+document.body.onmouseup = function () {
+    mousedown = false;
 }

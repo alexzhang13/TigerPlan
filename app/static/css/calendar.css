@@ -111,4 +111,14 @@ table {
 		 -moz-transform: translateY(16px) rotate(270deg);
 	}
 }
+
+.open {
+background: #a5a5a5;
+border: 1px solid;
+}
+
+.closed {
+background: #d171e4;
+border: 1px solid;
+}
  
