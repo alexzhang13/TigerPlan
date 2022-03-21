@@ -18,6 +18,6 @@ def get_user_groups(userid: int):
 
 def get_user_events(userid: int):
     """Get the user's member groups. Returns a list of groups."""
-    groups = db.session.query(Event).filter(Event.owner_id == userid).all()
-    return groups
+    events = db.session.query(Event).filter(Event.owner_id == userid).all()
+    return events
 
