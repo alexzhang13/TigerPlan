@@ -61,4 +61,33 @@
     </div>
     {% endif %}
 </div>
+
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if user is defined and user != '' %}
+    <div>
+        Showing groups for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+    <br>
+    <br>
+    {% if groups is defined and groups != '' %}
+    <div>
+        {% for group in groups %}
+            <div>
+                Group name: <strong> Example Group #{{ group.id }}</strong>
+                <a href="/delete_group/{{ group.id }}">
+                    <button> Delete group {{ group.id }}</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div>
+        <a href="/add_group">
+            <button> Add an example group with default field values.</button>
+        </a>
+    </div>
+</div>
+
 {% endblock %}

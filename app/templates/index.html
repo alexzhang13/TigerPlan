@@ -62,9 +62,11 @@
                             <h3 class="panel-title center" style="color: #C27BEE">My Groups</h3>
                         </div>
                         <div class="btn-group-vertical d-flex justify-content-center">
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Group 1 </a>
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Group 2 </a>
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Group 3 </a>
+                            {% if groups is defined and groups != '' %}
+                            {% for group in groups %}
+                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Group {{ group.id }} </a>
+                            {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-md-1"></div>
