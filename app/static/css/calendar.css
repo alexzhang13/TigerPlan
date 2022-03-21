@@ -113,12 +113,25 @@ table {
 }
 
 .open {
-background: #a5a5a5;
-border: 1px solid;
+	background: #a5a5a5;
+	border: 1px solid;
 }
 
 .closed {
-background: #d171e4;
-border: 1px solid;
+	background: #d171e4;
+	border: 1px solid;
+}
+
+*.unselectable {
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
 }
  
