@@ -61,7 +61,7 @@
     </div>
     {% endif %}
 </div>
-
+<br>
 <div class="container">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% if user is defined and user != '' %}
@@ -69,8 +69,7 @@
         Showing groups for user <strong>{{ user }}</strong>:
     </div>
     {% endif %}
-    <br>
-    <br>
+
     {% if groups is defined and groups != '' %}
     <div>
         {% for group in groups %}

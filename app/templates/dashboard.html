@@ -49,7 +49,16 @@
 
 <hr>
 <br>
-
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <strong>Dashboard page in progress!</strong>
+    {% if user is defined and user != '' %}
+    <div>
+        Showing dashboard page for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+</div>
+<br>
 <div class="container">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% if user is defined and user != '' %}
@@ -57,8 +66,7 @@
         Showing conflicts for user <strong>{{ user }}</strong>:
     </div>
     {% endif %}
-    <br>
-    <br>
+
     {% if conflicts is defined and conflicts != '' %}
     <div>
         {% for time in conflicts %}
