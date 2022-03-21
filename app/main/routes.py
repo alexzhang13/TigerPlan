@@ -1,8 +1,8 @@
-from logging.config import IDENTIFIER
+from app.routes.group import create_group, delete_group_on_id
 from app.routes.timeblock import create_timeblock, delete_timeblock
-from app.routes.user import get_conflicts, user_from_netid
+from app.routes.user import get_conflicts, get_user_groups, user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required
 from cas import CASClient
 from datetime import datetime
 
@@ -16,23 +16,58 @@ cas_client = CASClient(
     server_url='https://fed.princeton.edu/cas/login'
 )
 
-# ------------------------ HOME PAGE LOGIN -------------------------- #
+# ------------------------------------------------------------------- #
+#                           PAGE ROUTES                               #
+# ------------------------------------------------------------------- #
+
+# ----------------------------- HOME -------------------------------- #
 @bp.route("/", methods=["GET", "POST"])
 def index():
     if 'username' in session:
+        user = user_from_netid(session['username'])
+        groups = get_user_groups(user.id)
         return render_template("index.html", 
-        title='TigerPlan Homepage', user=session['username'])
+        title='TigerPlan Homepage', user=session['username'], groups=groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
-# ------------------------ USER DASHBOARD --------------------------- #
+# ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
     if 'username' in session:
         user = user_from_netid(session['username'])
         conflicts = get_conflicts(user.id)
         return render_template("dashboard.html",
-        title='TigerPlan User Dashboard', user=session['username'], conflicts=conflicts)
+        title='TigerPlan User Dashboard', 
+        user=session['username'], conflicts=conflicts)
+
+# -------------------------- MANAGE GROUPS -------------------------- #
+@bp.route("/mygroups", methods=['GET', 'POST'])
+def groups():
+    if 'username' in session:
+        user = user_from_netid(session['username'])
+        groups = get_user_groups(user.id)
+        return render_template("groups.html",
+        title='TigerPlan Manage Groups', user=session['username'], groups=groups)
+
+# ---------------------------- SCHEDULER ---------------------------- #
+@bp.route("/scheduler", methods=['GET', 'POST'])
+def scheduler():
+    if 'username' in session:
+        return render_template("scheduler.html",
+        title='TigerPlan Scheduler', user=session['username'])
+
+# ----------------------------- ABOUT ------------------------------- #
+@bp.route("/about", methods=['GET', 'POST'])
+def about():
+    if 'username' in session:
+        return render_template("about.html",
+        title='TigerPlan About', user=session['username'])
+
+
+# ------------------------------------------------------------------- #
+#                         MUTATION ROUTES                             #
+# ------------------------------------------------------------------- #
 
 # ------------------------ DELETE CONFLICT -------------------------- #
 @bp.route("/delete_conflict/<id>", methods=['GET', 'POST'])
@@ -41,7 +76,14 @@ def delete_conflict(id):
         delete_timeblock(id) 
         return redirect("/dashboard")
 
-# ------------------------ ADD DEFAULT CONFLICT --------------------- #
+# ------------------------ DELETE CONFLICT -------------------------- #
+@bp.route("/delete_group/<id>", methods=['GET', 'POST'])
+def delete_group(id):
+    if 'username' in session:
+        delete_group_on_id(id) 
+        return redirect("/mygroups")
+
+# --------------------- ADD DEFAULT CONFLICT ------------------------ #
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
 def add_conflict():
     if 'username' in session:
@@ -51,26 +93,17 @@ def add_conflict():
         create_timeblock(name="example", user=user, start=a, end=b)
         return redirect("/dashboard")
 
-# ----------------------- SCHEDULING PAGE --------------------------- #
-@bp.route("/scheduler", methods=['GET', 'POST'])
-def scheduler():
+# ----------------------- ADD DEFAULT GROUP ------------------------- #
+@bp.route("/add_group/", methods=['GET', 'POST'])
+def add_group():
     if 'username' in session:
-        return render_template("scheduler.html",
-        title='TigerPlan Scheduler', user=session['username'])
+        user = user_from_netid(session['username'])
+        create_group(name="example group", owner=user, members=[])
+        return redirect("/mygroups")
 
-# --------------------- MANAGE GROUPS PAGE -------------------------- #
-@bp.route("/mygroups", methods=['GET', 'POST'])
-def groups():
-    if 'username' in session:
-        return render_template("groups.html",
-        title='TigerPlan Manage Groups', user=session['username'])
-
-# -------------------------- ABOUT PAGE ----------------------------- #
-@bp.route("/about", methods=['GET', 'POST'])
-def about():
-    if 'username' in session:
-        return render_template("about.html",
-        title='TigerPlan About', user=session['username'])
+# ------------------------------------------------------------------- #
+#                       AUTHORIZATION ROUTES                          #
+# ------------------------------------------------------------------- #
 
 # -------------------------- LOGIN PAGE ----------------------------- #
 

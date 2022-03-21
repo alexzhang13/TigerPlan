@@ -13,13 +13,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64))
 
     # 1-to-n relation fields
-    owned_groups = db.relationship("Group", backref="own") # may need backref
+    owned_groups = db.relationship("Group")
     owned_events = db.relationship("Event")
     conflicts = db.relationship("TimeBlock")
     invitations = db.relationship("Invitation")
 
     # n-to-n relation fields
-    # member_groups = db.relationship("Group", secondary="Member_Group", backref="member_group")
+    groups = db.relationship("Member_Group", backref='member')
 
     def __repr__(self):
         return '<User {}>'.format(self.netid)
@@ -37,12 +37,9 @@ class Group(db.Model):
 
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    owner = db.relationship('User')
-    # owner = db.relationship("Group", back_populates="member_groups")
 
     # n-to-n relation fields TODO: FIX
-    # member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    # members = db.relationship("User", secondary="Member_Group", backref="member_group")
+    members = db.relationship("Member_Group", backref="group")
 
     def __repr__(self):
         return '<Group {}>'.format(self.id)
@@ -64,7 +61,8 @@ class Event(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
-    #IMPLEMENT: groups, individual invitees?
+    #IMPLEMENT: groups, individual invitees? NOPE
+    # i don't want to have individual invitees
 
     def __repr__(self):
         return '<Model {}>'.format(self.id)
