@@ -1,6 +1,6 @@
-from app.routes.group import create_group, delete_group_on_id
-from app.routes.timeblock import create_timeblock, delete_timeblock
-from app.routes.user import get_conflicts, get_user_groups, user_from_netid
+from app.src.group import create_group, delete_group_on_id
+from app.src.timeblock import create_timeblock, delete_timeblock
+from app.src.user import get_conflicts, get_user_groups, user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required
 from cas import CASClient
