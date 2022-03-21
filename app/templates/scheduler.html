@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-iris">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-teal">
     <div class="container-fluid">
         <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
             <a class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 navbar-brand"
@@ -61,4 +61,54 @@
     </div>
     {% endif %}
 </div>
+
+<br>
+
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if user is defined and user != '' %}
+    <div>
+        Showing groups owned by user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+
+    {% if groups is defined and groups != '' %}
+    <div>
+        {% for group in groups %}
+            <div>
+                Group name: <strong> Example Group #{{ group.id }}</strong>
+                <a href="/create_event/{{ group.id }}">
+                    <button> Create Event for Group {{ group.id }}</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<br>
+
+<div class="container">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if user is defined and user != '' %}
+    <div>
+        Showing events created by user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+
+    {% if events is defined and events != '' %}
+    <div>
+        {% for event in events %}
+            <div>
+                Event name: <strong> Event #{{ event.id }}</strong>
+                - Group #{{ event.group_id }}
+                <a href="/delete_event/{{ event.id }}">
+                    <button> Delete Event </button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}

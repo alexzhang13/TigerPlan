@@ -59,7 +59,7 @@
                     <div class="col-md-10">
                         <br>
                         <div class="panel-heading">
-                            <h3 class="panel-title center" style="color: #C27BEE">My Groups</h3>
+                            <h3 class="panel-title center" style="color: #C27BEE">My Owned Groups</h3>
                         </div>
                         <div class="btn-group-vertical d-flex justify-content-center">
                             {% if groups is defined and groups != '' %}
@@ -76,12 +76,14 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
                         <div class="panel-heading">
-                            <h3 class="panel-title center" style="color: #C27BEE">Pending Invitations</h3>
+                            <h3 class="panel-title center" style="color: #C27BEE">My Group Events</h3>
                         </div>
                         <div class="btn-group-vertical d-flex justify-content-center">
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Invitation 1 </a>
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Invitation 2 </a>
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Invitation 3 </a>
+                            {% if events is defined and groups != '' %}
+                            {% for event in events %}
+                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Event {{ event.id }} (Group {{ event.group_id }})</a>
+                            {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-md-1"></div>

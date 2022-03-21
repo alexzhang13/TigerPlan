@@ -76,12 +76,13 @@
             <div>
                 Group name: <strong> Example Group #{{ group.id }}</strong>
                 <a href="/delete_group/{{ group.id }}">
-                    <button> Delete group {{ group.id }}</button>
+                    <button> Delete group {{ group.id }} and related events.</button>
                 </a>
             </div>
         {% endfor %}
     </div>
     {% endif %}
+    <br>
     <div>
         <a href="/add_group">
             <button> Add an example group with default field values.</button>

@@ -1,4 +1,4 @@
-from app.models.models import Member_Group, User, Group
+from app.models.models import Member_Group, User, Group, Event
 from app import db
 
 def create_group(name: str, owner: User, members: User) -> Group: #TODO: Update the Member_Groups table 
@@ -32,6 +32,7 @@ def delete_group_on_id(id: int) -> bool:
     """Delete a group. Returns true if successful."""
     del_group = db.session.query(Group).filter(Group.id == id).one()
     db.session.query(Member_Group).filter(Member_Group.group_id == id).delete()
+    db.session.query(Event).filter(Event.group_id == id).delete()
     db.session.delete(del_group)
     db.session.commit()
     
