@@ -77,7 +77,7 @@
         {% for group in groups %}
             <div>
                 Group name: <strong> Example Group #{{ group.id }}</strong>
-                <a href="/create_event/{{ group.id }}">
+                <a href="/add_event/{{ group.id }}">
                     <button> Create Event for Group {{ group.id }}</button>
                 </a>
             </div>
@@ -102,7 +102,7 @@
             <div>
                 Event name: <strong> Event #{{ event.id }}</strong>
                 - Group #{{ event.group_id }}
-                <a href="/delete_event/{{ event.id }}">
+                <a href="/del_event/{{ event.id }}">
                     <button> Delete Event </button>
                 </a>
             </div>

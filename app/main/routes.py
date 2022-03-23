@@ -1,7 +1,7 @@
-from app.src.event import create_event_on_groupid, delete_event_on_id
-from app.src.group import create_group, delete_group_on_id
+from app.src.event import create_event, delete_event
+from app.src.group import create_group, delete_group
 from app.src.timeblock import create_timeblock, delete_timeblock
-from app.src.user import get_conflicts, get_user_events, get_user_groups, user_from_netid
+from app.src.user import get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required
 from cas import CASClient
@@ -25,7 +25,7 @@ cas_client = CASClient(
 @bp.route("/", methods=["GET", "POST"])
 def index():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         events = get_user_events(user.id)
         return render_template("index.html", 
@@ -38,8 +38,8 @@ def index():
 @bp.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
     if 'username' in session:
-        user = user_from_netid(session['username'])
-        conflicts = get_conflicts(user.id)
+        user = get_user_from_netid(session['username'])
+        conflicts = get_user_conflicts(user.id)
         return render_template("dashboard.html",
         title='TigerPlan User Dashboard', 
         user=session['username'], conflicts=conflicts)
@@ -48,7 +48,7 @@ def dashboard():
 @bp.route("/mygroups", methods=['GET', 'POST'])
 def groups():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         return render_template("mygroups.html",
         title='TigerPlan Manage Groups', user=session['username'], groups=groups)
@@ -57,7 +57,7 @@ def groups():
 @bp.route("/scheduler", methods=['GET', 'POST'])
 def scheduler():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         events = get_user_events(user.id)
         return render_template("scheduler.html",
@@ -80,7 +80,7 @@ def about():
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
 def add_conflict():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         a = datetime(2018, 11, 28)
         b = datetime(2018, 12, 28)
         create_timeblock(name="example", user=user, start=a, end=b)
@@ -90,38 +90,38 @@ def add_conflict():
 @bp.route("/add_group/", methods=['GET', 'POST'])
 def add_group():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         create_group(name="example group", owner=user, members=[])
         return redirect("/mygroups")
 
 # --------------------- CREATE DEFAULT EVENT ------------------------ #
-@bp.route("/create_event/<id>", methods=['GET', 'POST'])
-def create_event(id):
+@bp.route("/add_event/<id>", methods=['GET', 'POST'])
+def add_event(id):
     if 'username' in session:
-        user= user_from_netid(session['username'])
-        create_event_on_groupid(groupid=id, name="Event Name", owner=user, 
+        user= get_user_from_netid(session['username'])
+        create_event(groupid=id, name="Event Name", owner=user, 
             location="default location", description="default description") 
         return redirect("/scheduler")
 
 # ------------------------ DELETE CONFLICT -------------------------- #
-@bp.route("/delete_conflict/<id>", methods=['GET', 'POST'])
-def delete_conflict(id):
+@bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
+def del_conflict(id):
     if 'username' in session:
         delete_timeblock(id) 
         return redirect("/dashboard")
 
 # -------------------------- DELETE GROUP --------------------------- #
-@bp.route("/delete_group/<id>", methods=['GET', 'POST'])
-def delete_group(id):
+@bp.route("/del_group/<id>", methods=['GET', 'POST'])
+def del_group(id):
     if 'username' in session:
-        delete_group_on_id(id) 
+        delete_group(id) 
         return redirect("/mygroups")
 
 # ------------------------ DELETE CONFLICT -------------------------- #
-@bp.route("/delete_event/<id>", methods=['GET', 'POST'])
-def delete_event(id):
+@bp.route("/del_event/<id>", methods=['GET', 'POST'])
+def del_event(id):
     if 'username' in session:
-        delete_event_on_id(id) 
+        delete_event(id) 
         return redirect("/scheduler")
 
 # ------------------------------------------------------------------- #

@@ -61,9 +61,6 @@ class Event(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
-    #IMPLEMENT: groups, individual invitees? NOPE
-    # i don't want to have individual invitees
-
     def __repr__(self):
         return '<Model {}>'.format(self.id)
 

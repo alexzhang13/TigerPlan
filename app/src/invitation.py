@@ -1,6 +1,7 @@
 from app.models.models import Invitation, User, Event
 from app import db
 
+#---------------------------- CRUD Functions -------------------------#
 def create_invitation(invitee: User, event: Event) -> Invitation:
     """Create a invitation. Returns created invitation."""
     new_invite = Invitation(event=event,

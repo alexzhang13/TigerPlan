@@ -2,6 +2,7 @@ from xmlrpc.client import DateTime
 from app.models.models import TimeBlock, User
 from app import db
 
+#---------------------------- CRUD Functions -------------------------#
 def create_timeblock(name: str, user: User, start: DateTime, end: DateTime) -> TimeBlock:
     """Create a time block. Returns created time block."""
     new_tb = TimeBlock(name=name,
@@ -30,5 +31,4 @@ def delete_timeblock(id: int) -> bool:
     del_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
     db.session.delete(del_tb)
     db.session.commit()
-    # if successfully deleted, del_tb.id should be None
     return del_tb.id == None
