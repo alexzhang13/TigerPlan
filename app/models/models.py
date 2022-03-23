@@ -57,6 +57,10 @@ class Event(db.Model):
     # 1-to-n relation fields
     invitations = db.relationship("Invitation")
 
+    # TODO: event times (possible vs confirmed)
+    # times = db.relationship("TimeBlock")
+    # status = db.relationship("")
+
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
@@ -76,6 +80,9 @@ class TimeBlock(db.Model): #DONE
 
     # n-to-1 relation fields
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    # TODO: event times 
+    # event_id = db.Column(db.Integer, db.ForeignKey('events.id))
 
     def __repr__(self):
         return '<TimeBlock {}>'.format(self.id)
@@ -103,6 +110,14 @@ class Member_Group(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
+#---------------------------------------------------------------------#
+# Event status enums
+class Status(db.enum.Enum):
+    __tablename__ = "statuses"
+    id = db.Column(db.Integer, primary_key=True)
+
+    invitations_sent = 2
+    confirmed = 3
 
 #---------------------------------------------------------------------#
 @login.user_loader
