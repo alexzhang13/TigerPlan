@@ -12,13 +12,12 @@ def get_user_conflicts(userid: int) -> TimeBlock:
     """Get the user's conflicts. Returns a list of time blocks."""
     return db.session.query(TimeBlock).filter(TimeBlock.user_id == userid).all()
 
-def get_user_groups(userid: int):
-    """Get the user's member groups. Returns a list of groups."""
+def get_user_groups(userid: int) -> Group:
+    """Get the user(owner)'s groups. Returns a list of groups."""
     groups = db.session.query(Group).filter(Group.owner_id == userid).all()
     return groups
 
-def get_user_events(userid: int):
-    """Get the user's member groups. Returns a list of groups."""
+def get_user_events(userid: int) -> Event:
+    """Get the user(owner)'s events. Returns a list of eents."""
     events = db.session.query(Event).filter(Event.owner_id == userid).all()
     return events
-
