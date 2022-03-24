@@ -112,12 +112,12 @@ class Member_Group(db.Model):
 
 #---------------------------------------------------------------------#
 # Event status enums
-class Status(db.enum.Enum):
-    __tablename__ = "statuses"
-    id = db.Column(db.Integer, primary_key=True)
+# class Status(db.enum.Enum):
+#     __tablename__ = "statuses"
+#     id = db.Column(db.Integer, primary_key=True)
 
-    invitations_sent = 2
-    confirmed = 3
+#     invitations_sent = 2
+#     confirmed = 3
 
 #---------------------------------------------------------------------#
 @login.user_loader

@@ -91,7 +91,7 @@ def add_conflict():
 def add_group():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        create_group(name="example group", owner=user, members=[])
+        create_group(name="example group", owner=user)
         return redirect("/mygroups")
 
 # --------------------- CREATE DEFAULT EVENT ------------------------ #
