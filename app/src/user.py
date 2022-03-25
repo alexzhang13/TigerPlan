@@ -1,5 +1,5 @@
 from tokenize import String
-from app.models.models import TimeBlock, User, Group, Event
+from app.models.models import Member_Group, TimeBlock, User, Group, Event
 from app import db
 
 #---------------------------- Spec Functions -------------------------#
@@ -18,6 +18,20 @@ def get_user_groups(userid: int) -> Group:
     return groups
 
 def get_user_events(userid: int) -> Event:
-    """Get the user(owner)'s events. Returns a list of eents."""
+    """Get the user(owner)'s events. Returns a list of events."""
     events = db.session.query(Event).filter(Event.owner_id == userid).all()
     return events
+
+# TODO: TEST
+def get_member_groups(memberid: int) -> Group:
+    """Get the user(member)'s groups. Returns a list of groups."""
+    mem_groups = db.session.query(Group).filter( 
+        Member_Group.group_id == Group.id, Member_Group.member_id == memberid).all()
+    return mem_groups
+
+# TODO: TEST
+def get_member_events(memberid: int) -> Event:
+    """Get the user(member)'s events. Returns a list of events."""
+    mem_events = db.session.query(Event).filter(
+        Event.group_id == Member_Group.group_id, Member_Group.member_id == memberid).all()
+    return mem_events
