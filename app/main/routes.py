@@ -83,7 +83,7 @@ def add_conflict():
         user = get_user_from_netid(session['username'])
         a = datetime(2018, 11, 28)
         b = datetime(2018, 12, 28)
-        create_timeblock(name="example", user=user, start=a, end=b)
+        create_timeblock(name="example", user=user, start=a, end=b, isconflict=True)
         return redirect("/dashboard")
 
 # ----------------------- ADD DEFAULT GROUP ------------------------- #
