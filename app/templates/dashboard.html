@@ -87,5 +87,20 @@
             <button> Add an example conflict with default field values.</button>
         </a>
     </div>
+    <br>
+    {% if invitations is defined and invitations != '' %}
+    <div>
+        {% for invite in invitations %}
+            <div>
+                Invitation for event: <strong> {{ invite.event_id }}</strong>
+                <a href="#">
+                    <button>Respond</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
+
+
 {% endblock %}

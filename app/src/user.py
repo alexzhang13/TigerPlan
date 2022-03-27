@@ -1,5 +1,5 @@
 from tokenize import String
-from app.models.models import Member_Group, TimeBlock, User, Group, Event
+from app.models.models import Invitation, Member_Group, TimeBlock, User, Group, Event
 from app import db
 
 #---------------------------- Spec Functions -------------------------#
@@ -35,3 +35,10 @@ def get_member_events(memberid: int) -> Event:
     mem_events = db.session.query(Event).filter(
         Event.group_id == Member_Group.group_id, Member_Group.member_id == memberid).all()
     return mem_events
+
+# TODO: TEST
+def get_member_invitations(memberid: int) -> Invitation:
+    """Get the user(member)'s invitations pending response. Returns a list of invitations."""
+    mem_invs = db.session.query(Invitation).filter(
+        Invitation.user_id == memberid, Invitation.finalized == False).all()
+    return mem_invs
