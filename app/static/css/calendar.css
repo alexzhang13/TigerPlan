@@ -45,7 +45,7 @@ table {
  table tbody tr:nth-child(odd) {
 	 background: #c8cdd4;
 }
- table tbody tr:nth-child(4n+0) td {
+ table tbody tr:nth-child(2n+0) td {
 	 border-bottom: 1px solid #626E7E;
 }
  table tbody tr td {
@@ -114,12 +114,14 @@ table {
 
 .open {
 	background: #a5a5a5;
-	border: 1px solid;
 }
 
 .closed {
 	background: #d171e4;
-	border: 1px solid;
+}
+
+.conflict {
+	background: #71e4ab;
 }
 
 *.unselectable {

@@ -53,7 +53,7 @@
 <div id="main" class="container px-4" style="height: 70%;">
     <div class="row gx-5">
         <div class="col-md-4">
-            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 90%;" id="group_panel">
+            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="group_panel">
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
@@ -92,215 +92,34 @@
             </div>
         </div>
         <div class="col-md-8">
-            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 90%;" id="event_panel">
+            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="event_panel">
                 <br>
                 <div class="panel-heading">
                     <h3 class="panel-title center">My Events</h3>
                 </div>
-                <div class="filter panel-body">
-                    <div class="container unselectable">
-                        <meta name="viewport" content="width=1000px, initial-scale=0.5">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">1</span>
-                                        <span class="long unselectable" style="text-align: center">Monday</span>
-                                        <span class="short unselectable">Mon</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">2</span>
-                                        <span class="long unselectable" style="text-align: center">Tuesday</span>
-                                        <span class="short unselectable">Tue</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">3</span>
-                                        <span class="long unselectable" style="text-align: center">Wednesday</span>
-                                        <span class="short unselectable">Wed</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">4</span>
-                                        <span class="long unselectable" style="text-align: center">Thursday</span>
-                                        <span class="short unselectable">Thur</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">5</span>
-                                        <span class="long unselectable" style="text-align: center">Friday</span>
-                                        <span class="short unselectable">Fri</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">6</span>
-                                        <span class="long unselectable" style="text-align: center">Saturday</span>
-                                        <span class="short unselectable">Sat</span>
-                                    </th>
-                                    <th>
-                                        <span class="day unselectable" style="text-align: center">7</span>
-                                        <span class="long unselectable" style="text-align: center">Sunday</span>
-                                        <span class="short unselectable">Sun</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>1:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);", id="mon-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);", id="tue-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-100"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-100"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-130"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-130"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>2:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-200"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-200"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-230"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-230"></td>
-                                </tr>
-                    
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>3:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-300"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-330"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-330"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>4:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-300"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-300"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-430"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-430"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>5:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-500"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-500"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-530"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-530"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>6:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-600"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-600"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-630"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-630"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>7:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-700"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-700"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-730"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-730"></td>
-                                </tr>
-                                <tr>
-                                    <td class="hour unselectable" rowspan="2"><span>8:00</span></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-800"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-800"></td>
-                                </tr>
-                                <tr>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="mon-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="tue-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="wed-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="thu-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="fri-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sat-830"></td>
-                                    <td class="slot open" onmousedown="markd(this);" onmouseover="marko(this);" , id="sun-830"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div id="dp">
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    console.log("?");
+    const dp = new DayPilot.Calendar("dp", {
+        viewType: "Week"
+    });
+    dp.init();
+    onEventMoved: async (args) => {
+        const data = {
+            id: args.e.id(),
+            newStart: args.newStart,
+            newEnd: args.newEnd,
+        };
+        await DayPilot.Http.post(`backend_move.php`, data);
+        console.log("The calendar event was moved.");
+    }
+</script>
+
 {% endblock %}

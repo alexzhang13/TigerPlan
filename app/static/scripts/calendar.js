@@ -11,7 +11,10 @@ function markd(cell) {
 
 // mark on mouse over cell
 function marko(cell) {
-    if (!mousedown) return;
+    if (!mousedown) {
+        popup(cell);
+        return;
+    }
     if (cell.className == "") return;
     if (!marked) {
         close(cell);
@@ -21,8 +24,17 @@ function marko(cell) {
     }
 }
 
+// popup event window
+function popup(cell) {
+    console.log('Released');
+}
+
 function isOpen(cell) {
     return cell.className.indexOf("open") > -1;
+}
+
+function isClosed(cell) {
+    return cell.className.indexOf("closed") > -1;
 }
 
 function close(cell) {
@@ -33,7 +45,7 @@ function close(cell) {
 }
 
 function open(cell) {
-    if (!isOpen(cell)) {
+    if (isClosed(cell)) {
         cell.className = cell.className.replace(" closed", "");
         cell.className = cell.className + " open";
     }
