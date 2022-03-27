@@ -1,5 +1,5 @@
 from xmlrpc.client import DateTime
-from app.models.models import TimeBlock, User
+from app.models.models import TimeBlock, User, Event
 from app import db
 
 #---------------------------- CRUD Functions -------------------------#
@@ -33,3 +33,19 @@ def delete_timeblock(id: int) -> bool:
     db.session.delete(del_tb)
     db.session.commit()
     return del_tb.id == None
+
+#---------------------------- SPEC Functions -------------------------#
+def get_invitation_response_times(eventid: int) -> dict:
+    """Calculates time availabilites for an event by checking member 
+    invitation reponses. Returns a dictionary mapping timeblock ids to 
+    the amount of members available at that time."""
+    event = db.session.query(Event).filter(Event.id == eventid).one()
+    time_counts = {}
+    for invite in event.invitations:
+        for response in invite.responses:
+            timeblock_id = response.timeblock_id
+            if response.timeblock_id in time_counts:
+                time_counts[timeblock_id] += 1
+            else: 
+                time_counts[timeblock_id] = 1
+    return time_counts
