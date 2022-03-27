@@ -40,8 +40,10 @@ def delete_event(id: int) -> bool:
     del_invitations = db.session.query(Invitation).filter(Invitation.event_id == id).all()
     del_responses = db.session.query(Invitation_Timeblock).filter(Invitation.event_id == id, Invitation_Timeblock.invitation_id == Invitation.id)
     db.session.delete(del_event)
-    db.session.delete(del_invitations)
-    db.session.delete(del_responses)
+    for del_invitation in del_invitations:
+        db.session.delete(del_invitation)
+    for del_response in del_responses:
+        db.session.delete(del_response)
     db.session.commit()
     return del_event.id == None
 
@@ -62,5 +64,5 @@ def create_event_invitations(id: int) -> Invitation:
         Member_Group.group_id == Event.group_id, 
         Event.id == id).all()
     for member in members:
-        create_invitation(member, id)
+        create_invitation(member.id, id)
     return db.session.query(Invitation).filter(Invitation.event_id == id)

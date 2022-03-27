@@ -2,10 +2,9 @@ from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, User,
 from app import db
 
 #---------------------------- CRUD Functions -------------------------#
-def create_invitation(invitee: User, eventid: int) -> Invitation:
+def create_invitation(userId: int, eventid: int) -> Invitation:
     """Create a invitation. Returns created invitation."""
-    new_invite = Invitation(event_id=eventid,
-                      invitee=invitee)
+    new_invite = Invitation(event_id=eventid, user_id = userId)
     db.session.add(new_invite)
     db.session.commit()
     return new_invite

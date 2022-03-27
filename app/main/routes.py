@@ -1,4 +1,4 @@
-from app.src.event import create_event, delete_event
+from app.src.event import create_event, create_event_invitations, delete_event
 from app.src.group import create_group, delete_group
 from app.src.timeblock import create_timeblock, delete_timeblock
 from app.src.user import get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
@@ -117,11 +117,18 @@ def del_group(id):
         delete_group(id) 
         return redirect("/mygroups")
 
-# ------------------------ DELETE CONFLICT -------------------------- #
+# ------------------------ DELETE EVENT ----------------------------- #
 @bp.route("/del_event/<id>", methods=['GET', 'POST'])
 def del_event(id):
     if 'username' in session:
         delete_event(id) 
+        return redirect("/scheduler")
+
+# ------------------------ DELETE EVENT ----------------------------- #
+@bp.route("/cr_event_invitations/<id>", methods=['GET', 'POST'])
+def add_invitations(id):
+    if 'username' in session:
+        create_event_invitations(id) 
         return redirect("/scheduler")
 
 # ------------------------------------------------------------------- #
