@@ -48,3 +48,7 @@ main {
 .border-teal {
   border-color: #4BE6CA!important;
 }
+
+.card-header {
+  text-emphasis-color: #ffffff;
+}

@@ -82,11 +82,11 @@
                 {% if groups is defined and groups != '' %}
                 <div class="card-columns">
                         <div class = "card mb-3">
-                            <div class="card-header bg-teal"> <h5 class="card-title">My Groups</h5></div>
+                            <div class="card-header text-white bg-teal"> <h5 class="card-title">My Groups</h5></div>
                         </div>
                     {% for group in groups %}
                         <div class = "card mt-3 mb-3">
-                            <div class="card-header bg-teal">My Example Group #{{ group.id }}</div>
+                            <div class="card-header text-white bg-teal">My Example Group #{{ group.id }}</div>
                             <div class="card-body">
                             <p class="card-text">Some example text about {{ group.name }}.</p>
                             <a href="/del_group/{{ group.id }}">
@@ -109,7 +109,7 @@
         <div class = "col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
                 <div class="card">
-                    <div class="card-header bg-teal">
+                    <div class="card-header text-white bg-teal">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
                             <li class="nav-item">
                               <a class="nav-link active" id="members-tab" data-toggle="tab" href="#members" role="tab" aria-controls="members" aria-selected="true">Members</a>

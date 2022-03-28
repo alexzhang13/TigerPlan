@@ -52,7 +52,7 @@
 <br>
 <br>
 
-<div class="container mb-4">
+<div class="container pb-5">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <strong>Scheduling page in progress!</strong>
     {% if user is defined and user != '' %}
@@ -70,11 +70,11 @@
                 {% if events is defined and events != '' %}
                 <div class="card-columns">
                         <div class = "card mb-3">
-                            <div class="card-header bg-teal"> <h5 class="card-title">My Groups</h5></div>
+                            <div class="card-header text-white bg-teal"> <h5 class="card-title">Planned Events</h5></div>
                         </div>
                     {% for event in events %}
                         <div class = "card mt-3 mb-3">
-                            <div class="card-header bg-teal">
+                            <div class="card-header text-white bg-teal">
                                 <strong> Event #{{ event.id }}</strong>- Group #{{ event.group_id }}
                             </div>
                             <div class="card-body">
@@ -88,7 +88,7 @@
                         </div>
                     {% endfor %}
                         <div class = "card mt-3 mb-3">
-                            <div class="card-header bg-teal"><strong>New Event</strong></div>
+                            <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
                             <div class="card-body">
                                 <p class="card-text">Which group are you creating the event for?</p>
                                 <select class="custom-select custom-select-lg mb-3">
