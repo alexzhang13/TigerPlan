@@ -1,6 +1,7 @@
 from app.src.event import create_event, create_event_invitations, delete_event
 from app.src.group import create_group, delete_group
-from app.src.timeblock import create_timeblock, delete_timeblock
+from app.src.invitation import update_invitation
+from app.src.timeblock import create_timeblock, delete_timeblock, get_invitation_response_times
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required
@@ -21,6 +22,32 @@ cas_client = CASClient(
 #                           PAGE ROUTES                               #
 # ------------------------------------------------------------------- #
 
+# ----------------------------- TEST -------------------------------- #
+@bp.route("/test", methods=["GET", "POST"])
+def test():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        events = get_user_events(user.id)
+        print(events[0].invitations[0].event_id)
+        print(events[0].invitations[0].user_id)
+        print("-----------")
+        print(get_invitation_response_times(events[0].id))
+        return render_template("about.html")
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+@bp.route("/eventtest", methods=["GET", "POST"])
+def event_test():
+    if 'username' in session:
+
+        user = get_user_from_netid(session['username'])
+        events = get_user_events(user.id)
+        invitation = events[0].invitations[0]
+        update_invitation(invitation.id, "Hi")
+        return render_template("about.html")
+    return render_template("login.html", 
+            title='Login to TigerPlan')
+
 # ----------------------------- HOME -------------------------------- #
 @bp.route("/", methods=["GET", "POST"])
 def index():
@@ -32,7 +59,7 @@ def index():
             title='TigerPlan Homepage', user=session['username'], 
             groups=groups, events=events)
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerPlan') 
 
 # ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET', 'POST'])

@@ -93,7 +93,7 @@ class Invitation(db.Model): #DONE
 
     # primitive fields
     id = db.Column(db.Integer, primary_key=True)
-    finalized = db.Column(db.Boolean, default=False)
+    has_responded = db.Column(db.Boolean, default=False)
 
     # n-to-1 relation fields
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
