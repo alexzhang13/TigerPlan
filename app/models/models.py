@@ -126,21 +126,6 @@ class Invitation_Timeblock(db.Model):
     invitation_id = db.Column(db.Integer, db.ForeignKey('invitations.id'))
 
 #---------------------------------------------------------------------#
-# class MutableList(db.ext.mutable.Mutable, list):
-#     def append(self, value):
-#         list.append(self, value)
-#         self.changed()
-
-#     @classmethod
-#     def coerce(cls, key, value):
-#         if not isinstance(value, db.ext.mutable.MutableList):
-#             if isinstance(value, list):
-#                 return MutableList(value)
-#             return db.ext.mutable.Mutable.coerce(key, value)
-#         else:
-#             return value
-
-#---------------------------------------------------------------------#
 @login.user_loader
 def load_user(netid):
     return User.query.filter_by(netid=netid).first()
