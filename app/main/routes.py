@@ -34,6 +34,10 @@ def index():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+
+@bp.route("/testingstuff", methods=["GET", "POST"])
+def test():
+    return render_template("calendar.html")
 # ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
