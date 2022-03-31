@@ -93,7 +93,7 @@ class Invitation(db.Model): #DONE
 
     # primitive fields
     id = db.Column(db.Integer, primary_key=True)
-    has_responded = db.Column(db.Boolean, default=False)
+    finalized = db.Column(db.Boolean, default=False)
 
     # n-to-1 relation fields
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
@@ -124,6 +124,24 @@ class Invitation_Timeblock(db.Model):
     # n-to-n relation fields
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'))
     invitation_id = db.Column(db.Integer, db.ForeignKey('invitations.id'))
+
+    def __repr__(self):
+        return '<Initation_Timeblock {}>'.format(self.id)
+
+#---------------------------------------------------------------------#
+# class MutableList(db.ext.mutable.Mutable, list):
+#     def append(self, value):
+#         list.append(self, value)
+#         self.changed()
+
+#     @classmethod
+#     def coerce(cls, key, value):
+#         if not isinstance(value, db.ext.mutable.MutableList):
+#             if isinstance(value, list):
+#                 return MutableList(value)
+#             return db.ext.mutable.Mutable.coerce(key, value)
+#         else:
+#             return value
 
 #---------------------------------------------------------------------#
 @login.user_loader

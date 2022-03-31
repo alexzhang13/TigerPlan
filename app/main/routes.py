@@ -1,10 +1,10 @@
-from app.src.event import create_event, create_event_invitations, delete_event
+from app.src.event import create_event, create_event_invitations, delete_event, get_event
 from app.src.group import create_group, delete_group
-from app.src.invitation import update_invitation
+from app.src.invitation import update_invitation, get_invitation
 from app.src.timeblock import create_timeblock, delete_timeblock, get_invitation_response_times
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
 from datetime import datetime
 
@@ -28,10 +28,11 @@ def test():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         events = get_user_events(user.id)
-        print(events[0].invitations[0].event_id)
-        print(events[0].invitations[0].user_id)
+        event = get_event(2)
+        
+        print(event.invitations)
         print("-----------")
-        print(get_invitation_response_times(events[0].id))
+        print(get_invitation_response_times(event.id))
         return render_template("about.html")
     return render_template("login.html", 
         title='Login to TigerPlan')
@@ -39,11 +40,9 @@ def test():
 @bp.route("/eventtest", methods=["GET", "POST"])
 def event_test():
     if 'username' in session:
-
-        user = get_user_from_netid(session['username'])
-        events = get_user_events(user.id)
-        invitation = events[0].invitations[0]
-        update_invitation(invitation.id, "Hi")
+        update_invitation(1, timeblocks = [3, 5])
+        update_invitation(2, timeblocks = [3, 4])
+        update_invitation(3, timeblocks = [3])
         return render_template("about.html")
     return render_template("login.html", 
             title='Login to TigerPlan')
