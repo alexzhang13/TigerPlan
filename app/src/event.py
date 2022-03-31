@@ -1,5 +1,6 @@
+from xmlrpc.client import DateTime
 import app
-from app.models.models import Invitation, Invitation_Timeblock, Member_Group, User, Event
+from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, Member_Group, User, Event
 from app.src.invitation import create_invitation
 from flask import request
 from app import db, login
@@ -48,6 +49,24 @@ def delete_event(id: int) -> bool:
     return del_event.id == None
 
 #---------------------------- Spec Functions -------------------------#
+def set_proposed_times(id: int, datetimes: DateTime) -> Event:
+    """Sets the proposed time for an event. Returns the modifed event.
+    Takes in the parameters datetimes as an array of tuples, where the 
+    tuper is organized as (starttime, endtime)."""
+    event = get_event(id)
+
+    # Throws out previous times
+    for tb in event.times:
+        db.session.delete(tb)
+
+    name = event.name
+    for i, start_end in enumerate(datetimes):
+        tb = TimeBlock(name = name + str(i), start = start_end[0], end = start_end[1], is_conflict = False, event_id = event.id)
+        db.session.add(tb)
+
+    db.commit()
+    return event
+
 def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
     """Create an event. Returns created event."""
     new_event = Event(name=name,
@@ -65,4 +84,4 @@ def create_event_invitations(id: int) -> Invitation:
         Event.id == id).all()
     for member in members:
         create_invitation(member.id, id)
-    return db.session.query(Invitation).filter(Invitation.event_id == id)
+    return db.session.query(Invitation).filter(Invitation.event_id == id).all()
