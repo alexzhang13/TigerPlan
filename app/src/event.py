@@ -39,12 +39,12 @@ def delete_event(id: int) -> bool:
     """Delete an event and its associated invitations, if any. Returns true if successful."""
     del_event = db.session.query(Event).filter(Event.id == id).one()
     del_invitations = db.session.query(Invitation).filter(Invitation.event_id == id).all()
-    del_responses = db.session.query(Invitation_Timeblock).filter(Invitation.event_id == id, Invitation_Timeblock.invitation_id == Invitation.id)
-    db.session.delete(del_event)
-    for del_invitation in del_invitations:
-        db.session.delete(del_invitation)
+    del_responses = db.session.query(Invitation_Timeblock).filter(Invitation.event_id == id, Invitation_Timeblock.invitation_id == Invitation.id).all()
     for del_response in del_responses:
         db.session.delete(del_response)
+    for del_invitation in del_invitations:
+        db.session.delete(del_invitation)
+    db.session.delete(del_event)
     db.session.commit()
     return del_event.id == None
 
@@ -52,17 +52,16 @@ def delete_event(id: int) -> bool:
 # TODO: This should most likely also throw out old invitations
 def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     """Sets the proposed time for an event. Returns the modifed event.
-    Takes in the parameters datetimes as an array of tuples, where the 
-    tuper is organized as (starttime, endtime)."""
+    Takes in the parameters datetimes as an list of tuples, where the 
+    tuple is organized as (starttime, endtime)."""
     event = get_event(id)
 
     # Throws out previous times
     for tb in event.times:
         db.session.delete(tb)
 
-    name = event.name
     for i, start_end in enumerate(datetimes):
-        tb = TimeBlock(name = name + str(i), start = start_end[0], end = start_end[1], is_conflict = False, event_id = event.id)
+        tb = TimeBlock(start = start_end[0], end = start_end[1], is_conflict = False, event_id = event.id)
         db.session.add(tb)
 
     db.commit()

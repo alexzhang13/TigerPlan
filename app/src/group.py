@@ -1,5 +1,6 @@
-from app.models.models import Member_Group, User, Group, Event
+from app.models.models import Invitation, Invitation_Timeblock, Member_Group, User, Group, Event
 from app import db
+from app.src.event import delete_event
 
 #---------------------------- CRUD Functions -------------------------#
 def create_group(name: str, owner: User) -> Group: 
@@ -33,7 +34,15 @@ def delete_group(id: int) -> bool:
     """Delete a group. Returns true if successful."""
     del_group = db.session.query(Group).filter(Group.id == id).one()
     db.session.query(Member_Group).filter(Member_Group.group_id == id).delete()
-    db.session.query(Event).filter(Event.group_id == id).delete()
+    events = db.session.query(Event).filter(Event.group_id == id).all()
+    for event in events:
+        del_responses = db.session.query(Invitation_Timeblock).filter(Invitation.event_id == id, Invitation_Timeblock.invitation_id == Invitation.id).all()
+        for del_response  in del_responses:
+            db.session.delete(del_response)
+        del_invitations = db.session.query(Invitation).filter(Invitation.event_id == id).all()
+        for del_inv in del_invitations:
+            db.session(del_inv)
+        db.session.delete(event)
     db.session.delete(del_group)
     db.session.commit()
     return del_group.id == None

@@ -63,7 +63,7 @@ def index():
 
 
 @bp.route("/testingstuff", methods=["GET", "POST"])
-def test():
+def test_calendar():
     return render_template("calendar.html")
 # ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET', 'POST'])
@@ -120,7 +120,7 @@ def about():
 @bp.route("/moveEvent", methods=["POST"])
 def move_event():
     if 'username' in session:
-        user = user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         print(request.form['data'])
         a = datetime(2018, 11, 28)
         b = datetime(2018, 12, 28)
