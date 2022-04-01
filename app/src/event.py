@@ -49,6 +49,7 @@ def delete_event(id: int) -> bool:
     return del_event.id == None
 
 #---------------------------- Spec Functions -------------------------#
+# TODO: This should most likely also throw out old invitations
 def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     """Sets the proposed time for an event. Returns the modifed event.
     Takes in the parameters datetimes as an array of tuples, where the 
@@ -67,17 +68,18 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     db.commit()
     return event
 
-def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
-    """Create an event. Returns created event."""
-    new_event = Event(name=name,
-                      owner_id=owner.id,
-                      location=location,
-                      description=description)
-    db.session.add(new_event)
-    db.session.commit()
-    return new_event
+# def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
+#     """Create an event. Returns created event."""
+#     new_event = Event(name=name,
+#                       owner_id=owner.id,
+#                       location=location,
+#                       description=description)
+#     db.session.add(new_event)
+#     db.session.commit()
+#     return new_event
 
 def create_event_invitations(id: int) -> Invitation:
+    """Sends an invitation to every group member of the event."""
     members = db.session.query(User).filter(
         User.id == Member_Group.member_id, 
         Member_Group.group_id == Event.group_id, 
@@ -85,3 +87,20 @@ def create_event_invitations(id: int) -> Invitation:
     for member in members:
         create_invitation(member.id, id)
     return db.session.query(Invitation).filter(Invitation.event_id == id).all()
+
+def get_invitation_response_times(id: int) -> dict:
+    """Calculates time availabilites for an event by checking member 
+    invitation reponses. Returns a dictionary mapping timeblock ids to 
+    the amount of members available at that time."""
+    event = get_event(id)
+    time_counts = {}
+    for invite in event.invitations:
+        if not invite.finalized:
+            continue
+        for response in invite.responses:
+            timeblock_id = response.timeblock_id
+            if response.timeblock_id in time_counts:
+                time_counts[timeblock_id] += 1
+            else: 
+                time_counts[timeblock_id] = 1
+    return time_counts

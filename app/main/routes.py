@@ -1,7 +1,7 @@
-from app.src.event import create_event, create_event_invitations, delete_event, get_event
+from app.src.event import create_event, create_event_invitations, delete_event, get_event, get_invitation_response_times
 from app.src.group import create_group, delete_group
-from app.src.invitation import update_invitation, get_invitation
-from app.src.timeblock import create_timeblock, delete_timeblock, get_invitation_response_times
+from app.src.invitation import update_finalized, update_response, get_invitation
+from app.src.timeblock import create_timeblock, delete_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
 from flask import render_template, current_app, redirect, url_for, session, request
 from flask_login import login_user, logout_user, login_required 
@@ -40,9 +40,10 @@ def test():
 @bp.route("/eventtest", methods=["GET", "POST"])
 def event_test():
     if 'username' in session:
-        update_invitation(1, timeblocks = [3, 5])
-        update_invitation(2, timeblocks = [3, 4])
-        update_invitation(3, timeblocks = [3])
+        update_response(1, time_ids = [3, 5])
+        update_response(2, time_ids = [3, 4])
+        update_response(3, time_ids = [3])
+        update_finalized(2, True)
         return render_template("about.html")
     return render_template("login.html", 
             title='Login to TigerPlan')

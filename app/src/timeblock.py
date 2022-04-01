@@ -35,20 +35,3 @@ def delete_timeblock(id: int) -> bool:
     return del_tb.id == None
 
 #---------------------------- SPEC Functions -------------------------#
-def get_invitation_response_times(eventid: int) -> dict:
-    """Calculates time availabilites for an event by checking member 
-    invitation reponses. Returns a dictionary mapping timeblock ids to 
-    the amount of members available at that time."""
-    event = db.session.query(Event).filter(Event.id == eventid).one()
-    print(event.invitations)
-    time_counts = {}
-    for invite in event.invitations:
-        print(invite.responses)
-        for response in invite.responses:
-            print("Response", response)
-            timeblock_id = response.timeblock_id
-            if response.timeblock_id in time_counts:
-                time_counts[timeblock_id] += 1
-            else: 
-                time_counts[timeblock_id] = 1
-    return time_counts
