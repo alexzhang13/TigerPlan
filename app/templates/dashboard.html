@@ -47,9 +47,11 @@
     </div>
 </nav>
 
-<hr>
 <br>
-<div class="container">
+<br>
+<br>
+
+<div class="container pb-5">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <strong>Dashboard page in progress!</strong>
     {% if user is defined and user != '' %}
@@ -58,7 +60,67 @@
     </div>
     {% endif %}
 </div>
-<br>
+
+<div id="main" class="container-fluid px-5" style="height: 100%;">
+    <div class = "row">
+        <!-- Left Column -->
+        <div class = "col-md-4">
+            <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
+                {% if conflicts is defined and conflicts != '' %}
+                <div class="card-columns">
+                        <div class = "card mb-3">
+                            <div class="card-header text-white bg-iris"> <h5 class="card-title">My Recurring Events</h5></div>
+                        </div>
+                    {% for conflict in conflicts %}
+                        <div class = "card mt-3 mb-3">
+                            <div class="card-header text-white bg-iris">
+                                Example Conflict #{{ conflict.id }}
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text">Start: {{ conflict.start }}</div>
+                                <div class="card-text">End: {{ conflict.end }}</div>
+                                <a href="/del_conflict/{{ conflict.id }}">Delete conflict {{ conflict.id }}</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Right Column -->
+        <div class = "col-md-8">
+            <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
+                <div class="card">
+                    <div class="card-header text-white bg-iris">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item">
+                              <a class="nav-link active" id="members-tab" data-toggle="tab" href="#members" role="tab" aria-controls="members" aria-selected="true">Members</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="events-tab" data-toggle="tab" href="#events" role="tab" aria-controls="events" aria-selected="false">Events</a>
+                            </li>
+                          </ul>
+                    </div>
+                    <div class = "tab-content">
+                        <div class="tab-pane active" id="members" role="tabpanel" aria-labelledby="members-tab">
+                            <div class="card-body">
+                                <h5 class="card-title">Special title treatment</h5>
+                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="events" role="tabpanel" aria-labelledby="events-tab">
+                            <div class="card-body">
+                                <h5 class="card-title">Special title treatment</h5>
+                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% if user is defined and user != '' %}
@@ -67,25 +129,27 @@
     </div>
     {% endif %}
 
-    {% if conflicts is defined and conflicts != '' %}
-    <div>
-        {% for time in conflicts %}
-            <div>
-                Conflict name: <strong> Example Conflict #{{ time.id }}</strong>
-                start: {{ time.start }}
-                end: {{ time.end }}
-                <a href="/delete_conflict/{{ time.id }}">
-                    <button> Delete conflict {{ time.id }}</button>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <br>
     <div>
         <a href="/add_conflict">
             <button> Add an example conflict with default field values.</button>
         </a>
     </div>
+    <br>
+    {% if invitations is defined and invitations != '' %}
+    <div>
+        {% for invite in invitations %}
+            <div>
+                Invitation for event: <strong> {{ invite.event_id }}</strong>
+                <a href="#">
+                    <button>Respond</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
+
+
+
+
 {% endblock %}
