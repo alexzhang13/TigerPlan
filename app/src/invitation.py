@@ -1,5 +1,3 @@
-from multiprocessing.sharedctypes import Value
-from turtle import update
 from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, User, Event
 from app.src.timeblock import get_timeblock
 from app import db
