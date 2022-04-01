@@ -40,3 +40,15 @@ main {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
+
+.border-iris {
+  border-color: #5D5FEF!important;
+}
+
+.border-teal {
+  border-color: #4BE6CA!important;
+}
+
+.card-header {
+  text-emphasis-color: #ffffff;
+}

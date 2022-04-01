@@ -1,6 +1,6 @@
+from email.policy import default
 from app import db, login
 from flask_login import UserMixin
-# may need to import DateTime from SQL Alchemy
 
 #---------------------------------------------------------------------#
 class User(UserMixin, db.Model):
@@ -53,16 +53,15 @@ class Event(db.Model):
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     description = db.Column(db.String(64))
+    finalized = db.Column(db.Boolean, default=False)
 
     # 1-to-n relation fields
     invitations = db.relationship("Invitation")
+    times = db.relationship("TimeBlock")
 
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
-
-    #IMPLEMENT: groups, individual invitees? NOPE
-    # i don't want to have individual invitees
 
     def __repr__(self):
         return '<Model {}>'.format(self.id)
@@ -76,9 +75,14 @@ class TimeBlock(db.Model): #DONE
     name = db.Column(db.String(64)) 
     start = db.Column(db.DateTime())
     end = db.Column(db.DateTime())
+    is_conflict = db.Column(db.Boolean)
 
     # n-to-1 relation fields
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+
+    # n-to-n 
+    invitee_responses = db.relationship("Invitation_Timeblock", backref='timeblock')
 
     def __repr__(self):
         return '<TimeBlock {}>'.format(self.id)
@@ -86,12 +90,17 @@ class TimeBlock(db.Model): #DONE
 #---------------------------------------------------------------------#
 class Invitation(db.Model): #DONE
     __tablename__ = "invitations"
+
     # primitive fields
     id = db.Column(db.Integer, primary_key=True)
+    finalized = db.Column(db.Boolean, default=False)
 
     # n-to-1 relation fields
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    # n-to-n
+    responses = db.relationship("Invitation_Timeblock", backref='invitation')
 
     def __repr__(self):
         return '<Invitation {}>'.format(self.id)
@@ -106,6 +115,33 @@ class Member_Group(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
+#---------------------------------------------------------------------#
+# Associative table to facilitate n-to-n relationship between invitations, timeblocks
+class Invitation_Timeblock(db.Model):
+    __tablename__ = "invitation_timeblock"
+    id = db.Column(db.Integer, primary_key=True)
+
+    # n-to-n relation fields
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'))
+    invitation_id = db.Column(db.Integer, db.ForeignKey('invitations.id'))
+
+    def __repr__(self):
+        return '<Initation_Timeblock {}>'.format(self.id)
+
+#---------------------------------------------------------------------#
+# class MutableList(db.ext.mutable.Mutable, list):
+#     def append(self, value):
+#         list.append(self, value)
+#         self.changed()
+
+#     @classmethod
+#     def coerce(cls, key, value):
+#         if not isinstance(value, db.ext.mutable.MutableList):
+#             if isinstance(value, list):
+#                 return MutableList(value)
+#             return db.ext.mutable.Mutable.coerce(key, value)
+#         else:
+#             return value
 
 #---------------------------------------------------------------------#
 @login.user_loader

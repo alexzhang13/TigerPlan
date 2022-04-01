@@ -4,7 +4,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dummy-key'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'TigerPlan.db'))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 
+    'postgresql+psycopg2://postgres:lu@localhost/mydb').replace(
+    'postgres://', 'postgresql://') 
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_AUTO_RELOAD = True
     JSONIFY_PRETTYPRINT_REGULAR = True
