@@ -61,6 +61,10 @@ def index():
     return render_template("login.html", 
         title='Login to TigerPlan') 
 
+
+@bp.route("/testingstuff", methods=["GET", "POST"])
+def test():
+    return render_template("calendar.html")
 # ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
@@ -69,8 +73,10 @@ def dashboard():
         conflicts = get_user_conflicts(user.id)
         invitations = get_member_invitations(user.id)
         return render_template("dashboard.html",
-        title='TigerPlan User Dashboard', 
-        user=session['username'], conflicts=conflicts, invitations=invitations)
+            title='TigerPlan User Dashboard', user=session['username'], 
+            conflicts=conflicts, invitations=invitations)
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # -------------------------- MANAGE GROUPS -------------------------- #
 @bp.route("/mygroups", methods=['GET', 'POST'])
@@ -80,6 +86,8 @@ def groups():
         groups = get_user_groups(user.id)
         return render_template("mygroups.html",
         title='TigerPlan Manage Groups', user=session['username'], groups=groups)
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ---------------------------- SCHEDULER ---------------------------- #
 @bp.route("/scheduler", methods=['GET', 'POST'])
@@ -91,6 +99,8 @@ def scheduler():
         return render_template("scheduler.html",
             title='TigerPlan Scheduler', user=session['username'], 
             groups=groups, events=events)
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ----------------------------- ABOUT ------------------------------- #
 @bp.route("/about", methods=['GET', 'POST'])
@@ -98,11 +108,26 @@ def about():
     if 'username' in session:
         return render_template("about.html",
         title='TigerPlan About', user=session['username'])
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 
 # ------------------------------------------------------------------- #
 #                         MUTATION ROUTES                             #
 # ------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------- #
+@bp.route("/moveEvent", methods=["POST"])
+def move_event():
+    if 'username' in session:
+        user = user_from_netid(session['username'])
+        print(request.form['data'])
+        a = datetime(2018, 11, 28)
+        b = datetime(2018, 12, 28)
+        create_timeblock(name="example", user=user, start=a, end=b)
+        
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # --------------------- ADD DEFAULT CONFLICT ------------------------ #
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
@@ -113,6 +138,8 @@ def add_conflict():
         b = datetime(2018, 12, 28)
         create_timeblock(name="example", user=user, start=a, end=b, isconflict=True)
         return redirect("/dashboard")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ----------------------- ADD DEFAULT GROUP ------------------------- #
 @bp.route("/add_group/", methods=['GET', 'POST'])
@@ -121,6 +148,8 @@ def add_group():
         user = get_user_from_netid(session['username'])
         create_group(name="example group", owner=user)
         return redirect("/mygroups")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # --------------------- CREATE DEFAULT EVENT ------------------------ #
 @bp.route("/add_event/<id>", methods=['GET', 'POST'])
@@ -130,6 +159,8 @@ def add_event(id):
         create_event(groupid=id, name="Event Name", owner=user, 
             location="default location", description="default description") 
         return redirect("/scheduler")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ------------------------ DELETE CONFLICT -------------------------- #
 @bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
@@ -137,6 +168,8 @@ def del_conflict(id):
     if 'username' in session:
         delete_timeblock(id) 
         return redirect("/dashboard")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # -------------------------- DELETE GROUP --------------------------- #
 @bp.route("/del_group/<id>", methods=['GET', 'POST'])
@@ -144,6 +177,8 @@ def del_group(id):
     if 'username' in session:
         delete_group(id) 
         return redirect("/mygroups")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ------------------------ DELETE EVENT ----------------------------- #
 @bp.route("/del_event/<id>", methods=['GET', 'POST'])
@@ -158,6 +193,8 @@ def add_invitations(id):
     if 'username' in session:
         create_event_invitations(id) 
         return redirect("/scheduler")
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
 
 # ------------------------------------------------------------------- #
 #                       AUTHORIZATION ROUTES                          #
