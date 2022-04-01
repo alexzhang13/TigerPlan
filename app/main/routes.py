@@ -14,7 +14,7 @@ from app.models import models
 
 cas_client = CASClient(
     version=3,
-    service_url='http://localhost:80/login',
+    service_url='http://tigerplan.herokuapp.com/login',
     server_url='https://fed.princeton.edu/cas/login'
 )
 
