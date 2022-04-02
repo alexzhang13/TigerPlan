@@ -17,10 +17,12 @@
                     <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">Manage Groups</a>
+                    <a class="nav-link" href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">Manage
+                        Groups</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('main.scheduler') }}" tabindex="-1" aria-disabled="true">Scheduler</a>
+                    <a class="nav-link active" href="{{ url_for('main.scheduler') }}" tabindex="-1"
+                        aria-disabled="true">Scheduler</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('main.about') }}" tabindex="-1" aria-disabled="true">About</a>
@@ -63,53 +65,61 @@
 </div>
 
 <div id="main" class="container-fluid px-5" style="height: 100%;">
-    <div class = "row">
+    <div class="row">
         <!-- Left Column -->
-        <div class = "col-md-4">
+        <div class="col-md-4">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
                 {% if events is defined and events != '' %}
                 <div class="card-columns">
-                        <div class = "card mb-3">
-                            <div class="card-header text-white bg-teal"> <h5 class="card-title">Planned Events</h5></div>
+                    <div class="card mb-3">
+                        <div class="card-header text-white bg-teal">
+                            <h5 class="card-title">Planned Events</h5>
                         </div>
+                    </div>
                     {% for event in events %}
-                        <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal">
-                                <strong> Event #{{ event.id }}</strong>- Group #{{ event.group_id }}
-                            </div>
-                            <div class="card-body">
-                                <a href="/del_event/{{ event.id }}">
-                                    <button> Delete Event </button>
-                                </a>
-                                <a href="/cr_event_invitations/{{ event.id }}">
-                                    <button> Create Event Invitations </button>
-                                </a>
-                            </div>
+                    <div class="card mt-3 mb-3">
+                        <div class="card-header text-white bg-teal">
+                            <strong> Event #{{ event.id }}</strong>- Group #{{ event.group_id }}
                         </div>
+                        <div class="card-body">
+                            <a href="/del_event/{{ event.id }}">
+                                <button> Delete Event </button>
+                            </a>
+                            <a href="/cr_event_invitations/{{ event.id }}">
+                                <button> Create Event Invitations </button>
+                            </a>
+                            <a href="/view_event_details/{{event.id}}" target = "_blank">
+                                <button>View details</button>
+                            </a>
+                        </div>
+                    </div>
                     {% endfor %}
-                        <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
-                            <div class="card-body">
-                                <p class="card-text">Which group are you creating the event for?</p>
-                                <select class="custom-select custom-select-lg mb-3">
-                                    {% if groups is defined and groups != '' %}
-                                        {% for group in groups %}
-                                        <option value="{{ group.id }}">Example Group #{{ group.id }}</option>
-                                        {% endfor %}
-                                    {% endif %}
-                                </select>
-                                <a href="#">
-                                    <button> Create Event</button>
-                                </a>
-                            </div>
+                    <div class="card mt-3 mb-3">
+                        <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
+                        <div class="card-body">
+                            <p class="card-text">Which group are you creating the event for?</p>
+                            <select class="custom-select custom-select-lg mb-3">
+                                {% if groups is defined and groups != '' %}
+                                {% for group in groups %}
+                                <option value="{{ group.id }}">Example Group #{{ group.id }}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                            <a href="#">
+                                <button> Create Event</button>
+                            </a>
                         </div>
+                    </div>
                 </div>
                 {% endif %}
             </div>
         </div>
         <!-- Right Column -->
-        <div class = "col-md-8">
-            <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
+        <div class="col-md-8">
+            <div class="container pt-4 pb-4 border rounded-3 border-teal border-3" id="currentlyViewedEvent">
+                <table class="table table-hover" id = "eventTable">
+
+                </table>
             </div>
         </div>
     </div>
@@ -119,14 +129,56 @@
     {% if groups is defined and groups != '' %}
     <div>
         {% for group in groups %}
-            <div>
-                Group name: <strong> Example Group #{{ group.id }}</strong>
-                <a href="/add_event/{{ group.id }}">
-                    <button> Create Event for Group {{ group.id }}</button>
-                </a>
-            </div>
+        <div>
+            Group name: <strong> Example Group #{{ group.id }}</strong>
+            <a href="/add_event/{{ group.id }}">
+                <button> Create Event for Group {{ group.id }}</button>
+            </a>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
 </div>
+<!-- 
+<script>
+    'use strict'
+
+    function handleResponse(response) {
+        $('#eventTable').html(response);
+    }
+
+    let request = null;
+
+    function getDetails(eventid) {
+        let url = '/view_event_details/' + eventid;
+
+        if (request != null)
+            request.abort();
+
+        request = $.ajax(
+            {
+                type: 'GET',
+                url: url,
+                success: handleResponse
+            }
+        );
+    }
+
+    let selectedId = null;
+
+    function setup() {
+        $('#eventTable').on('click', '.clickable-row', function (event) {
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active');
+                
+            } else {
+                $(this).addClass('active').siblings().removeClass('active');
+            }
+        });
+    }
+
+
+
+    $('document').ready(setup);
+</script> -->
 {% endblock %}

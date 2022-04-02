@@ -54,7 +54,12 @@ class Event(db.Model):
     location = db.Column(db.String(64))
     description = db.Column(db.String(64))
     finalized = db.Column(db.Boolean, default=False)
-
+    
+    # 1-to-1 relation fields
+    # chosen_time_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'))
+    # chosen_time = db.relationship("TimeBlock",
+    #     foreign_keys = "Event.chosen_time_id", uselist=False)
+   
     # 1-to-n relation fields
     invitations = db.relationship("Invitation")
     times = db.relationship("TimeBlock")

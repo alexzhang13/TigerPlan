@@ -1,9 +1,10 @@
+from app.models.models import User, Group
 from app.src.event import create_event, create_event_invitations, delete_event, get_event, get_invitation_response_times
 from app.src.group import create_group, delete_group
-from app.src.invitation import update_finalized, update_response, get_invitation
+from app.src.invitation import invitation_update_finalized, invitation_update_response, get_invitation
 from app.src.timeblock import create_timeblock, delete_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
-from flask import render_template, current_app, redirect, url_for, session, request
+from flask import render_template, current_app, redirect, url_for, session, request, make_response
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
 from datetime import datetime
@@ -40,10 +41,10 @@ def test():
 @bp.route("/eventtest", methods=["GET", "POST"])
 def event_test():
     if 'username' in session:
-        update_response(1, time_ids = [3, 5])
-        update_response(2, time_ids = [3, 4])
-        update_response(3, time_ids = [3])
-        update_finalized(2, True)
+        invitation_update_response(1, time_ids = [3, 5])
+        invitation_update_response(2, time_ids = [3, 4])
+        invitation_update_response(3, time_ids = [3])
+        invitation_update_finalized(2, True)
         return render_template("about.html")
     return render_template("login.html", 
             title='Login to TigerPlan')
@@ -102,6 +103,25 @@ def scheduler():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+@bp.route("/view_event_details/<id>", methods=['GET', 'POST'])
+def view_event_details(id):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        # TODO: Make an error html file for these cases
+        try:
+            event = get_event(id)
+        except:
+            html = "<strong>Error fetching event<strong>"
+            return make_response(html)
+        if event.owner_id != user.id:
+            html = "<strong>Error fetching event<strong>"
+            return make_response(html)
+        responses, num = get_invitation_response_times(event.id)
+        return render_template("eventdetails.html", event=event, responses=responses, num=num)
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
+
 # ----------------------------- ABOUT ------------------------------- #
 @bp.route("/about", methods=['GET', 'POST'])
 def about():
@@ -155,12 +175,22 @@ def add_group():
 @bp.route("/add_event/<id>", methods=['GET', 'POST'])
 def add_event(id):
     if 'username' in session:
-        user= get_user_from_netid(session['username'])
+        user = get_user_from_netid(session['username'])
         create_event(groupid=id, name="Event Name", owner=user, 
             location="default location", description="default description") 
         return redirect("/scheduler")
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerPlan')
+
+# ------------------------- FINALIZE EVENT -------------------------- #
+@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
+def finalize_event(eventid, timeid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        print(eventid, timeid)
+        return redirect("/scheduler")
+    return render_template("login.html", 
+        title='Login to TigerPlan')
 
 # ------------------------ DELETE CONFLICT -------------------------- #
 @bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
@@ -187,7 +217,7 @@ def del_event(id):
         delete_event(id) 
         return redirect("/scheduler")
 
-# ------------------------ DELETE EVENT ----------------------------- #
+# ------------------- CREATE EVENT INVITATIONS ---------------------- #
 @bp.route("/cr_event_invitations/<id>", methods=['GET', 'POST'])
 def add_invitations(id):
     if 'username' in session:

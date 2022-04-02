@@ -37,15 +37,15 @@ def get_proposed_times(id: int) -> TimeBlock:
     times = db.session.query(TimeBlock).filter(TimeBlock.event_id == Invitation.event_id, Invitation.id == id).all()
     return times
 
-def update_finalized(id: int, finalized: bool) -> Invitation:
-    """Changes the invitations finalization state. Returns the updated invitation"""
+def invitation_update_finalized(id: int, finalized: bool) -> Invitation:
+    """Changes the invitation's finalization state. Returns the updated invitation"""
     updated_invite = db.session.query(Invitation).filter(Invitation.id == id).one()
     updated_invite.finalized = finalized
     db.session.add(updated_invite)
     db.session.commit()
     return updated_invite
 
-def update_response(id: int, time_ids: int) -> Invitation:
+def invitation_update_response(id: int, time_ids: int) -> Invitation:
     """Store member's selected times. Returns the updated invitation."""
     updated_invite = db.session.query(Invitation).filter(Invitation.id == id).one()
 

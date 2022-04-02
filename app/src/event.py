@@ -1,7 +1,9 @@
+from webbrowser import get
 from xmlrpc.client import DateTime
 import app
 from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, Member_Group, User, Event
 from app.src.invitation import create_invitation
+from app.src.timeblock import get_timeblock
 from flask import request
 from app import db, login
 
@@ -67,6 +69,22 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     db.commit()
     return event
 
+def event_update_finalized(id: int, finalized: bool) -> Invitation:
+    """Changes the event's finalization state. Returns the updated event."""
+    event = get_event(id)
+    event.finalized = finalized
+    db.session.add(event)
+    db.session.commit()
+    return event
+
+def event_set_chosen_time(id: int, timeblockid: int) -> Event:
+    """Sets the chosen time for the event. Returns the updated event."""
+    event = get_event(id)
+    event.chosen_time = timeblockid
+    db.session.add(event)
+    db.session.commit()
+    return event
+
 # def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
 #     """Create an event. Returns created event."""
 #     new_event = Event(name=name,
@@ -89,17 +107,20 @@ def create_event_invitations(id: int) -> Invitation:
 
 def get_invitation_response_times(id: int) -> dict:
     """Calculates time availabilites for an event by checking member 
-    invitation reponses. Returns a dictionary mapping timeblock ids to 
-    the amount of members available at that time."""
+    invitation reponses. Returns a dictionary mapping timeblocks to 
+    the amount of members available at that time, and a count of the
+    total number of responses."""
     event = get_event(id)
     time_counts = {}
+    num_responses = 0
     for invite in event.invitations:
         if not invite.finalized:
             continue
+        num_responses += 1
         for response in invite.responses:
-            timeblock_id = response.timeblock_id
-            if response.timeblock_id in time_counts:
-                time_counts[timeblock_id] += 1
+            timeblock = get_timeblock(response.timeblock_id)
+            if timeblock in time_counts:
+                time_counts[timeblock] += 1
             else: 
-                time_counts[timeblock_id] = 1
-    return time_counts
+                time_counts[timeblock] = 1
+    return time_counts, num_responses
