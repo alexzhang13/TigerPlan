@@ -1,5 +1,4 @@
 from multiprocessing.sharedctypes import Value
-from turtle import update
 from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, User, Event
 from app.src.timeblock import get_timeblock
 from app import db
@@ -47,7 +46,14 @@ def invitation_update_finalized(id: int, finalized: bool) -> Invitation:
 
 def invitation_update_response(id: int, time_ids: int) -> Invitation:
     """Store member's selected times. Returns the updated invitation."""
-    updated_invite = db.session.query(Invitation).filter(Invitation.id == id).one()
+    try:
+        updated_invite = get_invitation(id)
+        # Manually retrieve to avoid circular import
+        event = db.session.query(Event).filter(Event.id == id).one()
+        if (event.finalized):
+            raise Exception("Event is already finalized")
+    except Exception as ex:
+        raise ValueError("Issue fetching event") from ex
 
     for it_block in updated_invite.responses:
             db.session.delete(it_block)

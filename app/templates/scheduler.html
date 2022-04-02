@@ -85,9 +85,11 @@
                             <a href="/del_event/{{ event.id }}">
                                 <button> Delete Event </button>
                             </a>
+                            {% if not event.finalized %}
                             <a href="/cr_event_invitations/{{ event.id }}">
                                 <button> Create Event Invitations </button>
                             </a>
+                            {% endif %}
                             <a href="/view_event_details/{{event.id}}" target = "_blank">
                                 <button>View details</button>
                             </a>

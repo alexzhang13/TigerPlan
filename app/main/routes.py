@@ -1,5 +1,5 @@
 from app.models.models import User, Group
-from app.src.event import create_event, create_event_invitations, delete_event, get_event, get_invitation_response_times
+from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.group import create_group, delete_group
 from app.src.invitation import invitation_update_finalized, invitation_update_response, get_invitation
 from app.src.timeblock import create_timeblock, delete_timeblock
@@ -187,7 +187,7 @@ def add_event(id):
 def finalize_event(eventid, timeid):
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        print(eventid, timeid)
+        event_finalize(eventid, timeid)
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerPlan')

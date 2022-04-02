@@ -69,10 +69,25 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     db.commit()
     return event
 
-def event_update_finalized(id: int, finalized: bool) -> Invitation:
+def event_finalize(eventid: int, timeid: int) -> Invitation:
     """Changes the event's finalization state. Returns the updated event."""
-    event = get_event(id)
-    event.finalized = finalized
+    event = get_event(eventid)
+
+    # TODO: Should make sure timeblock exists/exists in event (although
+    # could just add back if not in event)
+
+    # throw out all timeblocks except matching timeblock
+    selected_timeblock = get_timeblock(timeid)
+    for tb in event.times:
+        print(tb.id)
+        if (tb == selected_timeblock):
+            print("not deleting")
+            continue
+        db.session.delete(tb)
+        print("deleting")
+
+    event.finalized = True
+
     db.session.add(event)
     db.session.commit()
     return event

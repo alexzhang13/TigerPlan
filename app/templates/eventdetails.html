@@ -3,6 +3,9 @@
 {% block content %}
 
 <div>Showing details for event <strong>{{event.name}}</strong></div>
+
+{% if not event.finalized %}
+
 <div>Currently selected time: <span id="selectedTime">None</span></div>
 <a>
     <button id="finalizeButton" onclick="finalize()" disabled>Finalize event time!</button>
@@ -58,4 +61,10 @@
 
 </script>
 
+{% else %}
+
+<strong>Event is already finalized!</strong>
+<div><strong>Chosen time: </strong> {{event.times}}</div>
+
+{% endif %}
 {% endblock %}
