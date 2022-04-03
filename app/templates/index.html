@@ -119,14 +119,6 @@
 <script>
     var Calendar = tui.Calendar;
 
-    var cal = new tui.Calendar('#calendar', {
-        defaultView: 'week',
-        template: templates,
-        taskView: false,
-        useCreationPopup: true,
-        useDetailPopup: true
-    });
-
     // register templates
     var templates = {
         popupIsAllDay: function() {
@@ -187,8 +179,15 @@
         popupDelete: function() {
         return 'Delete';
         }
-        
     };
+
+    var cal = new tui.Calendar('#calendar', {
+        defaultView: 'week',
+        template: templates,
+        taskView: false,
+        useCreationPopup: true,
+        useDetailPopup: true
+    });
   
 </script>
 
