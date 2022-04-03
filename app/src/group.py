@@ -9,9 +9,6 @@ def create_group(name: str, owner: User) -> Group:
                       owner_id=owner.id)
     db.session.add(new_group)
     db.session.commit()
-    new_member_group = Member_Group(group_id=new_group.id, member_id=owner.id)
-    db.session.add(new_member_group)
-    db.session.commit()
     return new_group
 
 def get_group(id: int) -> Group:
@@ -48,8 +45,8 @@ def delete_group(id: int) -> bool:
     return del_group.id == None
 
 #---------------------------- Spec Functions -------------------------#
-def add_member(id: int, member: User) -> bool:
-    new_mem_group = Member_Group(member_id=member.id, group_id=id)
+def add_member(id: int, memberId: int) -> bool:
+    new_mem_group = Member_Group(member_id=memberId, group_id=id)
     db.session.add(new_mem_group)
     db.session.commit()
     return new_mem_group.id != None
