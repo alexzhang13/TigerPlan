@@ -96,24 +96,23 @@
                         </div>
                     </div>
                     {% endfor %}
-                        <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
-                            <div class="card-body">
-                                <p class="card-text">Which group are you creating the event for?</p>
-                                <form>
-                                    <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
-                                        {% if groups is defined and groups != '' %}
-                                        {% for group in groups %}
-                                        <option value="{{ group.id }}">{{ group.name }}</option>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </select> <span>Select Group</span>
-                                    <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
-                                    <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
-                                    <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
-                                    <button id = "createNewEvent"> Create Event</button>
-                                  </form>
-                            </div>
+                    <div class = "card mt-3 mb-3">
+                        <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
+                        <div class="card-body">
+                            <p class="card-text">Which group are you creating the event for?</p>
+                            <form>
+                                <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
+                                    {% if groups is defined and groups != '' %}
+                                    {% for group in groups %}
+                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </select> <span>Select Group</span>
+                                <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
+                                <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
+                                <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
+                                <button id = "createNewEvent"> Create Event</button>
+                                </form>
                         </div>
                     </div>
                 </div>
