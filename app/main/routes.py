@@ -116,8 +116,12 @@ def view_event_details(id):
         if event.owner_id != user.id:
             html = "<strong>Error fetching event<strong>"
             return make_response(html)
-        responses, num = get_invitation_response_times(event.id)
-        return render_template("eventdetails.html", event=event, responses=responses, num=num)
+        if not event.finalized:
+            responses, num = get_invitation_response_times(event.id)
+            return render_template("eventdetails.html", finalized=False, event=event, responses=responses, num=num)
+        else:
+            # TODO: Ensure that there is a time
+            return render_template("eventdetails.html", finalized=True,event=event, time=event.times[0])
     return render_template("login.html", 
         title='Login to TigerResearch') 
 

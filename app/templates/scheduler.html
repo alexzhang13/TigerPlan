@@ -85,7 +85,7 @@
                             <a href="/del_event/{{ event.id }}">
                                 <button> Delete Event </button>
                             </a>
-                            {% if not event.finalized %}
+                            {% if not event.finalized and event.invitations|length == 0 %}
                             <a href="/cr_event_invitations/{{ event.id }}">
                                 <button> Create Event Invitations </button>
                             </a>

@@ -4,7 +4,7 @@
 
 <div>Showing details for event <strong>{{event.name}}</strong></div>
 
-{% if not event.finalized %}
+{% if not finalized %}
 
 <div>Currently selected time: <span id="selectedTime">None</span></div>
 <a>
@@ -63,8 +63,10 @@
 
 {% else %}
 
-<strong>Event is already finalized!</strong>
-<div><strong>Chosen time: </strong> {{event.times}}</div>
+<strong>Event {{name}} is already finalized!</strong>
+<div><strong>Chosen time: </strong> </div>
+<strong>Start: </strong> {{time.start}}|
+<strong>End: </strong>{{time.end}}
 
 {% endif %}
 {% endblock %}

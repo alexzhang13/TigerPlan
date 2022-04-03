@@ -24,11 +24,11 @@ def delete_invitation(id: int) -> bool:
 
 #------------------- Invitation_Timeblock Functions -------------------#
 def create_invitation_timeblock(invitation_id: int, timeblock_id: int) -> Invitation:
-    """Create a invitation. Returns created invitation."""
-    new_invite = Invitation(event_id=eventid, user_id = userId)
-    db.session.add(new_invite)
-    db.session.commit()
-    return new_invite
+    """Create a invitation_timeblock. Returns created 
+    invitation_timeblock. DOES NOT COMMIT CREATION"""
+    new_invtb = Invitation_Timeblock(timeblock_id=timeblock_id, invitation_id=invitation_id)
+    db.session.add(new_invtb)
+    return new_invtb
 
 #---------------------------- Spec Functions -------------------------#
 def get_proposed_times(id: int) -> TimeBlock:

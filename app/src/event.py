@@ -72,7 +72,9 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
 def event_finalize(eventid: int, timeid: int) -> Invitation:
     """Changes the event's finalization state. Returns the updated event."""
     event = get_event(eventid)
-
+    if event.finalized:
+        return event
+    
     # TODO: Should make sure timeblock exists/exists in event (although
     # could just add back if not in event)
 
@@ -81,10 +83,15 @@ def event_finalize(eventid: int, timeid: int) -> Invitation:
     for tb in event.times:
         print(tb.id)
         if (tb == selected_timeblock):
-            print("not deleting")
+            print("not deleting", tb)
             continue
+        print("deleting", tb)
         db.session.delete(tb)
-        print("deleting")
+
+    # throw out all invitation responses
+    for invitation in event.invitations:
+        for response in invitation.responses:
+            db.session.delete(response)
 
     event.finalized = True
 
@@ -112,6 +119,9 @@ def event_set_chosen_time(id: int, timeblockid: int) -> Event:
 
 def create_event_invitations(id: int) -> Invitation:
     """Sends an invitation to every group member of the event."""
+    event = get_event(id)
+    if len(event.invitations) != 0:
+        return
     members = db.session.query(User).filter(
         User.id == Member_Group.member_id, 
         Member_Group.group_id == Event.group_id, 
