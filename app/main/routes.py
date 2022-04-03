@@ -1,9 +1,8 @@
-from app.models.models import User, Group
-from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
-from app.src.group import create_group, delete_group
-from app.src.invitation import invitation_update_finalized, invitation_update_response, get_invitation
+from app.src.group import add_member, create_group, delete_group
 from app.src.timeblock import create_timeblock, delete_timeblock
-from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
+from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
+from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
+from app.src.invitation import invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
@@ -85,8 +84,9 @@ def groups():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
+        users = get_users()
         return render_template("mygroups.html",
-        title='TigerPlan Manage Groups', user=session['username'], groups=groups)
+        title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users)
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
@@ -165,23 +165,30 @@ def add_conflict():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
-# ----------------------- ADD DEFAULT GROUP ------------------------- #
-@bp.route("/add_group/", methods=['GET', 'POST'])
-def add_group():
+# ----------------------- ADD CUSTOM GROUP ------------------------- #
+@bp.route("/add_custom_group", methods=['GET', 'POST'])
+def add_custom_group():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        create_group(name="example group", owner=user)
+        name = request.args.get('name')
+        member = request.args.get('member')
+        new_group = create_group(name=name, owner=user)
+        add_member(id=new_group.id, memberId=member)
         return redirect("/mygroups")
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
-# --------------------- CREATE DEFAULT EVENT ------------------------ #
-@bp.route("/add_event/<id>", methods=['GET', 'POST'])
-def add_event(id):
+# --------------------- CREATE CUSTOM EVENT ------------------------ #
+@bp.route("/add_event", methods=['GET', 'POST'])
+def add_event():
     if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        create_event(groupid=id, name="Event Name", owner=user, 
-            location="default location", description="default description") 
+        user= get_user_from_netid(session['username'])
+        id = request.args.get('id')
+        name = request.args.get('name')
+        location = request.args.get('location')
+        description = request.args.get('description')
+        create_event(groupid=id, name=name, owner=user, 
+            location=location, description=description) 
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerPlan')

@@ -96,20 +96,24 @@
                         </div>
                     </div>
                     {% endfor %}
-                    <div class="card mt-3 mb-3">
-                        <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
-                        <div class="card-body">
-                            <p class="card-text">Which group are you creating the event for?</p>
-                            <select class="custom-select custom-select-lg mb-3">
-                                {% if groups is defined and groups != '' %}
-                                {% for group in groups %}
-                                <option value="{{ group.id }}">Example Group #{{ group.id }}</option>
-                                {% endfor %}
-                                {% endif %}
-                            </select>
-                            <a href="#">
-                                <button> Create Event</button>
-                            </a>
+                        <div class = "card mt-3 mb-3">
+                            <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
+                            <div class="card-body">
+                                <p class="card-text">Which group are you creating the event for?</p>
+                                <form>
+                                    <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
+                                        {% if groups is defined and groups != '' %}
+                                        {% for group in groups %}
+                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </select> <span>Select Group</span>
+                                    <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
+                                    <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
+                                    <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
+                                    <button id = "createNewEvent"> Create Event</button>
+                                  </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,60 +131,43 @@
     </div>
 </div>
 
-<div class="container">
-    {% if groups is defined and groups != '' %}
-    <div>
-        {% for group in groups %}
-        <div>
-            Group name: <strong> Example Group #{{ group.id }}</strong>
-            <a href="/add_event/{{ group.id }}">
-                <button> Create Event for Group {{ group.id }}</button>
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-</div>
-<!-- 
 <script>
-    'use strict'
 
-    function handleResponse(response) {
-        $('#eventTable').html(response);
-    }
-
+    'use strict';
     let request = null;
-
-    function getDetails(eventid) {
-        let url = '/view_event_details/' + eventid;
-
-        if (request != null)
-            request.abort();
-
-        request = $.ajax(
-            {
-                type: 'GET',
-                url: url,
-                success: handleResponse
-            }
-        );
+  
+    function getResults() {
+      let id = $('#NewEventGroupId :selected').val();
+      let name = $('#NewEventName').val();
+      let location = $('#NewEventLocation').val();
+      let description = $('#NewEventDescription').val();
+      id = encodeURIComponent(id);
+      name = encodeURIComponent(name);
+      location = encodeURIComponent(location);
+      description = encodeURIComponent(description);
+  
+      let url = '/add_event?id=' + id
+      url += "&name=" + name
+      url += '&location=' + location
+      url += '&description=' + description 
+  
+      if (request != null)
+        request.abort();
+  
+      request = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
     }
-
-    let selectedId = null;
-
+  
     function setup() {
-        $('#eventTable').on('click', '.clickable-row', function (event) {
-            if ($(this).hasClass('active')) {
-                $(this).removeClass('active');
-                
-            } else {
-                $(this).addClass('active').siblings().removeClass('active');
-            }
-        });
+      $('#createNewEvent').on('click', getResults);
     }
-
-
-
+  
     $('document').ready(setup);
-</script> -->
+  
+  </script>
+
 {% endblock %}
