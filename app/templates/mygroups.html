@@ -86,9 +86,9 @@
                         </div>
                     {% for group in groups %}
                         <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal">My Example Group #{{ group.id }}</div>
+                            <div class="card-header text-white bg-teal">{{ group.name }}</div>
                             <div class="card-body">
-                            <p class="card-text">Some example text about {{ group.name }}.</p>
+                            <p class="card-text">Some example text about group #{{ group.id }}.</p>
                             <a href="/del_group/{{ group.id }}">
                                 <button> Delete group {{ group.id }} and related events.</button>
                             </a>
@@ -99,9 +99,12 @@
                 {% endif %}
                 <br>
                 <div>
-                    <a href="/add_group">
-                        <button> Add an example group with default field values.</button>
-                    </a>
+                    <form action="" method="get">
+                        <div>
+                            <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
+                            <button id="createNewGroup">Create New Group</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -146,6 +149,37 @@
             </div>
         </div>
     </div>
+
 </div>
+
+<script>
+
+    'use strict';
+    let request = null;
+  
+    function getResults() {
+      let name = $('#NewGroupName').val();
+      name = encodeURIComponent(name);
+  
+      let url = '/add_custom_group/' + name
+  
+      if (request != null)
+        request.abort();
+  
+      request = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
+    }
+  
+    function setup() {
+      $('#createNewGroup').on('click', getResults);
+    }
+  
+    $('document').ready(setup);
+  
+  </script>
 
 {% endblock %}

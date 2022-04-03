@@ -141,12 +141,12 @@ def add_conflict():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
-# ----------------------- ADD DEFAULT GROUP ------------------------- #
-@bp.route("/add_group/", methods=['GET', 'POST'])
-def add_group():
+# ----------------------- ADD CUSTOM GROUP ------------------------- #
+@bp.route("/add_custom_group/<name>", methods=['GET', 'POST'])
+def add_custom_group(name):
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        create_group(name="example group", owner=user)
+        create_group(name=name, owner=user)
         return redirect("/mygroups")
     return render_template("login.html", 
         title='Login to TigerResearch') 
