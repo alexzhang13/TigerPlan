@@ -1,59 +1,90 @@
 /* Script for handling Events Calendar */
-var marked = false; // If cell is marked
-var mousedown = false; // If mouse is down
+var Calendar = tui.Calendar;
 
-// mark down cell
-function markd(cell) {
-    mousedown = true;
-    marked = !isOpen(cell);
-    marko(cell);
-}
+var cal = new tui.Calendar('#calendar', {
+    defaultView: 'week',
+    taskView: false,
+    scheduleView: ['time'],
+    useCreationPopup: true,
+    useDetailPopup: true,
+    template: templates
+});
 
-// mark on mouse over cell
-function marko(cell) {
-    if (!mousedown) {
-        popup(cell);
-        return;
+// register templates
+var templates = {
+    popupStateFree: function () {
+        return 'Free';
+    },
+    popupStateBusy: function () {
+        return 'Busy';
+    },
+    titlePlaceholder: function () {
+        return 'Subject';
+    },
+    locationPlaceholder: function () {
+        return 'Location';
+    },
+    startDatePlaceholder: function () {
+        return 'Start date';
+    },
+    endDatePlaceholder: function () {
+        return 'End date';
+    },
+    popupSave: function () {
+        return 'Save';
+    },
+    popupUpdate: function () {
+        return 'Update';
+    },
+    popupDetailDate: function (isAllDay, start, end) {
+        var isSameDate = moment(start).isSame(end);
+        var endFormat = (isSameDate ? '' : 'YYYY.MM.DD ') + 'hh:mm a';
+
+        if (isAllDay) {
+            return moment(start).format('YYYY.MM.DD') + (isSameDate ? '' : ' - ' + moment(end).format('YYYY.MM.DD'));
+        }
+
+        return (moment(start).format('YYYY.MM.DD hh:mm a') + ' - ' + moment(end).format(endFormat));
+    },
+    popupDetailUser: function (schedule) {
+        return 'User : ' + (schedule.attendees || []).join(', ');
+    },
+    popupDetailState: function (schedule) {
+        return 'State : ' + schedule.state || 'Busy';
+    },
+    popupDetailRepeat: function (schedule) {
+        return 'Repeat : ' + schedule.recurrenceRule;
+    },
+    popupDetailBody: function (schedule) {
+        return 'Body : ' + schedule.body;
+    },
+    popupEdit: function () {
+        return 'Edit';
+    },
+    popupDelete: function () {
+        return 'Delete';
     }
-    if (cell.className == "") return;
-    if (!marked) {
-        close(cell);
+
+};
+
+cal.createSchedules([
+    {
+        id: '1',
+        calendarId: '1',
+        title: 'my schedule',
+        category: 'time',
+        dueDateClass: '',
+        start: '2022-04-1T22:30:00+09:00',
+        end: '2022-04-1T02:30:00+09:00'
+    },
+    {
+        id: '2',
+        calendarId: '1',
+        title: 'second schedule',
+        category: 'time',
+        dueDateClass: '',
+        start: '2018-01-18T17:30:00+09:00',
+        end: '2018-01-19T17:31:00+09:00',
+        isReadOnly: true    // schedule is read-only
     }
-    else {
-        open(cell);
-    }
-}
-
-// popup event window
-function popup(cell) {
-    console.log('Released');
-}
-
-function isOpen(cell) {
-    return cell.className.indexOf("open") > -1;
-}
-
-function isClosed(cell) {
-    return cell.className.indexOf("closed") > -1;
-}
-
-function close(cell) {
-    if (isOpen(cell)) {
-        cell.className = cell.className.replace(" open", "");
-        cell.className = cell.className + " closed";
-    }
-}
-
-function open(cell) {
-    if (isClosed(cell)) {
-        cell.className = cell.className.replace(" closed", "");
-        cell.className = cell.className + " open";
-    }
-}
-
-document.body.onmousedown = function () {
-    mousedown = true;
-}
-document.body.onmouseup = function () {
-    mousedown = false;
-}
+]);
