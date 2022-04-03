@@ -98,7 +98,10 @@
                                         <option value="{{ group.id }}">{{ group.name }}</option>
                                         {% endfor %}
                                         {% endif %}
-                                    </select>
+                                    </select> <span>Select Group</span>
+                                    <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
+                                    <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
+                                    <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
                                     <button id = "createNewEvent"> Create Event</button>
                                   </form>
                             </div>
@@ -122,9 +125,18 @@
   
     function getResults() {
       let id = $('#NewEventGroupId :selected').val();
+      let name = $('#NewEventName').val();
+      let location = $('#NewEventLocation').val();
+      let description = $('#NewEventDescription').val();
       id = encodeURIComponent(id);
+      name = encodeURIComponent(name);
+      location = encodeURIComponent(location);
+      description = encodeURIComponent(description);
   
-      let url = '/add_event/' + id
+      let url = '/add_event?id=' + id
+      url += "&name=" + name
+      url += '&location=' + location
+      url += '&description=' + description 
   
       if (request != null)
         request.abort();

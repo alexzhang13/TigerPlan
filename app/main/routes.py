@@ -152,12 +152,16 @@ def add_custom_group(name):
         title='Login to TigerResearch') 
 
 # --------------------- CREATE DEFAULT EVENT ------------------------ #
-@bp.route("/add_event/<id>", methods=['GET', 'POST'])
-def add_event(id):
+@bp.route("/add_event", methods=['GET', 'POST'])
+def add_event():
     if 'username' in session:
         user= get_user_from_netid(session['username'])
-        create_event(groupid=id, name="Event Name", owner=user, 
-            location="default location", description="default description") 
+        id = request.args.get('id')
+        name = request.args.get('name')
+        location = request.args.get('location')
+        description = request.args.get('description')
+        create_event(groupid=id, name=name, owner=user, 
+            location=location, description=description) 
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerResearch') 
