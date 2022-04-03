@@ -91,16 +91,16 @@
                             <div class="card-header text-white bg-teal"><strong>New Event</strong></div>
                             <div class="card-body">
                                 <p class="card-text">Which group are you creating the event for?</p>
-                                <select class="custom-select custom-select-lg mb-3">
-                                    {% if groups is defined and groups != '' %}
+                                <form>
+                                    <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
+                                        {% if groups is defined and groups != '' %}
                                         {% for group in groups %}
-                                        <option value="{{ group.id }}">Example Group #{{ group.id }}</option>
+                                        <option value="{{ group.id }}">{{ group.name }}</option>
                                         {% endfor %}
-                                    {% endif %}
-                                </select>
-                                <a href="#">
-                                    <button> Create Event</button>
-                                </a>
+                                        {% endif %}
+                                    </select>
+                                    <button id = "createNewEvent"> Create Event</button>
+                                  </form>
                             </div>
                         </div>
                 </div>
@@ -115,18 +115,34 @@
     </div>
 </div>
 
-<div class="container">
-    {% if groups is defined and groups != '' %}
-    <div>
-        {% for group in groups %}
-            <div>
-                Group name: <strong> Example Group #{{ group.id }}</strong>
-                <a href="/add_event/{{ group.id }}">
-                    <button> Create Event for Group {{ group.id }}</button>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-</div>
+<script>
+
+    'use strict';
+    let request = null;
+  
+    function getResults() {
+      let id = $('#NewEventGroupId :selected').val();
+      id = encodeURIComponent(id);
+  
+      let url = '/add_event/' + id
+  
+      if (request != null)
+        request.abort();
+  
+      request = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
+    }
+  
+    function setup() {
+      $('#createNewEvent').on('click', getResults);
+    }
+  
+    $('document').ready(setup);
+  
+  </script>
+
 {% endblock %}
