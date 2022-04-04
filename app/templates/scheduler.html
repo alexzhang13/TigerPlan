@@ -79,7 +79,7 @@
                     {% for event in events %}
                     <div class="card mt-3 mb-3">
                         <div class="card-header text-white bg-teal">
-                            <strong> Event #{{ event.id }}</strong>- Group #{{ event.group_id }}
+                            Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
                         </div>
                         <div class="card-body">
                             <a href="/del_event/{{ event.id }}">
@@ -167,6 +167,6 @@
   
     $('document').ready(setup);
   
-  </script>
+</script>
 
 {% endblock %}

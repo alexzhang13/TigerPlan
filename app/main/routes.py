@@ -2,7 +2,7 @@ from app.src.group import add_member, create_group, delete_group
 from app.src.timeblock import create_timeblock, delete_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
-from app.src.invitation import invitation_update_finalized, invitation_update_response
+from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
@@ -78,6 +78,30 @@ def dashboard():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+
+### Respond to an invitation as an invitee. Called using AJAX in dashboard ###
+@bp.route("/respond_to_invitation/<id>", methods=['GET', 'POST'])
+def respond_to_invitation(id):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        try:
+            invitation = get_invitation(id)
+        except:
+            html = "<strong>Error fetching invitation<strong>"
+            return make_response(html)
+        if invitation.user_id != user.id:
+            html = "<strong>Error fetching invitation<strong>"
+            return make_response(html)
+        
+        response_timeblockids = []
+
+        for invtb in invitation.responses:
+            response_timeblockids.append(invtb.timeblock_id)
+
+        return render_template("respondtoinvitation.html", invitation=invitation, response_timeblockids=response_timeblockids)
+
+    return render_template("login.html", 
+        title='Login to TigerPlan')
 # -------------------------- MANAGE GROUPS -------------------------- #
 @bp.route("/mygroups", methods=['GET', 'POST'])
 def groups():
@@ -232,10 +256,77 @@ def del_event(id):
 @bp.route("/cr_event_invitations/<id>", methods=['GET', 'POST'])
 def add_invitations(id):
     if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        event = get_event(id)
+        if (event.owner_id != user.id):
+            html = "<strong>Error fetching event<strong>"
+            return make_response(html)
         create_event_invitations(id) 
         return redirect("/scheduler")
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerPlan') 
+
+# ------------------- EDIT INVITATION RESPONSE ---------------------- #
+@bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+def add_invitation_response_time(invitationid, timeid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        invitation = get_invitation(invitationid)
+        if invitation.user_id != user.id:
+            html = "<strong>Error fetching invitation<strong>"
+            print("Invitation is not owned by user")
+            return make_response(html, 400)
+        else:
+            try:
+                invitation_add_response_time(invitationid, timeid)
+            except ValueError as ex:
+                html = "<strong>%s<strong>" % str(ex)
+                print("value error", str(ex))
+                return make_response(html, 400)
+            return "Success!"
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+@bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+def del_invitation_response_time(invitationid, timeid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        invitation = get_invitation(invitationid)
+        if (invitation.user_id != user.id):
+            html = "<strong>Error fetching invitation<strong>"
+            print("Invitation is not owned by user")
+            return make_response(html, 400)
+        else:
+            try:
+                invitation_del_response_time(invitationid, timeid)
+            except ValueError as ex:
+                html = "<strong>%s<strong>" % str(ex)
+                print("value error", str(ex))
+                return make_response(html, 400)
+            return "Success!"
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ---------------------- FINALIZE INVITATION ------------------------ #
+@bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
+def finalize_invitation(invitationid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        invitation = get_invitation(invitationid)
+        if (invitation.user_id != user.id):
+            html = "<strong>Error fetching invitation<strong>"
+            print("Invitation is not owned by user")
+            return make_response(html, 400)
+        else:
+            try:
+                invitation_update_finalized(invitationid, True)
+            except ValueError as ex:
+                html = "<strong>%s<strong>" % str(ex)
+                print("value error", str(ex))
+                return make_response(html, 400)
+            return "Success!"
+    return render_template("login.html", 
+        title='Login to TigerPlan')
 
 # ------------------------------------------------------------------- #
 #                       AUTHORIZATION ROUTES                          #

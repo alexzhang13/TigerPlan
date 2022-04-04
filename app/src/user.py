@@ -48,5 +48,5 @@ def get_member_events(memberid: int) -> Event:
 def get_member_invitations(memberid: int) -> Invitation:
     """Get the user(member)'s invitations pending response. Returns a list of invitations."""
     mem_invs = db.session.query(Invitation).filter(
-        Invitation.user_id == memberid, Invitation.finalized == False).all()
+        Invitation.user_id == memberid).all()
     return mem_invs

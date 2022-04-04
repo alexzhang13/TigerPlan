@@ -33,7 +33,7 @@ class Group(db.Model):
     name = db.Column(db.String(64))
 
     # 1-to-n relation fields
-    events = db.relationship("Event")
+    events = db.relationship("Event", backref="group")
 
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -61,7 +61,7 @@ class Event(db.Model):
     #     foreign_keys = "Event.chosen_time_id", uselist=False)
    
     # 1-to-n relation fields
-    invitations = db.relationship("Invitation")
+    invitations = db.relationship("Invitation", backref="event")
     times = db.relationship("TimeBlock")
 
     # n-to-1 relation fields
@@ -87,7 +87,7 @@ class TimeBlock(db.Model): #DONE
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
 
     # n-to-n 
-    invitee_responses = db.relationship("Invitation_Timeblock", backref='timeblock')
+    # invitee_responses = db.relationship("Invitation_Timeblock", backref='timeblock')
 
     def __repr__(self):
         return '<TimeBlock {}>'.format(self.id)
@@ -102,6 +102,7 @@ class Invitation(db.Model): #DONE
 
     # n-to-1 relation fields
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # n-to-n
@@ -128,6 +129,8 @@ class Invitation_Timeblock(db.Model):
 
     # n-to-n relation fields
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'))
+    timeblock = db.relationship("TimeBlock", foreign_keys="Invitation_Timeblock.timeblock_id")
+
     invitation_id = db.Column(db.Integer, db.ForeignKey('invitations.id'))
 
     def __repr__(self):

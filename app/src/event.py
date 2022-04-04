@@ -46,6 +46,9 @@ def delete_event(id: int) -> bool:
         db.session.delete(del_response)
     for del_invitation in del_invitations:
         db.session.delete(del_invitation)
+    for timeblock in del_event.times:
+        db.session.delete(timeblock)
+
     db.session.delete(del_event)
     db.session.commit()
     return del_event.id == None
@@ -78,6 +81,12 @@ def event_finalize(eventid: int, timeid: int) -> Invitation:
     # TODO: Should make sure timeblock exists/exists in event (although
     # could just add back if not in event)
 
+
+
+    # throw out all invitation responses
+    for invitation in event.invitations:
+        for response in invitation.responses:
+            db.session.delete(response)
     # throw out all timeblocks except matching timeblock
     selected_timeblock = get_timeblock(timeid)
     for tb in event.times:
@@ -87,11 +96,6 @@ def event_finalize(eventid: int, timeid: int) -> Invitation:
             continue
         print("deleting", tb)
         db.session.delete(tb)
-
-    # throw out all invitation responses
-    for invitation in event.invitations:
-        for response in invitation.responses:
-            db.session.delete(response)
 
     event.finalized = True
 

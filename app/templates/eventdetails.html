@@ -54,6 +54,7 @@
         if (selectedId === null) {
             return;
         }
+        // TODO: this is really dumb I should've used AJAX
         let url = "/finalize_event_time/{{event.id}}/" + selectedId
         location.href = url
     }

@@ -38,12 +38,64 @@ def get_proposed_times(id: int) -> TimeBlock:
 
 def invitation_update_finalized(id: int, finalized: bool) -> Invitation:
     """Changes the invitation's finalization state. Returns the updated invitation"""
-    updated_invite = db.session.query(Invitation).filter(Invitation.id == id).one()
-    updated_invite.finalized = finalized
-    db.session.add(updated_invite)
+    try:
+        invitation = get_invitation(id)
+        if (invitation.event.finalized):
+            raise ValueError("Event is already finalized")
+    except Exception as ex:
+        raise ValueError(str(ex)) from ex
+    invitation.finalized = finalized
+    db.session.add(invitation)
     db.session.commit()
-    return updated_invite
+    return invitation
 
+def invitation_add_response_time(id: int, timeid: int) -> Invitation:
+    """Adds a specified time to the invitation. If such a time already exists, do nothing."""
+    try:
+        invitation = get_invitation(id)
+        if (invitation.event.finalized):
+            raise ValueError("Event is already finalized")
+    except Exception as ex:
+        raise ValueError(str(ex)) from ex
+
+    itblock = db.session.query(Invitation_Timeblock).filter(Invitation_Timeblock.timeblock_id == timeid).first()
+
+    if itblock is not None:
+        return invitation
+    
+    try:
+        _ = get_timeblock(timeid)
+    except Exception as ex:
+        raise ValueError("Issue with timeblock id: " + timeid) from ex
+
+    new_response = Invitation_Timeblock(timeblock_id=timeid, invitation_id=id)
+    db.session.add(new_response)
+    db.session.commit()
+        
+    return invitation
+
+def invitation_del_response_time(id: int, timeid: int) -> Invitation:
+    """Removes a specified time from the invitation. If such a time doesn't already exist, do nothing."""
+    try:
+        invitation = get_invitation(id)
+        print("finalized?")
+        print(invitation.event.finalized)
+        if (invitation.event.finalized):
+            raise ValueError("Event is already finalized")
+    except Exception as ex:
+        raise ValueError(str(ex)) from ex
+
+    itblock = db.session.query(Invitation_Timeblock).filter(Invitation_Timeblock.timeblock_id == timeid).first()
+
+    if itblock is None:
+        return invitation
+    
+    db.session.delete(itblock)
+    db.session.commit()
+        
+    return invitation
+
+# TODO: not really being used right now, since AJAX adds one at a time
 def invitation_update_response(id: int, time_ids: int) -> Invitation:
     """Store member's selected times. Returns the updated invitation."""
     try:
