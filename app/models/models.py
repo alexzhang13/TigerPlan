@@ -87,6 +87,15 @@ class TimeBlock(db.Model): #DONE
     def __repr__(self):
         return '<TimeBlock {}>'.format(self.id)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "start": self.start.strftime('%Y-%m-%dT%H:%M:%S'),
+            "end": self.end.strftime('%Y-%m-%dT%H:%M:%S'),
+            "is_conflict": self.is_conflict
+        }
+
 #---------------------------------------------------------------------#
 class Invitation(db.Model): #DONE
     __tablename__ = "invitations"

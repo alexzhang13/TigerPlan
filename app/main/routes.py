@@ -1,12 +1,13 @@
 from app.src.event import create_event, create_event_invitations, delete_event, get_event, get_invitation_response_times
 from app.src.group import create_group, delete_group
 from app.src.invitation import update_finalized, update_response, get_invitation
-from app.src.timeblock import create_timeblock, delete_timeblock
+from app.src.timeblock import create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid
-from flask import render_template, current_app, redirect, url_for, session, request
+from flask import render_template, current_app, redirect, url_for, session, request, jsonify, make_response
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
 from datetime import datetime
+import json
 
 from app import db
 from app.main import bp
@@ -47,6 +48,19 @@ def event_test():
         return render_template("about.html")
     return render_template("login.html", 
             title='Login to TigerPlan')
+
+
+@bp.route("/events1", methods=["GET", "POST"])
+def event1():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        groups = get_user_groups(user.id)
+        events = get_user_events(user.id)
+        return render_template("event.html", 
+            title='TigerPlan Event Page', user=session['username'], 
+            groups=groups, events=events)
+    return render_template("login.html", 
+        title='Login to TigerPlan') 
 
 # ----------------------------- HOME -------------------------------- #
 @bp.route("/", methods=["GET", "POST"])
@@ -117,7 +131,7 @@ def about():
 # ------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------- #
-@bp.route("/moveEvent", methods=["POST"])
+@bp.route("/moveEvent/", methods=["POST"])
 def move_event():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
@@ -130,6 +144,36 @@ def move_event():
         title='Login to TigerResearch') 
 
 # --------------------- ADD DEFAULT CONFLICT ------------------------ #
+@bp.route("/saveNewSchedule/", methods=["GET", "POST"])
+def saveNewSchedule():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        schedule = json.loads(request.get_data())
+        start = datetime.fromisoformat(schedule['start']['_date'][:-1])
+        end = datetime.fromisoformat(schedule['end']['_date'][:-1])
+
+        create_timeblock(name=schedule['title'], user=user, start=start, 
+            end=end, isconflict=True)
+        return make_response(jsonify(success=True))
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
+@bp.route("/update_conflict/", methods=["GET", "POST"])
+def update_conflict():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        schedule = json.loads(request.get_data())
+
+        start = datetime.strptime(schedule['start'][5:], '%d %b %Y %H:%M:%S GMT')
+        end = datetime.strptime(schedule['end'][5:], '%d %b %Y %H:%M:%S GMT')
+
+         # retrieve database datetime
+        update_timeblock(schedule['id'], schedule['title'], start, end)
+
+        return make_response(jsonify(success=True))
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
 def add_conflict():
     if 'username' in session:
@@ -257,3 +301,12 @@ def logout_callback():
     # redirect from CAS logout request after CAS logout successfully
     session.pop('username', None)
     return redirect(url_for('main.index'))
+
+# ------------------------ LOAD CONFLICTS --------------------------- #
+@bp.route("/load_conflicts", methods=['GET', 'POST'])
+def load_conflicts():
+    user = get_user_from_netid(session['username'])
+    conflicts = get_user_conflicts(user.id)
+    conflicts = [conflict.to_json() for conflict in conflicts]
+
+    return jsonify(conflicts)
