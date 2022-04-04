@@ -226,9 +226,10 @@ function refreshScheduleVisibility() {
 }
 
 $(document).ready(function () {
+    addCalendar(cal);
+
     // call ajax to load calendar
     let url = '/load_conflicts'
-    addCalendar(cal);
 
     var toCreate = []
     schedules = $.ajax({
@@ -246,9 +247,10 @@ $(document).ready(function () {
                     dueDateClass: '',
                     start: response[i].start + 'Z',
                     end: response[i].end + 'Z',
-                    bgColor: "#" + randomColor,
-                    dragBgColor: "#" + randomColor,
-                    }
+                    bgColor: "#808080",
+                    dragBgColor: "#808080",
+                    isReadOnly: true
+                }
                 toCreate.push(d);
                 console.log(toCreate)
             }

@@ -84,6 +84,7 @@
                                 <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Event {{ event.id }} (Group {{ event.group_id }})</a>
                             {% endfor %}
                             {% endif %}
+                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="/events1"> Event A </a>
                         </div>
                     </div>
                     <div class="col-md-1"></div>
@@ -118,42 +119,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 <script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
-
-<script>
-    $(document).ready(function () {
-            // call ajax to load calendar
-            let url = '/load_conflicts'
-
-            var toCreate = []
-            schedules = $.ajax({
-                type: "GET",
-                url: url,
-                success: function (response) {
-                    console.log(response)
-                    for (let i = 0; i < response.length; i++) {
-                        var randomColor = Math.floor(Math.random() * 16777215).toString(16);
-                        var d = {
-                            id: response[i].id,
-                            calendarId: '1',
-                            title: response[i].name,
-                            category: 'time',
-                            dueDateClass: '',
-                            start: response[i].start + 'Z',
-                            end: response[i].end + 'Z',
-                            bgColor: "#" + randomColor,
-                            dragBgColor: "#" + randomColor,
-                        }
-                        toCreate.push(d);
-                        console.log(toCreate)
-                    }
-                    cal.createSchedules(toCreate);
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        });
-
-</script>
 
 {% endblock %}

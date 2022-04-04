@@ -60,6 +60,7 @@
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
+                        <hr>
                         <div class="panel-heading">
                             <h3 class="panel-title center" style="color: #7bd7ee">My Group Events</h3>
                         </div>
@@ -104,43 +105,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-    <script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
-
-    <script>
-        $(document).ready(function () {
-            // call ajax to load calendar
-            let url = '/load_conflicts'
-
-            var toCreate = []
-            schedules = $.ajax({
-                type: "GET",
-                url: url,
-                success: function (response) {
-                    console.log(response)
-                    for (let i = 0; i < response.length; i++) {
-                        var randomColor = Math.floor(Math.random() * 16777215).toString(16);
-                        var d = {
-                            id: response[i].id,
-                            calendarId: '1',
-                            title: response[i].name,
-                            category: 'time',
-                            dueDateClass: '',
-                            start: response[i].start + 'Z',
-                            end: response[i].end + 'Z',
-                            bgColor: "#808080",
-                            dragBgColor: "#808080",
-                            isReadOnly: true,
-                        }
-                        toCreate.push(d);
-                    }
-                    cal.createSchedules(toCreate);
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        });
-
-    </script>
+    <script src="{{ url_for('static', filename='scripts/event-calendar.js') }}"></script>
 
     {% endblock %}

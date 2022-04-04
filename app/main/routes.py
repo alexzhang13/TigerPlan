@@ -50,7 +50,7 @@ def event_test():
             title='Login to TigerPlan')
 
 
-@bp.route("/event1", methods=["GET", "POST"])
+@bp.route("/events1", methods=["GET", "POST"])
 def event1():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
