@@ -7,6 +7,10 @@ def get_user_from_id(id: int) -> Event:
     """Get the user from the user's id"""
     return db.session.query(User).filter(User.id == id).one()
 
+def get_users() -> User:
+    """Get all users"""
+    return db.session.query(User).all()
+
 def get_user_from_netid(netid: String) -> User:
     """Get the user from the user's unique netid"""
     user = db.session.query(User).filter(User.netid == netid).one()
@@ -44,5 +48,5 @@ def get_member_events(memberid: int) -> Event:
 def get_member_invitations(memberid: int) -> Invitation:
     """Get the user(member)'s invitations pending response. Returns a list of invitations."""
     mem_invs = db.session.query(Invitation).filter(
-        Invitation.user_id == memberid, Invitation.finalized == False).all()
+        Invitation.user_id == memberid).all()
     return mem_invs

@@ -1,0 +1,72 @@
+
+<div>Responding to Invitiation to <strong>{{invitation.event.name}}</strong></div>
+
+{% if invitation.event.finalized %}
+Event has already been finalized!
+{% elif invitation.finalized %}
+{% else %}
+
+<a>
+    <button id="finalizeButton" onclick="finalize({{invitation.id}})">Finalize response!</button>
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Timeblock</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    {% for timeblock in invitation.event.times %}
+    <tr>
+        <td>Start time: <strong>{{timeblock.start}}</strong>
+            <br>
+            End time: <strong>{{timeblock.end}}</strong>
+        </td>
+        <td id="availibity{{timeblock.id}}">
+            {% if timeblock.id in response_timeblockids %}
+            Available
+            {% else %}
+            Unavailable
+            {% endif %}
+        </td>
+        <td>
+
+            {% if timeblock.id in response_timeblockids %}
+            <button onclick="setAvailability({{invitation.id}}, {{timeblock.id}}, 'del')">
+                make unavailable
+            </button>
+            {% else %}
+            <button onclick="setAvailability({{invitation.id}}, {{timeblock.id}}, 'add')">
+                make available
+            </button>
+            {% endif %}
+        </td>
+    </tr>
+
+    {% endfor %}
+</table>
+{% endif %}
+<!-- <script>
+    'use strict'
+
+    function setAvailability(button, timeblockid) {
+        button.html = "selected";
+        
+        let id = 'availability' + timeblockid;
+        console.log(id);
+        if (button.available === "true") {
+            document.getElementById('availability' + timeblockid).html = "unavailable";
+        } else {
+            document.getElementById('availability' + timeblockid).html = "available";
+        }
+        console.log("selected " + timeblockid);
+    }
+
+    function finalize() {
+        
+        console.log("Finalize!")
+    }
+
+
+</script> -->
