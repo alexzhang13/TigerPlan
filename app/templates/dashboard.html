@@ -72,13 +72,13 @@
                 <div class="card-columns">
                     <div class="card mb-3">
                         <div class="card-header text-white bg-iris">
-                            <h5 class="card-title">My Recurring Events</h5>
+                            <h5 class="card-title">My Recurring Conflicts</h5>
                         </div>
                     </div>
                     {% for conflict in conflicts %}
                     <div class="card mt-3 mb-3">
                         <div class="card-header text-white bg-iris">
-                            Example Conflict #{{ conflict.id }}
+                            {{ conflict.name }}
                         </div>
                         <div class="card-body">
                             <div class="card-text">Start: {{ conflict.start }}</div>
@@ -92,7 +92,7 @@
             </div>
 
             <div class="container">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 {% if user is defined and user != '' %}
                 <div>
                     Showing conflicts for user <strong>{{ user }}</strong>:
@@ -104,7 +104,7 @@
                         <button> Add an example conflict with default field values.</button>
                     </a>
                 </div>
-                <br>
+                <br> -->
                 {% if invitations is defined and invitations != '' %}
                 <div>
                     {% for invite in invitations %}
