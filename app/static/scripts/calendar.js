@@ -15,6 +15,8 @@ var cal = new tui.Calendar('#calendar', {
     template: templates
 });
 
+calendarList.addCalendar(cal);
+
 // register templates
 var templates = {
     popupStateFree: function () {
@@ -93,6 +95,30 @@ cal.on({
         console.log('beforeUpdateSchedule', e);
 
         cal.updateSchedule(schedule.id, schedule.calendarId, changes);
+
+        var data = {
+            id: schedule.id,
+            title: schedule.title,
+            start: e.changes.start.toUTCString(),
+            end: e.changes.end.toUTCString(),
+        }
+        
+        var url = '/update_conflict'
+
+        console.log(data)
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(data),
+            dataType: "json",
+            success: function (response) {
+                console.log(response)
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
         // UPDATE ON DB ON FLASK
 
         refreshScheduleVisibility();
@@ -100,6 +126,8 @@ cal.on({
     'beforeDeleteSchedule': function (e) {
         console.log('beforeDeleteSchedule', e);
         cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
+        // UPDATE ON DB ON FLASK
+
     },
     'afterRenderSchedule': function (e) {
         var schedule = e.schedule;
@@ -126,11 +154,25 @@ cal.on({
     
 });
 
+function getHashId (startTime, endTime) {
+    var first = startTime.toString(36);
+    var second = endTime.toString(36);
+    return first + second;
+}
+
+function deleteSchedule(scheduleData) {
+    
+}
+
 function saveNewSchedule(scheduleData) {
     console.log('scheduleData ', scheduleData)
     var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    var randomId = Math.floor(Math.random() * 22345679).toString(16);
+
+    // figure out better ID genereation
+    var hashId = getHashId(scheduleData.start, scheduleData.end);
     var schedule = {
-        id: '1',
+        id: randomId,
         title: scheduleData.title,
         start: scheduleData.start,
         end: scheduleData.end,
@@ -150,6 +192,23 @@ function saveNewSchedule(scheduleData) {
 
     cal.createSchedules([schedule]);
 
+    // call ajax to save calendar
+    let url = '/saveNewSchedule'
+    console.log(JSON.stringify( schedule ))
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify( schedule ),
+        dataType: "json",
+        success: function (response) {
+            console.log(response)
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+
     // refreshScheduleVisibility();
 }
 
@@ -167,28 +226,3 @@ function refreshScheduleVisibility() {
         span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
     });
 }
-
-$(document).ready(function() {
-    calendarList.push(cal);
-    cal.createSchedules([
-        {
-            id: '1',
-            calendarId: '1',
-            title: 'my schedule',
-            category: 'time',
-            dueDateClass: '',
-            start: '2022-04-3T2:30:00+09:00',
-            end: '2022-04-3T03:30:00+09:00'
-        },
-        {
-            id: '2',
-            calendarId: '1',
-            title: 'second schedule',
-            category: 'time',
-            dueDateClass: '',
-            start: '2018-01-18T17:30:00+09:00',
-            end: '2018-01-19T17:31:00+09:00',
-            isReadOnly: true    // schedule is read-only
-        }
-    ]);
-});

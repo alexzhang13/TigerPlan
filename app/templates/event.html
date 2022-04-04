@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-purple">
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-skyblue">
     <div class="container-fluid">
         <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
             <a class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 navbar-brand"
@@ -16,10 +16,12 @@
                     <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">Manage Groups</a>
+                    <a class="nav-link" href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">Manage
+                        Groups</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.scheduler') }}" tabindex="-1" aria-disabled="true">Scheduler</a>
+                    <a class="nav-link" href="{{ url_for('main.scheduler') }}" tabindex="-1"
+                        aria-disabled="true">Scheduler</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('main.about') }}" tabindex="-1" aria-disabled="true">About</a>
@@ -53,35 +55,19 @@
 <div id="main" class="container px-4" style="height: 70%;">
     <div class="row gx-5">
         <div class="col-md-4">
-            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="group_panel">
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-10">
-                        <br>
-                        <div class="panel-heading">
-                            <h3 class="panel-title center" style="color: #C27BEE">My Owned Groups</h3>
-                        </div>
-                        <div class="btn-group-vertical d-flex justify-content-center">
-                            {% if groups is defined and groups != '' %}
-                            {% for group in groups %}
-                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Group {{ group.id }} </a>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-1"></div>
-                </div>
-                <hr>
+            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;"
+                id="group_panel">
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
                         <div class="panel-heading">
-                            <h3 class="panel-title center" style="color: #C27BEE">My Group Events</h3>
+                            <h3 class="panel-title center" style="color: #7bd7ee">My Group Events</h3>
                         </div>
                         <div class="btn-group-vertical d-flex justify-content-center">
                             {% if events is defined and groups != '' %}
                             {% for event in events %}
-                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Event {{ event.id }} (Group {{ event.group_id }})</a>
+                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#">
+                                Event {{ event.id }} (Group {{ event.group_id }})</a>
                             {% endfor %}
                             {% endif %}
                         </div>
@@ -97,30 +83,31 @@
                 <div class="panel-heading">
                     <h3 class="panel-title center">My Events</h3>
 
-                <div id="menu">
-                    <span id="menu-navi">
-                      <button type="button" class="btn btn-default btn-sm move-today" data-action="move-today">Today</button>
-                      <button type="button" class="btn btn-default btn-sm move-day" data-action="move-prev">
-                        <i class="calendar-icon ic-arrow-line-left" data-action="move-prev"></i>
-                      </button>
-                      <button type="button" class="btn btn-default btn-sm move-day" data-action="move-next">
-                        <i class="calendar-icon ic-arrow-line-right" data-action="move-next"></i>
-                      </button>
-                    </span>
-                    <span id="renderRange" class="render-range"></span>
-                  </div>
-              
-                <div id="calendar"></div>
+                    <div id="menu">
+                        <span id="menu-navi">
+                            <button type="button" class="btn btn-default btn-sm move-today"
+                                data-action="move-today">Today</button>
+                            <button type="button" class="btn btn-default btn-sm move-day" data-action="move-prev">
+                                <i class="calendar-icon ic-arrow-line-left" data-action="move-prev"></i>
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm move-day" data-action="move-next">
+                                <i class="calendar-icon ic-arrow-line-right" data-action="move-next"></i>
+                            </button>
+                        </span>
+                        <span id="renderRange" class="render-range"></span>
+                    </div>
+
+                    <div id="calendar"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-<script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+    <script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
 
-<script>
-    $(document).ready(function () {
+    <script>
+        $(document).ready(function () {
             // call ajax to load calendar
             let url = '/load_conflicts'
 
@@ -140,11 +127,11 @@
                             dueDateClass: '',
                             start: response[i].start + 'Z',
                             end: response[i].end + 'Z',
-                            bgColor: "#" + randomColor,
-                            dragBgColor: "#" + randomColor,
+                            bgColor: "#808080",
+                            dragBgColor: "#808080",
+                            isReadOnly: true,
                         }
                         toCreate.push(d);
-                        console.log(toCreate)
                     }
                     cal.createSchedules(toCreate);
                 },
@@ -154,6 +141,6 @@
             });
         });
 
-</script>
+    </script>
 
-{% endblock %}
+    {% endblock %}

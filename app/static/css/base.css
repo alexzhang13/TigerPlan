@@ -49,6 +49,10 @@ main {
   border-color: #4BE6CA!important;
 }
 
+.border-skyblue {
+  border-color: #7bd7ee!important;
+}
+
 .card-header {
   text-emphasis-color: #ffffff;
 }
