@@ -111,6 +111,19 @@
                                 <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
                                 <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
                                 <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed Time</span></div>
+                                    <input type="text" name="start1" id ="Start1" class="form-control" placeholder="Start Time">
+                                    <input type="text" name="end1" id="End1" class="form-control" placeholder="End Time">
+                                </div>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed Time</span></div>
+                                    <input type="text" name="start2" id ="Start2" class="form-control" placeholder="Start Time">
+                                    <input type="text" name="end2" id="End2" class="form-control" placeholder="End Time">
+                                </div>
+                                <small id="passwordHelpBlock" class="form-text text-muted">
+                                    Specify times in the format YYYY-MM-DD HR:MN:SC (for example, "2018-11-28 00:00:00").
+                                </small>
                                 <button id = "createNewEvent"> Create Event</button>
                                 </form>
                         </div>
@@ -140,15 +153,25 @@
       let name = $('#NewEventName').val();
       let location = $('#NewEventLocation').val();
       let description = $('#NewEventDescription').val();
+      let start1 = $('#Start1').val();
+      let start2 = $('#Start2').val();
+      let end1 = $('#End1').val();
+      let end2 = $('#End2').val();
       id = encodeURIComponent(id);
       name = encodeURIComponent(name);
       location = encodeURIComponent(location);
       description = encodeURIComponent(description);
+      start1 = encodeURIComponent(start1);
+      start2 = encodeURIComponent(start2);
+      end1 = encodeURIComponent(end1);
+      end2 = encodeURIComponent(end2);
   
       let url = '/add_event?id=' + id
       url += "&name=" + name
       url += '&location=' + location
       url += '&description=' + description 
+      url += '&start1=' + start1 + '&end1=' + end1
+      url += '&start2=' + start2 + '&end2=' + end1
   
       if (request != null)
         request.abort();

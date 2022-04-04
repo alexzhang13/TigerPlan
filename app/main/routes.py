@@ -1,5 +1,5 @@
 from app.src.group import add_member, create_group, delete_group
-from app.src.timeblock import create_timeblock, delete_timeblock
+from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_update_finalized, invitation_update_response
@@ -211,8 +211,16 @@ def add_event():
         name = request.args.get('name')
         location = request.args.get('location')
         description = request.args.get('description')
-        create_event(groupid=id, name=name, owner=user, 
-            location=location, description=description) 
+        new_event = create_event(groupid=id, name=name, owner=user,
+            location=location, description=description)
+
+        start1 = request.args.get('start1')
+        start2 = request.args.get('start2')
+        end1 = request.args.get('end1')
+        end2 = request.args.get('end2')
+
+        create_event_timeblock(eventId=new_event.id, start=start1, end=end1, isconflict=False)
+        create_event_timeblock(eventId=new_event.id, start=start2, end=end2, isconflict=False)
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerPlan')

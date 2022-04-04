@@ -14,6 +14,16 @@ def create_timeblock(name: str, user: User, start: DateTime, end: DateTime, isco
     db.session.commit()
     return new_tb
 
+def create_event_timeblock(start: DateTime, end: DateTime, isconflict: bool, eventId: int) -> TimeBlock:
+    """Create a time block. Returns created time block."""
+    new_tb = TimeBlock(start=start,
+                      end=end,
+                      is_conflict=isconflict,
+                      event_id=eventId)
+    db.session.add(new_tb)
+    db.session.commit()
+    return new_tb
+
 def get_timeblock(id: int) -> TimeBlock:
     """Get a time block. Returns time block."""
     return db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
