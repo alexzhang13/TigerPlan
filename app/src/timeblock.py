@@ -28,11 +28,14 @@ def get_timeblock(id: int) -> TimeBlock:
     """Get a time block. Returns time block."""
     return db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
 
-def update_timeblock(id: int, name: str) -> TimeBlock:
+def update_timeblock(id: int, name: str, start: TimeBlock, end: TimeBlock) -> TimeBlock:
     """Update a time block. Returns updated time block."""
     updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
     if name is not None:
         updated_tb.name = name
+    updated_tb.start = start
+    updated_tb.end = end
+    
     db.session.add(updated_tb)
     db.session.commit()
     return updated_tb
