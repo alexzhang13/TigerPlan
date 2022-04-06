@@ -1,4 +1,4 @@
-from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_members, update_group_name, update_owner
+from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
@@ -323,7 +323,7 @@ def manage_members(groupid):
         group = get_group(groupid)
         members = get_members(groupid)
         users = get_users()
-        return render_template("members.html", group=group, members=members, users=users)
+        return render_template("groupmembers.html", group=group, members=members, users=users)
     return render_template("login.html", 
         title='Login to TigerPlan')
 
@@ -334,6 +334,16 @@ def admin(groupid):
         group = get_group(groupid)
         members = get_members(groupid)
         return render_template("groupadmin.html", group=group, members=members)
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ------------------- GROUP EVENTS ---------------------- #
+@bp.route("/groupevents/<groupid>", methods=['GET', 'POST'])
+def groupevents(groupid):
+    if 'username' in session:
+        group = get_group(groupid)
+        events = get_group_events(groupid)
+        return render_template("groupevent.html", group=group, events=events)
     return render_template("login.html", 
         title='Login to TigerPlan')
 

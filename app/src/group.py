@@ -74,3 +74,6 @@ def update_group_name(groupid: int, newName: str) -> bool:
     db.session.add(group)
     db.session.commit()
     return db.session.query(Group).filter(Group.id == groupid, Group.name == newName).all() != None
+
+def get_group_events(groupid: int) -> Event:
+    return db.session.query(Event).filter(Event.group_id == groupid).all()
