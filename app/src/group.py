@@ -51,10 +51,12 @@ def add_member(id: int, memberId: int) -> bool:
     db.session.commit()
     return new_mem_group.id != None
 
-def delete_member(id: int, member: User) -> bool:
-    del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==member.id)
+def delete_member(id: int, memberId: int) -> bool:
+    del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).one()
     db.session.delete(del_mem_group)
     db.session.commit()
     return del_mem_group.id == None
     
-
+def get_members(groupid: int) -> User:
+    '''Get the group's members. Returns a list of users.'''
+    return db.session.query(User).filter(Member_Group.group_id == groupid, Member_Group.member_id == User.id).all()

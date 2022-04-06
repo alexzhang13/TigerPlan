@@ -1,4 +1,4 @@
-from app.src.group import add_member, create_group, delete_group
+from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_members
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
@@ -244,7 +244,7 @@ def add_custom_group():
         add_member(id=new_group.id, memberId=member)
         return redirect("/mygroups")
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerResearch')
 
 # --------------------- CREATE CUSTOM EVENT ------------------------ #
 @bp.route("/add_event", methods=['GET', 'POST'])
@@ -317,6 +317,37 @@ def add_invitations(id):
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerPlan') 
+
+# ------------------- MEMBERs ---------------------- #
+@bp.route("/members/<groupid>", methods=['GET', 'POST'])
+def manage_members(groupid):
+    if 'username' in session:
+        group = get_group(groupid)
+        members = get_members(groupid)
+        users = get_users()
+        return render_template("members.html", group=group, members=members, users=users)
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ------------------------ REMOVE MEMBER ----------------------------- #
+@bp.route("/remove_member/<groupid>/<id>", methods=['GET', 'POST'])
+def remove_member(groupid, id):
+    if 'username' in session:
+        delete_member(groupid, id)
+        return redirect("/members/" + groupid)
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ----------------------- ADD GROUP MEMBER ------------------------- #
+@bp.route("/add_new_member", methods=['GET', 'POST'])
+def add_new_member():
+    if 'username' in session:
+        groupId = request.args.get('group')
+        member = request.args.get('member')
+        add_member(id=groupId, memberId=member)
+        return redirect("/members/" + groupId)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
 
 # ------------------- EDIT INVITATION RESPONSE ---------------------- #
 @bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])

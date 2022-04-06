@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if members is defined %}
+<div><strong>{{ group.name }}</strong></div>
+<div>Group Members</div>
+
+<form action="" method="get">
+    <div>
+        <select id="NewGroupMember" class="form-select form-select-sm">
+            {% if users is defined and users != '' %}
+            {% for user in users %}
+            <option value="{{ user.id }}">{{ user.netid }}</option>
+            {% endfor %}
+            {% endif %}
+        </select> <span>Select Group Members</span>
+        <button id="addNewMember">Add Member</button>
+    </div>
+</form>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Netid</th>
+        </tr>
+    </thead>
+    {% for member in members %}
+    <tr>
+        <td>{{ member.name }}</td>
+        <td>{{ member.netid }}</td>
+        <td>
+            <a href="/remove_member/{{ group.id }}/{{ member.id }}">Remove Member</a>
+        </td>
+    </tr>
+
+    {% endfor %}
+</table>
+{% endif %}
+
+<script>
+
+    'use strict';
+    let request = null;
+  
+    function getResults() {
+      let member = $('#NewGroupMember :selected').val();
+      member = encodeURIComponent(member);
+  
+      let url = '/add_new_member?group=' + '{{ group.id }}'
+      url += '&member=' + member
+  
+      if (request != null)
+        request.abort();
+  
+      request = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
+    }
+  
+    function setup() {
+      $('#addNewMember').on('click', getResults);
+    }
+  
+    $('document').ready(setup);
+  
+  </script>
+{% endblock %}
