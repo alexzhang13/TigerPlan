@@ -60,3 +60,17 @@ def delete_member(id: int, memberId: int) -> bool:
 def get_members(groupid: int) -> User:
     '''Get the group's members. Returns a list of users.'''
     return db.session.query(User).filter(Member_Group.group_id == groupid, Member_Group.member_id == User.id).all()
+
+def update_owner(groupid: int, newOwnerId: int) -> bool:
+    group = db.session.query(Group).filter(Group.id == groupid).one()
+    group.owner_id = newOwnerId
+    db.session.add(group)
+    db.session.commit()
+    return db.session.query(Group).filter(Group.id == groupid, Group.owner_id == newOwnerId).one() != None
+
+def update_group_name(groupid: int, newName: str) -> bool:
+    group = db.session.query(Group).filter(Group.id == groupid).one()
+    group.name = newName
+    db.session.add(group)
+    db.session.commit()
+    return db.session.query(Group).filter(Group.id == groupid, Group.name == newName).all() != None

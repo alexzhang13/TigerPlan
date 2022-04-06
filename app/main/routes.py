@@ -1,4 +1,4 @@
-from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_members
+from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
@@ -239,9 +239,7 @@ def add_custom_group():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         name = request.args.get('name')
-        member = request.args.get('member')
         new_group = create_group(name=name, owner=user)
-        add_member(id=new_group.id, memberId=member)
         return redirect("/mygroups")
     return render_template("login.html", 
         title='Login to TigerResearch')
@@ -329,6 +327,16 @@ def manage_members(groupid):
     return render_template("login.html", 
         title='Login to TigerPlan')
 
+# ------------------- GROUP ADMIN ---------------------- #
+@bp.route("/admin/<groupid>", methods=['GET', 'POST'])
+def admin(groupid):
+    if 'username' in session:
+        group = get_group(groupid)
+        members = get_members(groupid)
+        return render_template("groupadmin.html", group=group, members=members)
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
 # ------------------------ REMOVE MEMBER ----------------------------- #
 @bp.route("/remove_member/<groupid>/<id>", methods=['GET', 'POST'])
 def remove_member(groupid, id):
@@ -346,6 +354,28 @@ def add_new_member():
         member = request.args.get('member')
         add_member(id=groupId, memberId=member)
         return redirect("/members/" + groupId)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- TRANSFER OWNERSHIP ------------------------- #
+@bp.route("/change_ownership", methods=['GET', 'POST'])
+def change_ownership():
+    if 'username' in session:
+        groupId = request.args.get('group')
+        member = request.args.get('member')
+        update_owner(groupid=groupId, memberId=member)
+        return redirect("/admin/" + groupId)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- CHANGE GROUP NAME ------------------------- #
+@bp.route("/change_group_name", methods=['GET', 'POST'])
+def change_group_name():
+    if 'username' in session:
+        groupId = request.args.get('group')
+        name = request.args.get('name')
+        update_group_name(groupid=groupId, newName=name)
+        return redirect("/admin/" + groupId)
     return render_template("login.html", 
         title='Login to TigerResearch')
 

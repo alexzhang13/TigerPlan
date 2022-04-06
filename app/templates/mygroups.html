@@ -87,12 +87,7 @@
                     {% for group in groups %}
                         <div class = "card mt-3 mb-3">
                             <div class="card-header text-white bg-teal">{{ group.name }}</div>
-                            <div class="card-body">
-                            <p class="card-text">Some example text about group #{{ group.id }}.</p>
-                            <a href="/del_group/{{ group.id }}">
-                                <button> Delete group {{ group.id }} and related events.</button>
-                            </a>
-                            </div>
+                            <div class="card-body"></div>
                         </div>
                     {% endfor %}
                         <div class = "card mt-3 mb-3">
@@ -102,13 +97,6 @@
                             <form action="" method="get">
                                 <div>
                                     <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                    <select id="NewGroupMember" class="form-select form-select-sm">
-                                        {% if users is defined and users != '' %}
-                                        {% for invitee in users %}
-                                        <option value="{{ invitee.id }}">{{ invitee.netid }}</option>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </select> <span>Select Group Members</span>
                                     <button id="createNewGroup">Create New Group</button>
                                 </div>
                             </form>
@@ -170,12 +158,9 @@
   
     function getResults() {
       let name = $('#NewGroupName').val();
-      let member = $('#NewGroupMember :selected').val();
       name = encodeURIComponent(name);
-      member = encodeURIComponent(member);
   
       let url = '/add_custom_group?name=' + name
-      url += '&member=' + member
   
       if (request != null)
         request.abort();
