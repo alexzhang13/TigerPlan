@@ -152,23 +152,15 @@ cal.on({
     
 });
 
-function getHashId (startTime, endTime) {
-    var first = startTime.toString(36);
-    var second = endTime.toString(36);
-    return first + second;
-}
-
 function deleteSchedule(scheduleData) {
     
 }
 
 function saveNewSchedule(scheduleData) {
-    console.log('scheduleData ', scheduleData)
     var randomColor = Math.floor(Math.random() * 16777215).toString(16);
     var randomId = Math.floor(Math.random() * 22345679).toString(16);
 
     // figure out better ID genereation
-    var hashId = getHashId(scheduleData.start, scheduleData.end);
     var schedule = {
         id: randomId,
         title: scheduleData.title,
@@ -188,11 +180,8 @@ function saveNewSchedule(scheduleData) {
         // state: scheduleData.state
     };
 
-    cal.createSchedules([schedule]);
-
     // call ajax to save calendar
     let url = '/saveNewSchedule'
-    console.log(JSON.stringify( schedule ))
 
     $.ajax({
         type: "POST",
@@ -201,6 +190,9 @@ function saveNewSchedule(scheduleData) {
         dataType: "json",
         success: function (response) {
             console.log(response)
+            schedule['id'] = response.id
+            console.log(schedule)
+            cal.createSchedules([schedule]);
         },
         error: function (error) {
             console.log(error);
