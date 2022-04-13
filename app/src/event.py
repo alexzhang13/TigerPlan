@@ -54,7 +54,6 @@ def delete_event(id: int) -> bool:
     return del_event.id == None
 
 #---------------------------- Spec Functions -------------------------#
-# TODO: This should most likely also throw out old invitations
 def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     """Sets the proposed time for an event. Returns the modifed event.
     Takes in the parameters datetimes as an list of tuples, where the 
@@ -65,7 +64,7 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     for tb in event.times:
         db.session.delete(tb)
 
-    for i, start_end in enumerate(datetimes):
+    for start_end in datetimes:
         tb = TimeBlock(start = start_end[0], end = start_end[1], is_conflict = False, event_id = event.id)
         db.session.add(tb)
 
@@ -110,16 +109,6 @@ def event_set_chosen_time(id: int, timeblockid: int) -> Event:
     db.session.add(event)
     db.session.commit()
     return event
-
-# def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
-#     """Create an event. Returns created event."""
-#     new_event = Event(name=name,
-#                       owner_id=owner.id,
-#                       location=location,
-#                       description=description)
-#     db.session.add(new_event)
-#     db.session.commit()
-#     return new_event
 
 def create_event_invitations(id: int) -> Invitation:
     """Sends an invitation to every group member of the event."""
