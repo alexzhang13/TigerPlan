@@ -1,15 +1,16 @@
+from datetime import datetime
 from webbrowser import get
 from xmlrpc.client import DateTime
 import app
 from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, Member_Group, User, Event
 from app.src.invitation import create_invitation
-from app.src.timeblock import get_timeblock
+from app.src.timeblock import create_event_timeblock, get_timeblock
 from flask import request
 from app import db, login
 
 #---------------------------- CRUD Functions -------------------------#
 
-def create_event(name: str, owner: User, location: str, description: str, groupid: int) -> Event:
+def create_event(name: str, owner: User, location: str, description: str, groupid: int, timeblocks) -> Event:
     """Create an event. Returns created event."""
     new_event = Event(group_id=groupid, 
                       name=name,
@@ -17,6 +18,15 @@ def create_event(name: str, owner: User, location: str, description: str, groupi
                       location=location,
                       description=description)
     db.session.add(new_event)
+    
+    # make sure id is accessable
+    db.session.flush()
+
+    for timeblock in timeblocks:
+        start = datetime.fromisoformat(timeblock['start']['_date'][:-1])
+        end = datetime.fromisoformat(timeblock['end']['_date'][:-1])
+        _ = create_event_timeblock(eventId=new_event.id, start=start, end=end, isconflict=False, commit=False)
+
     db.session.commit()
     return new_event
 

@@ -118,18 +118,6 @@
                                     placeholder="Event Location" autofocus>
                                 <input type="text" name="newEventDescription" id="NewEventDescription"
                                     class="form-control" placeholder="Event Description" autofocus>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed
-                                            Time</span></div>
-                                    <input type="text" name="start1" id="Start1" class="form-control"
-                                        placeholder="Start Time">
-                                    <input type="text" name="end1" id="End1" class="form-control"
-                                        placeholder="End Time">
-                                </div>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed
-                                            Time</span></div>
-                                </div>
                                 <small id="passwordHelpBlock" class="form-text text-muted">
                                     Specify times by dragging in the calendar!
                                 </small>
@@ -212,12 +200,7 @@
         let name = $('#NewEventName').val();
         let location = $('#NewEventLocation').val();
         let description = $('#NewEventDescription').val();
-        id = encodeURIComponent(id);
-        name = encodeURIComponent(name);
-        location = encodeURIComponent(location);
-        description = encodeURIComponent(description);
         let schedules = getAllSchedules();
-        console.log(schedules);
 
         let timeblocks = []
         for (let i = 0; i < schedules.length; i++) {
@@ -227,7 +210,30 @@
                 timeblock.start = schedule.start;
                 timeblock.end = schedule.end;
             }
+            timeblocks.push(timeblock);
         }
+
+        let newEventData = {};
+        newEventData.groupId = id;
+        newEventData.name = name;
+        newEventData.location = location;
+        newEventData.description = description;
+        newEventData.timeblocks = timeblocks;
+
+        console.log(newEventData);
+        let url = '/add_event'
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(newEventData),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
     }
 
     function setup() {
