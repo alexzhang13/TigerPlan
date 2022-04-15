@@ -76,28 +76,29 @@
                             <h5 class="card-title">Planned Events</h5>
                         </div>
                     </div>
-                    {% for event in events %}
-                    <div class="card mt-3 mb-3">
-                        <div class="card-header text-white bg-teal">
-                            Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                    <span id="existingEvents">
+                        {% for event in events %}
+                        <div class="card mt-3 mb-3" id="eventCard{{event.id}}">
+                            <div class="card-header text-white bg-teal">
+                                Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                            </div>
+                            <div class="card-body">
+                                <a href="/del_event/{{ event.id }}">
+                                    <button> Delete Event </button>
+                                </a>
+                                {% if not event.finalized and event.invitations|length == 0 %}
+                                <a href="/cr_event_invitations/{{ event.id }}">
+                                    <button> Create Event Invitations </button>
+                                </a>
+                                {% endif %}
+                                <a href="/view_event_details/{{event.id}}" target="_blank">
+                                    <button>View details</button>
+                                </a>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <a href="/del_event/{{ event.id }}">
-                                <button> Delete Event </button>
-                            </a>
-                            {% if not event.finalized and event.invitations|length == 0 %}
-                            <a href="/cr_event_invitations/{{ event.id }}">
-                                <button> Create Event Invitations </button>
-                            </a>
-                            {% endif %}
-                            <a href="/view_event_details/{{event.id}}" target="_blank">
-                                <button>View details</button>
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <button id="showCreateEventCardButton"
-                            onclick="showCreateEventCard(true)">
+                        {% endfor %}
+                    </span>
+                    <button id="showCreateEventCardButton" onclick="showCreateEventCard(true)">
                         Create Event!
                     </button>
                     <div class="card mt-3 mb-3" id="createEventCard" style="display: none;">
@@ -127,6 +128,10 @@
                             <button id="createNewEventButton">Create Event</button>
                         </div>
                     </div>
+                    <div id="serverResponse">
+
+                    </div>
+
                 </div>
                 {% endif %}
             </div>
@@ -152,7 +157,7 @@
             $("#showCreateEventCardButton").hide();
             renderTimeSelectionCalendar();
         } else {
-            $("#createEventCard").hide(5000);
+            $("#createEventCard").hide(500);
             $("#showCreateEventCardButton").show();
             destroyTimeSelectionCalendar();
         }
@@ -194,6 +199,47 @@
         );
     }
 
+    function makeNewEventCard(eventId, eventName, groupName) {
+        let deleteButton = $('<button>', { text: "Delete Event" });
+        let deleteLink = $('<a>');
+        deleteLink.attr("href", "/def_event/" + eventId);
+        deleteLink.append(deleteButton);
+
+        let createInvitesButton = $('<button>',
+            { text: "Create Event Invitations" });
+        let createLink = $('<a>');
+        createLink.attr("href", "cr_event_invitations/" + eventId);
+        createLink.append(createInvitesButton);
+
+        let detailsButton = $('<button>', { text: "View details" });
+        let detailsLink = $('<a>');
+        detailsLink.attr("href", "view_event_detais/" + eventId);
+        detailsLink.attr("target", "_blank");
+        detailsLink.append(detailsLink);
+
+        let cardBody = $('<div>');
+        cardBody.addClass("card-body");
+        cardBody.append(deleteButton);
+        cardBody.append(createInvitesButton);
+        cardBody.append(detailsButton);
+
+        let cardHead = $('<div>');
+        cardHead.addClass("card-header text-white bg-teal");
+        cardHead.append({ text: "Event name: " })
+        let eventNameStrong = $('<strong>', { text: eventName });
+        cardHead.append(eventNameStrong);
+        cardHead.append({ text: "Group: " + groupName });
+
+        let card = $('<div>');
+        card.attr({ class: "card mt-3 mb-3" })
+        card.addClass("card mt-3 mb-3");
+        card.attr("id", "eventCard" + eventId);
+        card.append(cardHead);
+        card.append(cardBody);
+
+        $("#existingEvents").append(card);
+    }
+
     function createNewEvent() {
         console.log("creating new event");
         let id = $('#NewEventGroupId :selected').val();
@@ -229,10 +275,51 @@
             dataType: "json",
             success: function (response) {
                 console.log(response);
+                let banner = $('<div>', { text: response.response });
+                if (response.response === "success") {
+                    banner.addClass("alert alert-success");
+                } else {
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#serverResponse");
+
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return;
+                }
+                banner.appendTo("#serverResponse");
+
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+
+                $("createNewEventButton").prop("disabled", false);
+                makeNewEventCard(response.newEventId,
+                    name, response.groupName);
+                showCreateEventCard(false);
             },
             error: function (error) {
                 console.log(error);
+                let banner = $('<div>', { text: "an error occurred" });
+                banner.addClass("alert alert-warning");
+                banner.appendTo("#serverResponse");
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+                $("createNewEventButton").prop("disabled", false);
             }
+        });
+        $("createNewEventButton").on('click', function () {
+            $(this).prop("disabled", true);
         });
     }
 

@@ -248,27 +248,31 @@ def add_custom_group():
 @bp.route("/add_event", methods=['GET', 'POST'])
 def add_event():
     if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        schedule = json.loads(request.get_data())
-        print(schedule)
-        group_id = schedule['groupId']
-        name = schedule['name']
-        location = schedule['location']
-        description = schedule['description']
-        timeblocks = schedule['timeblocks']
-        new_event = create_event(groupid=group_id, name=name,
-                                owner=user, location=location, 
-                                description=description,
-                                timeblocks=timeblocks)
-
-        # start1 = request.args.get('start1')
-        # start2 = request.args.get('start2')
-        # end1 = request.args.get('end1')
-        # end2 = request.args.get('end2')
-
-        # create_event_timeblock(eventId=new_event.id, start=start1, end=end1, isconflict=False)
-        # create_event_timeblock(eventId=new_event.id, start=start2, end=end2, isconflict=False)
-        return make_response("success!")
+        try:
+            user = get_user_from_netid(session['username'])
+            schedule = json.loads(request.get_data())
+            group_id = schedule['groupId']
+            name = schedule['name']
+            location = schedule['location']
+            description = schedule['description']
+            timeblocks = schedule['timeblocks']
+            new_event = create_event(groupid=group_id, name=name,
+                                    owner=user, location=location, 
+                                    description=description,
+                                    timeblocks=timeblocks)
+            response_json = json.dumps({"response":"success", 
+                "newEventId":new_event.id,
+                "groupName":new_event.group.name
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/add_event':", ex)
+            response_json = json.dumps({"response":"failure"})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     return render_template("login.html", 
         title='Login to TigerPlan')
 
