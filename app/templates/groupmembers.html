@@ -1,8 +1,5 @@
-{% extends "base.html" %}
 
-{% block content %}
-{% if members is defined %}
-<div><strong>{{ group.name }}</strong></div>
+<div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
 <form action="" method="get">
@@ -18,7 +15,7 @@
     </div>
 </form>
 
-
+{% if members is defined %}
 <table class="table table-striped">
     <thead>
         <tr>
@@ -31,7 +28,7 @@
         <td>{{ member.name }}</td>
         <td>{{ member.netid }}</td>
         <td>
-            <a href="/remove_member/{{ group.id }}/{{ member.id }}">Remove Member</a>
+            <a href="/remove_member/{{ this_group.id }}/{{ member.id }}">Remove Member</a>
         </td>
     </tr>
 
@@ -48,7 +45,7 @@
       let member = $('#NewGroupMember :selected').val();
       member = encodeURIComponent(member);
   
-      let url = '/add_new_member?group=' + '{{ group.id }}'
+      let url = '/add_new_member?group=' + '{{ this_group.id }}'
       url += '&member=' + member
   
       if (request != null)
@@ -69,4 +66,3 @@
     $('document').ready(setup);
   
   </script>
-{% endblock %}
