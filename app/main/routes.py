@@ -96,6 +96,7 @@ def dashboard():
 ### Respond to an invitation as an invitee. Called using AJAX in dashboard ###
 @bp.route("/respond_to_invitation/<id>", methods=['GET', 'POST'])
 def respond_to_invitation(id):
+    # TODO: Make JSON
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         try:
@@ -252,10 +253,17 @@ def add_event():
             user = get_user_from_netid(session['username'])
             schedule = json.loads(request.get_data())
             group_id = schedule['groupId']
+            # TODO: Make sure group_id is valid?
+            group_id = int(group_id)
             name = schedule['name']
+            if (name is None or name.strip() == ""):
+                raise Exception("Name is abscent")
             location = schedule['location']
             description = schedule['description']
             timeblocks = schedule['timeblocks']
+            if (len(timeblocks) == 0):
+                raise Exception("No timeblocks included")
+            
             new_event = create_event(groupid=group_id, name=name,
                                     owner=user, location=location, 
                                     description=description,
@@ -281,6 +289,7 @@ def add_event():
 def finalize_event(eventid, timeid):
     if 'username' in session:
         user = get_user_from_netid(session['username'])
+        #TODO: check authorization
         event_finalize(eventid, timeid)
         return redirect("/scheduler")
     return render_template("login.html", 
@@ -290,6 +299,7 @@ def finalize_event(eventid, timeid):
 @bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
 def del_conflict(id):
     if 'username' in session:
+        #TODO: check authorization
         delete_timeblock(id) 
         return redirect("/dashboard")
     return render_template("login.html", 
@@ -299,6 +309,7 @@ def del_conflict(id):
 @bp.route("/del_group/<id>", methods=['GET', 'POST'])
 def del_group(id):
     if 'username' in session:
+        #TODO: check authorization
         delete_group(id) 
         return redirect("/mygroups")
     return render_template("login.html", 
@@ -309,8 +320,13 @@ def del_group(id):
 def del_event(id):
     if 'username' in session:
         try:
+            user = get_user_from_netid(session['username'])
+            event = get_event(id)
+            if (event.owner_id != user.id):
+                raise Exception("User is not event owner")
             delete_event(id)
-        except:
+        except Exception as ex:
+            print("An exception occured at '/del_event':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
@@ -328,6 +344,7 @@ def add_invitations(id):
         user = get_user_from_netid(session['username'])
         event = get_event(id)
         if (event.owner_id != user.id):
+            # TODO: Make this JSON
             html = "<strong>Error fetching event<strong>"
             return make_response(html)
         create_event_invitations(id) 
@@ -339,7 +356,11 @@ def add_invitations(id):
 @bp.route("/members/<groupid>", methods=['GET', 'POST'])
 def manage_members(groupid):
     if 'username' in session:
+        # TODO: Authorization checking
+        # user = get_user_from_netid(session['username'])
         group = get_group(groupid)
+        # if (group.owner_id != user.id):
+        #     raise Exception("User is not group owner")
         members = get_members(groupid)
         users = get_users()
         return render_template("groupmembers.html", group=group, members=members, users=users)
@@ -350,6 +371,7 @@ def manage_members(groupid):
 @bp.route("/admin/<groupid>", methods=['GET', 'POST'])
 def admin(groupid):
     if 'username' in session:
+        # TODO: Authorization checking
         group = get_group(groupid)
         members = get_members(groupid)
         return render_template("groupadmin.html", group=group, members=members)
@@ -360,6 +382,7 @@ def admin(groupid):
 @bp.route("/groupevents/<groupid>", methods=['GET', 'POST'])
 def groupevents(groupid):
     if 'username' in session:
+        # TODO: Authorization checking
         group = get_group(groupid)
         events = get_group_events(groupid)
         return render_template("groupevent.html", group=group, events=events)
@@ -370,6 +393,7 @@ def groupevents(groupid):
 @bp.route("/remove_member/<groupid>/<id>", methods=['GET', 'POST'])
 def remove_member(groupid, id):
     if 'username' in session:
+        # TODO: Authorization checking
         delete_member(groupid, id)
         return redirect("/members/" + groupid)
     return render_template("login.html", 
@@ -379,6 +403,7 @@ def remove_member(groupid, id):
 @bp.route("/add_new_member", methods=['GET', 'POST'])
 def add_new_member():
     if 'username' in session:
+        # TODO: Authorization checking
         groupId = request.args.get('group')
         member = request.args.get('member')
         add_member(id=groupId, memberId=member)
@@ -390,6 +415,7 @@ def add_new_member():
 @bp.route("/change_ownership", methods=['GET', 'POST'])
 def change_ownership():
     if 'username' in session:
+        # TODO: Authorization checking
         groupId = request.args.get('group')
         member = request.args.get('member')
         update_owner(groupid=groupId, memberId=member)
@@ -401,6 +427,7 @@ def change_ownership():
 @bp.route("/change_group_name", methods=['GET', 'POST'])
 def change_group_name():
     if 'username' in session:
+        # TODO: Authorization checking
         groupId = request.args.get('group')
         name = request.args.get('name')
         update_group_name(groupid=groupId, newName=name)
@@ -416,6 +443,7 @@ def add_invitation_response_time(invitationid, timeid):
         invitation = get_invitation(invitationid)
         if invitation.user_id != user.id:
             html = "<strong>Error fetching invitation<strong>"
+            # TODO: Make JSON
             print("Invitation is not owned by user")
             return make_response(html, 400)
         else:
@@ -423,9 +451,12 @@ def add_invitation_response_time(invitationid, timeid):
                 invitation_add_response_time(invitationid, timeid)
             except ValueError as ex:
                 html = "<strong>%s<strong>" % str(ex)
+                # TODO: Make JSON
                 print("value error", str(ex))
                 return make_response(html, 400)
+            # TODO: Make JSON
             return "Success!"
+    # TODO: Make JSON
     return render_template("login.html", 
         title='Login to TigerPlan')
 
@@ -435,6 +466,7 @@ def del_invitation_response_time(invitationid, timeid):
         user = get_user_from_netid(session['username'])
         invitation = get_invitation(invitationid)
         if (invitation.user_id != user.id):
+            # TODO: Make JSON
             html = "<strong>Error fetching invitation<strong>"
             print("Invitation is not owned by user")
             return make_response(html, 400)
@@ -442,9 +474,11 @@ def del_invitation_response_time(invitationid, timeid):
             try:
                 invitation_del_response_time(invitationid, timeid)
             except ValueError as ex:
+                # TODO: Make JSON
                 html = "<strong>%s<strong>" % str(ex)
                 print("value error", str(ex))
                 return make_response(html, 400)
+            # TODO: Make JSON
             return "Success!"
     return render_template("login.html", 
         title='Login to TigerPlan')
@@ -458,11 +492,13 @@ def finalize_invitation(invitationid):
         if (invitation.user_id != user.id):
             html = "<strong>Error fetching invitation<strong>"
             print("Invitation is not owned by user")
+            # TODO: Make JSON
             return make_response(html, 400)
         else:
             try:
                 invitation_update_finalized(invitationid, True)
             except ValueError as ex:
+                # TODO: Make JSON
                 html = "<strong>%s<strong>" % str(ex)
                 print("value error", str(ex))
                 return make_response(html, 400)
