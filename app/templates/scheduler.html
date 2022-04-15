@@ -83,8 +83,8 @@
                                 Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
                             </div>
                             <div class="card-body">
-                                <a href="/del_event/{{ event.id }}">
-                                    <button> Delete Event </button>
+                                <a>
+                                    <button onclick="deleteEvent({{event.id}})"> Delete Event </button>
                                 </a>
                                 {% if not event.finalized and event.invitations|length == 0 %}
                                 <a href="/cr_event_invitations/{{ event.id }}">
@@ -151,6 +151,48 @@
     let request = null;
     let variable = "does this work";
 
+    function deleteEvent(eventId) {
+        let url = "/del_event/" + eventId;
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    let html = "<div class='alert alert-success'>";
+                    html += "Event deleted!</div>"
+                    $("#eventCard" + eventId).html(html);
+
+                    setTimeout(function () {
+                        $("#eventCard" + eventId).hide(1000);
+                        setTimeout(function () {
+                            $("#eventCard" + eventId).remove();
+                        }, 1000);
+                    }, 3000);
+                    return;
+                } else {
+                    let banner = $('<div>',
+                        { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#serverResponse");
+
+                    $("#eventCard" + eventId).append(banner);
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return; 
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
     function showCreateEventCard(show) {
         if (show) {
             $("#createEventCard").show();
@@ -163,65 +205,30 @@
         }
     }
 
-    function getResults() {
-        let id = $('#NewEventGroupId :selected').val();
-        let name = $('#NewEventName').val();
-        let location = $('#NewEventLocation').val();
-        let description = $('#NewEventDescription').val();
-        let start1 = $('#Start1').val();
-        let start2 = $('#Start2').val();
-        let end1 = $('#End1').val();
-        let end2 = $('#End2').val();
-        id = encodeURIComponent(id);
-        name = encodeURIComponent(name);
-        location = encodeURIComponent(location);
-        description = encodeURIComponent(description);
-        start1 = encodeURIComponent(start1);
-        start2 = encodeURIComponent(start2);
-        end1 = encodeURIComponent(end1);
-        end2 = encodeURIComponent(end2);
-
-        let url = '/add_event?id=' + id
-        url += "&name=" + name
-        url += '&location=' + location
-        url += '&description=' + description
-        url += '&start1=' + start1 + '&end1=' + end1
-        url += '&start2=' + start2 + '&end2=' + end1
-
-        if (request != null)
-            request.abort();
-
-        request = $.ajax(
-            {
-                type: 'GET',
-                url: url,
-            }
-        );
-    }
-
     function makeNewEventCard(eventId, eventName, groupName) {
         let deleteButton = $('<button>', { text: "Delete Event" });
+        deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
         let deleteLink = $('<a>');
-        deleteLink.attr("href", "/def_event/" + eventId);
         deleteLink.append(deleteButton);
 
         let createInvitesButton = $('<button>',
             { text: "Create Event Invitations" });
-        let createLink = $('<a>');
-        createLink.attr("href", "cr_event_invitations/" + eventId);
-        createLink.append(createInvitesButton);
+        let createInvitesLink = $('<a>');
+        createInvitesLink.attr("href",
+            "cr_event_invitations/" + eventId);
+        createInvitesLink.append(createInvitesButton);
 
         let detailsButton = $('<button>', { text: "View details" });
         let detailsLink = $('<a>');
-        detailsLink.attr("href", "view_event_detais/" + eventId);
+        detailsLink.attr("href", "view_event_details/" + eventId);
         detailsLink.attr("target", "_blank");
-        detailsLink.append(detailsLink);
+        detailsLink.append(detailsButton);
 
         let cardBody = $('<div>');
         cardBody.addClass("card-body");
-        cardBody.append(deleteButton);
-        cardBody.append(createInvitesButton);
-        cardBody.append(detailsButton);
+        cardBody.append(deleteLink);
+        cardBody.append(createInvitesLink);
+        cardBody.append(detailsLink);
 
         let cardHead = $('<div>');
         cardHead.addClass("card-header text-white bg-teal");
@@ -275,10 +282,12 @@
             dataType: "json",
             success: function (response) {
                 console.log(response);
-                let banner = $('<div>', { text: response.response });
-                if (response.response === "success") {
+                let banner;
+                if (response.success) {
+                    banner = $('<div>', { text: "Success!" });
                     banner.addClass("alert alert-success");
                 } else {
+                    banner = $('<div>', { text: "An error occured" });
                     banner.addClass("alert alert-warning");
                     banner.appendTo("#serverResponse");
 
@@ -303,10 +312,14 @@
                 makeNewEventCard(response.newEventId,
                     name, response.groupName);
                 showCreateEventCard(false);
+                $('#select-box').prop('selectedIndex',0);
+                $('#NewEventName').val('');
+                $('#NewEventLocation').val('');
+                $('#NewEventDescription').val('');
             },
             error: function (error) {
                 console.log(error);
-                let banner = $('<div>', { text: "an error occurred" });
+                let banner = $('<div>', { text: "An error occurred" });
                 banner.addClass("alert alert-warning");
                 banner.appendTo("#serverResponse");
                 setTimeout(function () {

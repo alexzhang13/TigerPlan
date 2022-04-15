@@ -260,7 +260,7 @@ def add_event():
                                     owner=user, location=location, 
                                     description=description,
                                     timeblocks=timeblocks)
-            response_json = json.dumps({"response":"success", 
+            response_json = json.dumps({"success":True, 
                 "newEventId":new_event.id,
                 "groupName":new_event.group.name
                 })
@@ -269,7 +269,7 @@ def add_event():
             return response
         except Exception as ex:
             print("An exception occured at '/add_event':", ex)
-            response_json = json.dumps({"response":"failure"})
+            response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
@@ -308,8 +308,18 @@ def del_group(id):
 @bp.route("/del_event/<id>", methods=['GET', 'POST'])
 def del_event(id):
     if 'username' in session:
-        delete_event(id) 
-        return redirect("/scheduler")
+        try:
+            delete_event(id)
+        except:
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        response_json = json.dumps({"success":True})
+        response = make_response(response_json)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 # ------------------- CREATE EVENT INVITATIONS ---------------------- #
 @bp.route("/cr_event_invitations/<id>", methods=['GET', 'POST'])
