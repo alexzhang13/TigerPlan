@@ -124,10 +124,30 @@ def groups():
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         users = get_users()
-        return render_template("mygroups.html",
-        title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users)
+        groupId = request.args.get("groupId")
+        if (groupId):
+            group = get_group(groupId)
+            members = get_members(groupId)
+            events = get_group_events(groupId)
+            return render_template("mygroups.html",
+            title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users, members=members, this_group=group, events=events)
+        return render_template("mygroups.html", title='TigerPlan Manage Groups', user=session['username'], groups=groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
+
+# # -------------------------- MANAGE GROUPS -------------------------- #
+# @bp.route("/managegroup/<groupId>", methods=['GET', 'POST'])
+# def managegroup(groupId):
+#     if 'username' in session:
+#         user = get_user_from_netid(session['username'])
+#         groups = get_user_groups(user.id)
+#         group = get_group(groupId)
+#         members = get_members(groupId)
+#         users = get_users()
+#         return render_template("mygroups.html",
+#         title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users, members=members, this_group=group)
+#     return render_template("login.html", 
+#         title='Login to TigerResearch') 
 
 # ---------------------------- SCHEDULER ---------------------------- #
 @bp.route("/scheduler", methods=['GET', 'POST'])
@@ -240,7 +260,7 @@ def add_custom_group():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         name = request.args.get('name')
-        new_group = create_group(name=name, owner=user)
+        create_group(name=name, owner=user)
         return redirect("/mygroups")
     return render_template("login.html", 
         title='Login to TigerResearch')
@@ -352,42 +372,37 @@ def add_invitations(id):
     return render_template("login.html", 
         title='Login to TigerPlan') 
 
-# ------------------- MEMBERs ---------------------- #
-@bp.route("/members/<groupid>", methods=['GET', 'POST'])
-def manage_members(groupid):
-    if 'username' in session:
-        # TODO: Authorization checking
-        # user = get_user_from_netid(session['username'])
-        group = get_group(groupid)
-        # if (group.owner_id != user.id):
-        #     raise Exception("User is not group owner")
-        members = get_members(groupid)
-        users = get_users()
-        return render_template("groupmembers.html", group=group, members=members, users=users)
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+# # ------------------- MEMBERs ---------------------- #
+# @bp.route("/members", methods=['GET', 'POST'])
+# def manage_members():
+#     if 'username' in session:
+#         groupId = request.args.get('group')
+#         group = get_group(groupId)
+#         members = get_members(groupId)
+#         users = get_users()
+#         return make_response("groupmembers.html", group=group, members=members, users=users)
+#     return make_response("login.html", 
+#         title='Login to TigerPlan')
 
-# ------------------- GROUP ADMIN ---------------------- #
-@bp.route("/admin/<groupid>", methods=['GET', 'POST'])
-def admin(groupid):
-    if 'username' in session:
-        # TODO: Authorization checking
-        group = get_group(groupid)
-        members = get_members(groupid)
-        return render_template("groupadmin.html", group=group, members=members)
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+# # ------------------- GROUP ADMIN ---------------------- #
+# @bp.route("/admin/<groupid>", methods=['GET', 'POST'])
+# def admin(groupid):
+#     if 'username' in session:
+#         group = get_group(groupid)
+#         members = get_members(groupid)
+#         return render_template("groupadmin.html", group=group, members=members)
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
 
-# ------------------- GROUP EVENTS ---------------------- #
-@bp.route("/groupevents/<groupid>", methods=['GET', 'POST'])
-def groupevents(groupid):
-    if 'username' in session:
-        # TODO: Authorization checking
-        group = get_group(groupid)
-        events = get_group_events(groupid)
-        return render_template("groupevent.html", group=group, events=events)
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+# # ------------------- GROUP EVENTS ---------------------- #
+# @bp.route("/groupevents/<groupid>", methods=['GET', 'POST'])
+# def groupevents(groupid):
+#     if 'username' in session:
+#         group = get_group(groupid)
+#         events = get_group_events(groupid)
+#         return render_template("groupevent.html", group=group, events=events)
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
 
 # ------------------------ REMOVE MEMBER ----------------------------- #
 @bp.route("/remove_member/<groupid>/<id>", methods=['GET', 'POST'])
@@ -395,7 +410,7 @@ def remove_member(groupid, id):
     if 'username' in session:
         # TODO: Authorization checking
         delete_member(groupid, id)
-        return redirect("/members/" + groupid)
+        return redirect("/mygroups?groupId=" + groupid)
     return render_template("login.html", 
         title='Login to TigerPlan')
 
@@ -407,7 +422,7 @@ def add_new_member():
         groupId = request.args.get('group')
         member = request.args.get('member')
         add_member(id=groupId, memberId=member)
-        return redirect("/members/" + groupId)
+        return redirect("/mygroups?groupId=" + groupId)
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -419,7 +434,7 @@ def change_ownership():
         groupId = request.args.get('group')
         member = request.args.get('member')
         update_owner(groupid=groupId, memberId=member)
-        return redirect("/admin/" + groupId)
+        return redirect("/mygroups?groupId=" + groupId)
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -431,7 +446,7 @@ def change_group_name():
         groupId = request.args.get('group')
         name = request.args.get('name')
         update_group_name(groupid=groupId, newName=name)
-        return redirect("/admin/" + groupId)
+        return redirect("/mygroups?groupId=" + groupId)
     return render_template("login.html", 
         title='Login to TigerResearch')
 

@@ -1,26 +1,10 @@
-{% extends "base.html" %}
 
-{% block content %}
-{% if members is defined %}
-<div><strong>{{ group.name }}</strong></div>
+<div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
-<form action="" method="get">
-    <div>
-        <select id="NewGroupMember" class="form-select form-select-sm">
-            {% if users is defined and users != '' %}
-            {% for user in users %}
-            <option value="{{ user.id }}">{{ user.netid }}</option>
-            {% endfor %}
-            {% endif %}
-        </select> <span>Select Group Members</span>
-        <button id="addNewMember">Add Member</button>
-    </div>
-</form>
-
-
-<table class="table table-striped">
-    <thead>
+{% if members is defined %}
+<table class="table">
+    <thead class = "thead-dark">
         <tr>
             <th>Name</th>
             <th>Netid</th>
@@ -31,13 +15,26 @@
         <td>{{ member.name }}</td>
         <td>{{ member.netid }}</td>
         <td>
-            <a href="/remove_member/{{ group.id }}/{{ member.id }}">Remove Member</a>
+            <a href="/remove_member/{{ this_group.id }}/{{ member.id }}">Remove Member</a>
         </td>
     </tr>
 
     {% endfor %}
 </table>
 {% endif %}
+
+<form action="" method="get">
+  <div>
+      <select id="NewGroupMember" class="form-select form-select-sm">
+          {% if users is defined and users != '' %}
+          {% for user in users %}
+          <option value="{{ user.id }}">{{ user.netid }}</option>
+          {% endfor %}
+          {% endif %}
+      </select> <span>Select Group Members</span>
+      <button id="addNewMember">Add Member</button>
+  </div>
+</form>
 
 <script>
 
@@ -48,7 +45,7 @@
       let member = $('#NewGroupMember :selected').val();
       member = encodeURIComponent(member);
   
-      let url = '/add_new_member?group=' + '{{ group.id }}'
+      let url = '/add_new_member?group=' + '{{ this_group.id }}'
       url += '&member=' + member
   
       if (request != null)
@@ -69,4 +66,3 @@
     $('document').ready(setup);
   
   </script>
-{% endblock %}

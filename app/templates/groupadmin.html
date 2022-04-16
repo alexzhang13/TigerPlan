@@ -1,8 +1,5 @@
-{% extends "base.html" %}
-
-{% block content %}
 {% if members is defined %}
-<div><strong>{{ group.name }}</strong></div>
+<div><strong>{{ this_group.name }}</strong></div>
 <div>Group Owner</div>
 
 <form action="" method="get">
@@ -22,22 +19,20 @@
 <p class="card-text">UPDATE GROUP NAME: Please specify a name for your group.</p>
 <form action="" method="get">
     <div>
-        <input type="text" name="updateGroupName" id="UpdateGroupName" class="form-control" placeholder="Group Name" autofocus>
+        <input type="text" id="UpdateGroupName" class="form-control" placeholder="Group Name" autofocus>
         <button id="changeGroupName">Update Group Name</button>
     </div>
 </form>
 
 <br>
 
-<a href="/del_group/{{ group.id }}">
+<a href="/del_group/{{ this_group.id }}">
   <button> Delete this group and all its related events. (CANNOT BE UNDONE)</button>
 </a>
-
 
 {% endif %}
 
 <script>
-
     'use strict';
     let request = null;
   
@@ -45,7 +40,7 @@
       let member = $('#NewGroupOwner :selected').val();
       member = encodeURIComponent(member);
   
-      let url = '/transfer_ownership?group=' + '{{ group.id }}'
+      let url = '/transfer_ownership?group=' + '{{ this_group.id }}'
       url += '&member=' + member
   
       if (request != null)
@@ -58,18 +53,23 @@
         }
       );
     }
+</script>
+
+<script>
+    'use strict';
+    let requestB = null;
 
     function changeName() {
       let name = $('#UpdateGroupName').val();
       name = encodeURIComponent(name);
   
-      let url = '/change_group_name?group=' + '{{ group.id }}'
+      let url = '/change_group_name?group=' + '{{ this_group.id }}'
       url += '&name=' + name
   
-      if (request != null)
-        request.abort();
+      if (requestB != null)
+        requestB.abort();
   
-      request = $.ajax(
+      requestB = $.ajax(
         {
           type: 'GET',
           url: url,
@@ -83,6 +83,4 @@
     }
   
     $('document').ready(setup);
-  
 </script>
-{% endblock %}
