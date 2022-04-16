@@ -21,7 +21,12 @@
         <div class="tab-pane" id="events">
             <div class="card-body">
                 <h5 class="card-title">Group Events</h5>
-                <p class="card-text">Here's what your group has scheduled!</p>
+                {% if events is defined and events != ''%}
+                    <p class="card-text">Here's what your group has scheduled!</p>
+                    {% include 'groupevent.html' %}
+                {% else %}
+                    <p class="card-text">This group does not have any events planned.</p>
+                {% endif %}
             </div>
         </div>
         <div class="tab-pane" id="settings">

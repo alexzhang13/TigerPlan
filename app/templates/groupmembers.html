@@ -2,22 +2,9 @@
 <div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
-<form action="" method="get">
-    <div>
-        <select id="NewGroupMember" class="form-select form-select-sm">
-            {% if users is defined and users != '' %}
-            {% for user in users %}
-            <option value="{{ user.id }}">{{ user.netid }}</option>
-            {% endfor %}
-            {% endif %}
-        </select> <span>Select Group Members</span>
-        <button id="addNewMember">Add Member</button>
-    </div>
-</form>
-
 {% if members is defined %}
-<table class="table table-striped">
-    <thead>
+<table class="table">
+    <thead class = "thead-dark">
         <tr>
             <th>Name</th>
             <th>Netid</th>
@@ -35,6 +22,19 @@
     {% endfor %}
 </table>
 {% endif %}
+
+<form action="" method="get">
+  <div>
+      <select id="NewGroupMember" class="form-select form-select-sm">
+          {% if users is defined and users != '' %}
+          {% for user in users %}
+          <option value="{{ user.id }}">{{ user.netid }}</option>
+          {% endfor %}
+          {% endif %}
+      </select> <span>Select Group Members</span>
+      <button id="addNewMember">Add Member</button>
+  </div>
+</form>
 
 <script>
 

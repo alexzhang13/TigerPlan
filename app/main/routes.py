@@ -127,8 +127,9 @@ def groups():
         if (groupId):
             group = get_group(groupId)
             members = get_members(groupId)
+            events = get_group_events(groupId)
             return render_template("mygroups.html",
-            title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users, members=members, this_group=group)
+            title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users, members=members, this_group=group, events=events)
         return render_template("mygroups.html", title='TigerPlan Manage Groups', user=session['username'], groups=groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 

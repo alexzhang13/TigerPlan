@@ -107,7 +107,11 @@
         <!-- Right Column -->
         <div class = "col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
-              {% include 'managegrouptab.html' %}
+                {% if this_group is defined %}
+                    {% include 'managegrouptab.html' %}
+                {% else %}
+                <h5>Please select a group.</h5>
+                {% endif %}
             </div>
         </div>
     </div>
