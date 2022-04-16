@@ -232,10 +232,10 @@
 
         let cardHead = $('<div>');
         cardHead.addClass("card-header text-white bg-teal");
-        cardHead.append({ text: "Event name: " })
+        cardHead.append(document.createTextNode("Event name: "));
         let eventNameStrong = $('<strong>', { text: eventName });
         cardHead.append(eventNameStrong);
-        cardHead.append({ text: "Group: " + groupName });
+        cardHead.append(document.createTextNode(" - Group: " + groupName));
 
         let card = $('<div>');
         card.attr({ class: "card mt-3 mb-3" })
