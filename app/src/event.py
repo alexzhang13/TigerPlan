@@ -1,15 +1,16 @@
+from datetime import datetime
 from webbrowser import get
 from xmlrpc.client import DateTime
 import app
 from app.models.models import Invitation, Invitation_Timeblock, TimeBlock, Member_Group, User, Event
 from app.src.invitation import create_invitation
-from app.src.timeblock import get_timeblock
+from app.src.timeblock import create_event_timeblock, get_timeblock
 from flask import request
 from app import db, login
 
 #---------------------------- CRUD Functions -------------------------#
 
-def create_event(name: str, owner: User, location: str, description: str, groupid: int) -> Event:
+def create_event(name: str, owner: User, location: str, description: str, groupid: int, timeblocks) -> Event:
     """Create an event. Returns created event."""
     new_event = Event(group_id=groupid, 
                       name=name,
@@ -17,6 +18,15 @@ def create_event(name: str, owner: User, location: str, description: str, groupi
                       location=location,
                       description=description)
     db.session.add(new_event)
+    
+    # make sure id is accessable
+    db.session.flush()
+
+    for timeblock in timeblocks:
+        start = datetime.fromisoformat(timeblock['start']['_date'][:-1])
+        end = datetime.fromisoformat(timeblock['end']['_date'][:-1])
+        _ = create_event_timeblock(eventId=new_event.id, start=start, end=end, isconflict=False, commit=False)
+
     db.session.commit()
     return new_event
 
@@ -54,7 +64,6 @@ def delete_event(id: int) -> bool:
     return del_event.id == None
 
 #---------------------------- Spec Functions -------------------------#
-# TODO: This should most likely also throw out old invitations
 def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     """Sets the proposed time for an event. Returns the modifed event.
     Takes in the parameters datetimes as an list of tuples, where the 
@@ -65,7 +74,7 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     for tb in event.times:
         db.session.delete(tb)
 
-    for i, start_end in enumerate(datetimes):
+    for start_end in datetimes:
         tb = TimeBlock(start = start_end[0], end = start_end[1], is_conflict = False, event_id = event.id)
         db.session.add(tb)
 
@@ -110,16 +119,6 @@ def event_set_chosen_time(id: int, timeblockid: int) -> Event:
     db.session.add(event)
     db.session.commit()
     return event
-
-# def create_event_unattached(name: str, owner: User, location: str, description: str) -> Event:
-#     """Create an event. Returns created event."""
-#     new_event = Event(name=name,
-#                       owner_id=owner.id,
-#                       location=location,
-#                       description=description)
-#     db.session.add(new_event)
-#     db.session.commit()
-#     return new_event
 
 def create_event_invitations(id: int) -> Invitation:
     """Sends an invitation to every group member of the event."""

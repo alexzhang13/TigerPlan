@@ -76,27 +76,32 @@
                             <h5 class="card-title">Planned Events</h5>
                         </div>
                     </div>
-                    {% for event in events %}
-                    <div class="card mt-3 mb-3">
-                        <div class="card-header text-white bg-teal">
-                            Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                    <span id="existingEvents">
+                        {% for event in events %}
+                        <div class="card mt-3 mb-3" id="eventCard{{event.id}}">
+                            <div class="card-header text-white bg-teal">
+                                Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                            </div>
+                            <div class="card-body">
+                                <a>
+                                    <button onclick="deleteEvent({{event.id}})"> Delete Event </button>
+                                </a>
+                                {% if not event.finalized and event.invitations|length == 0 %}
+                                <a href="/cr_event_invitations/{{ event.id }}">
+                                    <button> Create Event Invitations </button>
+                                </a>
+                                {% endif %}
+                                <a href="/view_event_details/{{event.id}}" target="_blank">
+                                    <button>View details</button>
+                                </a>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <a href="/del_event/{{ event.id }}">
-                                <button> Delete Event </button>
-                            </a>
-                            {% if not event.finalized and event.invitations|length == 0 %}
-                            <a href="/cr_event_invitations/{{ event.id }}">
-                                <button> Create Event Invitations </button>
-                            </a>
-                            {% endif %}
-                            <a href="/view_event_details/{{event.id}}" target = "_blank">
-                                <button>View details</button>
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <div class = "card mt-3 mb-3">
+                        {% endfor %}
+                    </span>
+                    <button id="showCreateEventCardButton" onclick="showCreateEventCard(true)">
+                        Create Event!
+                    </button>
+                    <div class="card mt-3 mb-3" id="createEventCard" style="display: none;">
                         <div class="card-header text-white bg-teal"><strong>Create New Event</strong></div>
                         <div class="card-body">
                             <p class="card-text">Which group are you creating the event for?</p>
@@ -108,26 +113,25 @@
                                     {% endfor %}
                                     {% endif %}
                                 </select> <span>Select Group</span>
-                                <input type="text" name="newEventName" id="NewEventName" class="form-control" placeholder="Event Name" autofocus>
-                                <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control" placeholder="Event Location" autofocus>
-                                <input type="text" name="newEventDescription" id="NewEventDescription" class="form-control" placeholder="Event Description" autofocus>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed Time</span></div>
-                                    <input type="text" name="start1" id ="Start1" class="form-control" placeholder="Start Time">
-                                    <input type="text" name="end1" id="End1" class="form-control" placeholder="End Time">
-                                </div>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text" id="">Proposed Time</span></div>
-                                    <input type="text" name="start2" id ="Start2" class="form-control" placeholder="Start Time">
-                                    <input type="text" name="end2" id="End2" class="form-control" placeholder="End Time">
-                                </div>
+                                <input type="text" name="newEventName" id="NewEventName" class="form-control"
+                                    placeholder="Event Name" autofocus>
+                                <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control"
+                                    placeholder="Event Location" autofocus>
+                                <input type="text" name="newEventDescription" id="NewEventDescription"
+                                    class="form-control" placeholder="Event Description" autofocus>
                                 <small id="passwordHelpBlock" class="form-text text-muted">
-                                    Specify times in the format YYYY-MM-DD HR:MN:SC (for example, "2018-11-28 00:00:00").
+                                    Specify times by dragging in the calendar!
                                 </small>
-                                <button id = "createNewEvent"> Create Event</button>
-                                </form>
+                                <br>
+                            </form>
+                            <button onclick="showCreateEventCard(false)">Cancel</button>
+                            <button id="createNewEventButton">Create Event</button>
                         </div>
                     </div>
+                    <div id="eventCreationResponse">
+
+                    </div>
+
                 </div>
                 {% endif %}
             </div>
@@ -135,9 +139,7 @@
         <!-- Right Column -->
         <div class="col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3" id="currentlyViewedEvent">
-                <table class="table table-hover" id = "eventTable">
-
-                </table>
+                <div id="calendar"></div>
             </div>
         </div>
     </div>
@@ -147,49 +149,238 @@
 
     'use strict';
     let request = null;
-  
-    function getResults() {
-      let id = $('#NewEventGroupId :selected').val();
-      let name = $('#NewEventName').val();
-      let location = $('#NewEventLocation').val();
-      let description = $('#NewEventDescription').val();
-      let start1 = $('#Start1').val();
-      let start2 = $('#Start2').val();
-      let end1 = $('#End1').val();
-      let end2 = $('#End2').val();
-      id = encodeURIComponent(id);
-      name = encodeURIComponent(name);
-      location = encodeURIComponent(location);
-      description = encodeURIComponent(description);
-      start1 = encodeURIComponent(start1);
-      start2 = encodeURIComponent(start2);
-      end1 = encodeURIComponent(end1);
-      end2 = encodeURIComponent(end2);
-  
-      let url = '/add_event?id=' + id
-      url += "&name=" + name
-      url += '&location=' + location
-      url += '&description=' + description 
-      url += '&start1=' + start1 + '&end1=' + end1
-      url += '&start2=' + start2 + '&end2=' + end1
-  
-      if (request != null)
-        request.abort();
-  
-      request = $.ajax(
-        {
-          type: 'GET',
-          url: url,
+    let variable = "does this work";
+
+    function deleteEvent(eventId) {
+        let url = "/del_event/" + eventId;
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    let html = "<div class='alert alert-success'>";
+                    html += "Event deleted!</div>"
+                    $("#eventCard" + eventId).html(html);
+
+                    setTimeout(function () {
+                        $("#eventCard" + eventId).hide(1000);
+                        setTimeout(function () {
+                            $("#eventCard" + eventId).remove();
+                        }, 1000);
+                    }, 3000);
+                    return;
+                } else {
+                    let banner = $('<div>',
+                        { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    $("#eventCard" + eventId).append(banner);
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return; 
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function showCreateEventCard(show) {
+        if (show) {
+            $("#createEventCard").show();
+            $("#showCreateEventCardButton").hide();
+            renderTimeSelectionCalendar();
+        } else {
+            $("#createEventCard").hide(500);
+            $("#showCreateEventCardButton").show();
+            destroyTimeSelectionCalendar();
         }
-      );
     }
-  
+
+    function makeNewEventCard(eventId, eventName, groupName) {
+        let deleteButton = $('<button>', { text: "Delete Event" });
+        deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
+        let deleteLink = $('<a>');
+        deleteLink.append(deleteButton);
+
+        let createInvitesButton = $('<button>',
+            { text: "Create Event Invitations" });
+        let createInvitesLink = $('<a>');
+        createInvitesLink.attr("href",
+            "cr_event_invitations/" + eventId);
+        createInvitesLink.append(createInvitesButton);
+
+        let detailsButton = $('<button>', { text: "View details" });
+        let detailsLink = $('<a>');
+        detailsLink.attr("href", "view_event_details/" + eventId);
+        detailsLink.attr("target", "_blank");
+        detailsLink.append(detailsButton);
+
+        let cardBody = $('<div>');
+        cardBody.addClass("card-body");
+        cardBody.append(deleteLink);
+        cardBody.append(createInvitesLink);
+        cardBody.append(detailsLink);
+
+        let cardHead = $('<div>');
+        cardHead.addClass("card-header text-white bg-teal");
+        cardHead.append(document.createTextNode("Event name: "));
+        let eventNameStrong = $('<strong>', { text: eventName });
+        cardHead.append(eventNameStrong);
+        cardHead.append(document.createTextNode(" - Group: " + groupName));
+
+        let card = $('<div>');
+        card.attr({ class: "card mt-3 mb-3" })
+        card.addClass("card mt-3 mb-3");
+        card.attr("id", "eventCard" + eventId);
+        card.append(cardHead);
+        card.append(cardBody);
+
+        $("#existingEvents").append(card);
+    }
+
+
+    function checkNewEventValidity(id, name, schedules) {
+        if (!id || id.trim() === "") {
+            return "Issue identifying associated group";
+        }
+        if (!name || name.trim() === "") {
+            return "A name is required";
+        }
+        if (!schedules || schedules.length == 0) {
+            return "At least one timeblock is required";
+        }
+        return "";
+    }
+
+    function createNewEvent() {
+        let id = $('#NewEventGroupId :selected').val();
+        let name = $('#NewEventName').val();
+        let location = $('#NewEventLocation').val();
+        let description = $('#NewEventDescription').val();
+        let schedules = getAllSchedules();
+
+        let validity = checkNewEventValidity(id, name, schedules);
+
+        if (validity != "") {
+            console.log(validity);
+
+            let banner = $('<div>', { text: validity });
+            banner.addClass("alert alert-warning");
+            banner.appendTo("#eventCreationResponse");
+
+            setTimeout(function () {
+                banner.hide(1000);
+                setTimeout(function () {
+                    banner.remove()
+                }, 1000);
+            }, 3000);
+            return;
+        }
+
+        console.log("creating new event");
+
+        let timeblocks = []
+        for (let i = 0; i < schedules.length; i++) {
+            let schedule = schedules[i];
+            let timeblock = {};
+            if (schedule.start && schedule.end) {
+                timeblock.start = schedule.start;
+                timeblock.end = schedule.end;
+            }
+            timeblocks.push(timeblock);
+        }
+
+        let newEventData = {};
+        newEventData.groupId = id;
+        newEventData.name = name;
+        newEventData.location = location;
+        newEventData.description = description;
+        newEventData.timeblocks = timeblocks;
+
+        console.log(newEventData);
+        let url = '/add_event'
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(newEventData),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                let banner;
+                if (response.success) {
+                    banner = $('<div>', { text: "Success!" });
+                    banner.addClass("alert alert-success");
+                } else {
+                    banner = $('<div>', { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return;
+                }
+                banner.appendTo("#eventCreationResponse");
+
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+
+                $("createNewEventButton").prop("disabled", false);
+                makeNewEventCard(response.newEventId,
+                    name, response.groupName);
+                showCreateEventCard(false);
+                $('#select-box').prop('selectedIndex',0);
+                $('#NewEventName').val('');
+                $('#NewEventLocation').val('');
+                $('#NewEventDescription').val('');
+            },
+            error: function (error) {
+                console.log(error);
+                let banner = $('<div>', { text: "An error occurred" });
+                banner.addClass("alert alert-warning");
+                banner.appendTo("#eventCreationResponse");
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+                $("createNewEventButton").prop("disabled", false);
+            }
+        });
+        $("createNewEventButton").on('click', function () {
+            $(this).prop("disabled", true);
+        });
+    }
+
     function setup() {
-      $('#createNewEvent').on('click', getResults);
+        console.log("Setting up page");
+        $('#createNewEventButton').on('click', createNewEvent);
     }
-  
+
     $('document').ready(setup);
-  
+
 </script>
+
+<script>
+
+</script>
+<script src="{{ url_for('static', filename='scripts/event-calendar.js') }}"></script>
 
 {% endblock %}
