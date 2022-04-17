@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>Showing details for event <strong>{{event.name}}</strong></div>
+
+{% if not finalized %}
+
+<div>Currently selected time: <span id="selectedTime">None</span></div>
+<a>
+    <button id="finalizeButton" onclick="finalize()" disabled>Finalize event time!</button>
+</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Timeblock</th>
+            <th>Members available <br>
+                (out of {{num}} finalized responses)</th>
+        </tr>
+    </thead>
+    {% for timeblock in responses %}
+    <tr>
+        <td>Start time: <strong>{{timeblock.start}}</strong>
+            <br>
+            End time: <strong>{{timeblock.end}}</strong>
+        </td>
+        <td>{{responses[timeblock]}}</td>
+        <td>
+            <button onclick="rowClicked(this, {{timeblock.id}}, '{{timeblock.start}}', '{{timeblock.end}}')">
+                select time
+            </button>
+        </td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+<script>
+    'use strict'
+
+    let selectedId = null;
+
+    function rowClicked(button, timeblockid, start, end) {
+        button.html = "selected";
+        selectedId = timeblockid;
+        let pattern = "<strong>Start: </strong> " + start + "|";
+        pattern += "<strong>End: </strong>" + end;
+        $("#selectedTime").html(pattern)
+        document.getElementById('finalizeButton').disabled = false;
+        console.log("selected " + timeblockid);
+    }
+
+    function finalize() {
+        if (selectedId === null) {
+            return;
+        }
+        // TODO: this is really dumb I should've used AJAX
+        let url = "/finalize_event_time/{{event.id}}/" + selectedId
+        location.href = url
+    }
+
+
+</script>
+
+{% else %}
+
+<strong>Event {{name}} is already finalized!</strong>
+<div><strong>Chosen time: </strong> </div>
+<strong>Start: </strong> {{time.start}}|
+<strong>End: </strong>{{time.end}}
+
+{% endif %}
+{% endblock %}
