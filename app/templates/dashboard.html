@@ -89,28 +89,19 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-            </div>
 
-            <div class="container">
-                <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                {% if user is defined and user != '' %}
-                <div>
-                    Showing conflicts for user <strong>{{ user }}</strong>:
-                </div>
-                {% endif %}
-
-                <div>
-                    <a href="/add_conflict">
-                        <button> Add an example conflict with default field values.</button>
-                    </a>
-                </div>
-                <br> -->
                 {% if invitations is defined and invitations != '' %}
-                <div>
+                <div class="card-columns">
+                    <div class="card mb-3">
+                        <div class="card-header text-white bg-iris">
+                            <h5 class="card-title">Pending Invitations</h5>
+                        </div>
+                    </div>
                     {% for invite in invitations %}
                     {% if not invite.finalized and not invite.event.finalized %}
-                    <div>
-                        Invitation for event: <strong> {{ invite.event.name }}</strong>
+                    <div class="card-header text-white bg-iris">
+                        <h5>{{ invite.event.name }}</h5>
+                        <p>{{ invite.event.group.name }}</p>
                         <a onclick="getResults('{{invite.id}}')">
                             <button>Respond</button>
                         </a>
@@ -119,8 +110,8 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-            </div>
 
+            </div>
         </div>
         <!-- Right Column -->
         <div class="col-md-8">
