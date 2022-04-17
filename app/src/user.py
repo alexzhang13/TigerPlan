@@ -50,3 +50,4 @@ def get_member_invitations(memberid: int) -> Invitation:
     mem_invs = db.session.query(Invitation).filter(
         Invitation.user_id == memberid).all()
     return mem_invs
+

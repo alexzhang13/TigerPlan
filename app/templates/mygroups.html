@@ -79,121 +79,75 @@
         <!-- Left Column -->
         <div class = "col-md-4">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
-                {% if groups is defined and groups != '' %}
-                <div class="card-columns">
-                        <div class = "card mb-3">
-                            <div class="card-header text-white bg-teal"> <h5 class="card-title">My Groups</h5></div>
-                        </div>
+                <div class="btn-group-vertical d-flex justify-content-center">
+                    {% if groups is defined and groups != '' %}
                     {% for group in groups %}
-                        <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal">{{ group.name }}</div>
-                            <div class="card-body">
-                            <p class="card-text">Some example text about group #{{ group.id }}.</p>
-                            <a href="/del_group/{{ group.id }}">
-                                <button> Delete group {{ group.id }} and related events.</button>
-                            </a>
-                            </div>
-                        </div>
+                        {% if this_group is defined and this_group == group %}
+                        <a class="btn btn-lg btn-outline-info border rounded active" style="margin: 9px 0 5px;" href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id }}) </a>
+                        {% else %}
+                        <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id }}) </a>
+                        {% endif %}
                     {% endfor %}
-                        <div class = "card mt-3 mb-3">
-                            <div class="card-header text-white bg-teal">Create New Group</div>
-                            <div class="card-body">
-                            <p class="card-text">Please specify a name for your new group.</p>
-                            <form action="" method="get">
-                                <div>
-                                    <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                    <select id="NewGroupMember" class="form-select form-select-sm">
-                                        {% if users is defined and users != '' %}
-                                        {% for invitee in users %}
-                                        <option value="{{ invitee.id }}">{{ invitee.netid }}</option>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </select> <span>Select Group Members</span>
-                                    <button id="createNewGroup">Create New Group</button>
-                                </div>
-                            </form>
-                            </div>
-                        </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                <br>
+                <div class = "card mt-3 mb-3">
+                    <div class="card-header text-white bg-teal">Create New Group</div>
+                    <div class="card-body">
+                    <p class="card-text">Please specify a name for your new group.</p>
+                    <form action="" method="get">
+                        <div>
+                            <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
+                            <button id="createNewGroup">Create New Group</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Right Column -->
         <div class = "col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
-                <div class="card">
-                    <div class="card-header text-white bg-teal">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                            <li class="nav-item">
-                              <a class="nav-link active" id="members-tab" data-toggle="tab" href="#members" role="tab" aria-controls="members" aria-selected="true">Members</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="events-tab" data-toggle="tab" href="#events" role="tab" aria-controls="events" aria-selected="false">Events</a>
-                            </li>
-                            <li class="nav-item">
-                            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="true">Admin</a>
-                            </li>
-                          </ul>
-                    </div>
-                    <div class = "tab-content">
-                        <div class="tab-pane active" id="members" role="tabpanel" aria-labelledby="members-tab">
-                            <div class="card-body">
-                                <h5 class="card-title">Special title treatment</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="events" role="tabpanel" aria-labelledby="events-tab">
-                            <div class="card-body">
-                                <h5 class="card-title">Special title treatment</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                            <div class="card-body">
-                                <h5 class="card-title">Special title treatment</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% if this_group is defined %}
+                    {% include 'managegrouptab.html' %}
+                {% else %}
+                <h5>Please select a group.</h5>
+                {% endif %}
             </div>
         </div>
     </div>
 
 </div>
 
+
+<!-- Script to create a new group -->
 <script>
 
     'use strict';
-    let request = null;
-  
-    function getResults() {
+    let myGroupsRequest = null;
+
+    function newGroupResults() {
       let name = $('#NewGroupName').val();
-      let member = $('#NewGroupMember :selected').val();
       name = encodeURIComponent(name);
-      member = encodeURIComponent(member);
   
       let url = '/add_custom_group?name=' + name
-      url += '&member=' + member
   
-      if (request != null)
-        request.abort();
+      if (myGroupsRequest != null)
+        myGroupsRequest.abort();
   
-      request = $.ajax(
+      myGroupsRequest = $.ajax(
         {
-          type: 'GET',
+          type: 'POST',
           url: url,
         }
       );
     }
   
     function setup() {
-      $('#createNewGroup').on('click', getResults);
+      $('#createNewGroup').on('click', newGroupResults);
     }
-  
+
     $('document').ready(setup);
   
-  </script>
+</script>
 
 {% endblock %}

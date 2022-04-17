@@ -1,0 +1,83 @@
+{% if members is defined %}
+<div><strong>{{ this_group.name }}</strong></div>
+<div>Group Owner</div>
+
+<form action="" method="get">
+    <div>
+        <select id="NewGroupOwner" class="form-select form-select-sm">
+            {% if members != '' %}
+            {% for user in members %}
+            <option value="{{ user.id }}">{{ user.netid }}</option>
+            {% endfor %}
+            {% endif %}
+        </select> <span>Select New Owner</span>
+        <button id="changeOwner">Transfer Ownership to This Member (CANNOT BE UNDONE)</button>
+    </div>
+</form>
+
+<br>
+<p class="card-text">UPDATE GROUP NAME: Please specify a name for your group.</p>
+<form action="" method="get">
+    <div>
+        <input type="text" id="UpdateGroupName" class="form-control" placeholder="Group Name" autofocus>
+        <button id="changeGroupName">Update Group Name</button>
+    </div>
+</form>
+
+<br>
+
+<a href="/del_group/{{ this_group.id }}">
+  <button> Delete this group and all its related events. (CANNOT BE UNDONE)</button>
+</a>
+
+{% endif %}
+
+<script>
+    'use strict';
+    let transferOwnershipRequest = null;
+  
+    function changeOwner() {
+      let member = $('#NewGroupOwner :selected').val();
+      member = encodeURIComponent(member);
+  
+      let url = '/transfer_ownership?group=' + '{{ this_group.id }}'
+      url += '&member=' + member
+  
+      if (transferOwnershipRequest != null)
+        transferOwnershipRequest.abort();
+  
+      transferOwnershipRequest = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
+    }
+    
+    let updateGroupNameRequest = null;
+
+    function changeName() {
+      let name = $('#UpdateGroupName').val();
+      name = encodeURIComponent(name);
+  
+      let url = '/change_group_name?group=' + '{{ this_group.id }}'
+      url += '&name=' + name
+  
+      if (updateGroupNameRequest != null)
+        updateGroupNameRequest.abort();
+  
+      updateGroupNameRequest = $.ajax(
+        {
+          type: 'GET',
+          url: url,
+        }
+      );
+    }
+  
+    function setup() {
+      $('#changeOwner').on('click', changeOwner);
+      $('#changeGroupName').on('click', changeName);
+    }
+  
+    $('document').ready(setup);
+</script>
