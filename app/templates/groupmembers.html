@@ -1,68 +1,191 @@
-
 <div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
 {% if members is defined %}
-<table class="table">
-    <thead class = "thead-dark">
-        <tr>
-            <th>Name</th>
-            <th>Netid</th>
-        </tr>
-    </thead>
-    {% for member in members %}
+<table class="table" id="membersTable">
+  <thead class="thead-dark">
     <tr>
-        <td>{{ member.name }}</td>
-        <td>{{ member.netid }}</td>
-        <td>
-            <a href="/remove_member/{{ this_group.id }}/{{ member.id }}">Remove Member</a>
-        </td>
+      <th>Name</th>
+      <th>Netid</th>
     </tr>
+  </thead>
+  {% for member in members %}
+  <tr id="memberRow{{member.id}}">
+    <td>{{ member.name }}</td>
+    <td>{{ member.netid }}</td>
+    <td>
+      <button onclick="removeMember('{{member.id}}')">
+        Remove Member
+      </button>
+    </td>
+  </tr>
 
-    {% endfor %}
+  {% endfor %}
 </table>
+{% else %}
+<div>No members yet!</div>
 {% endif %}
 
-<form action="" method="get">
-  <div>
-      <select id="NewGroupMember" class="form-select form-select-sm">
-          {% if users is defined and users != '' %}
-          {% for user in users %}
-          <option value="{{ user.id }}">{{ user.netid }}</option>
-          {% endfor %}
-          {% endif %}
-      </select> <span>Select Group Members</span>
-      <button id="addNewMember">Add Member</button>
-  </div>
-</form>
+<!-- <form action="" method="get"> -->
+<div>
+  <select id="NewGroupMember" class="form-select form-select-sm">
+    {% if users is defined and users != '' %}
+    {% for user in users %}
+    <option value="{{ user.id }}">{{ user.netid }}</option>
+    {% endfor %}
+    {% endif %}
+  </select> <span>Select Group Members</span>
+  <button id="addNewMember">Add Member</button>
+</div>
+<div id = "groupMembersResponse"></div>
+<!-- </form> -->
 
 <script>
 
-    'use strict';
-    let request = null;
-  
-    function getResults() {
-      let member = $('#NewGroupMember :selected').val();
-      member = encodeURIComponent(member);
-  
-      let url = '/add_new_member?group=' + '{{ this_group.id }}'
-      url += '&member=' + member
-  
-      if (request != null)
-        request.abort();
-  
-      request = $.ajax(
-        {
-          type: 'GET',
-          url: url,
+  'use strict';
+  let groupId = encodeURIComponent("{{ this_group.id }}");
+
+  function makeNewMemberTableRow(memberName, memberNetid, memberId, groupId) {
+    let tableRow = $('<tr>');
+    if (memberName === null) {
+      // default name
+      memberName = "None";
+    }
+    tableRow.append($('<td>', { text: memberName }));
+    tableRow.append($('<td>', { text: memberNetid }));
+    tableRow.attr('id', "memberRow" + memberId);
+    let deleteUserTd = $('<td>');
+    let deleteUserButton = $('<button>', { text: "Remove member"});
+    deleteUserButton.attr('onclick', "removeMember(" + memberId + ")");
+    deleteUserTd.append(deleteUserButton);
+    tableRow.append(deleteUserTd);
+    $('#membersTable').append(tableRow);
+    console.log("Table row")
+  }
+
+  let addNewMemberRequest = null;
+  function addNewMember() {
+    let memberId = $('#NewGroupMember :selected').val();
+    memberId = encodeURIComponent(memberId);
+
+    let url = '/add_new_member?group=' + groupId;
+    url += '&member=' + memberId
+
+    if (addNewMemberRequest != null)
+      addNewMemberRequest.abort();
+
+    addNewMemberRequest = $.ajax(
+      {
+        type: 'POST',
+        url: url,
+        success: function (response) {
+          let banner;
+          if (response.success) {
+            let bannerText = response.redundant ? response.memberNetid + " is already in group!" : "Success!";
+            banner = $('<div>', { text: bannerText });
+            banner.addClass("alert alert-success");
+            if (!response.redundant) {
+              makeNewMemberTableRow(response.memberName, response.memberNetid, memberId, groupId);
+            }
+            banner.appendTo("#groupMembersResponse");
+
+            setTimeout(function () {
+              banner.hide(1000);
+              setTimeout(function () {
+                banner.remove()
+              }, 1000);
+            }, 3000);
+          } else {
+            banner = $('<div>', { text: "Error fetching group" });
+            banner.addClass("alert alert-warning");
+            banner.appendTo("#groupMembersResponse");
+
+            setTimeout(function () {
+              banner.hide(1000);
+              setTimeout(function () {
+                banner.remove()
+              }, 1000);
+            }, 3000);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+          let banner = $('<div>', { text: "An error occurred" });
+          banner.addClass("alert alert-warning");
+          banner.appendTo("#groupMembersResponse");
+          setTimeout(function () {
+            banner.hide(1000);
+            setTimeout(function () {
+              banner.remove()
+            }, 1000);
+          }, 3000);
         }
-      );
-    }
-  
-    function setup() {
-      $('#addNewMember').on('click', getResults);
-    }
-  
-    $('document').ready(setup);
-  
-  </script>
+      }
+    );
+  }
+
+  let removeMemberRequest = null;
+  function removeMember(memberId) {
+    memberId = encodeURIComponent(memberId);
+    let url = '/remove_member?groupId=' + groupId;
+    url += '&memberId=' + memberId;
+
+    if (removeMemberRequest != null)
+    removeMemberRequest.abort();
+
+    removeMemberRequest = $.ajax(
+      {
+        type: 'POST',
+        url: url,
+        success: function (response) {
+          let banner;
+          if (response.success) {
+            banner = $('<div>', { text: "Success!" });
+            banner.addClass("alert alert-success");
+          } else {
+            banner = $('<div>', { text: "Error deleting" });
+            banner.addClass("alert alert-warning");
+            banner.appendTo("#groupMembersResponse");
+
+            setTimeout(function () {
+              banner.hide(1000);
+              setTimeout(function () {
+                banner.remove()
+              }, 1000);
+            }, 3000);
+            return;
+          }
+
+          $('#memberRow' + memberId).remove();
+          banner.appendTo("#groupMembersResponse");
+
+          setTimeout(function () {
+            banner.hide(1000);
+            setTimeout(function () {
+              banner.remove()
+            }, 1000);
+          }, 3000);
+        },
+        error: function (error) {
+          console.log(error);
+          let banner = $('<div>', { text: "An error occurred" });
+          banner.addClass("alert alert-warning");
+          banner.appendTo("#groupMembersResponse");
+          setTimeout(function () {
+            banner.hide(1000);
+            setTimeout(function () {
+              banner.remove()
+            }, 1000);
+          }, 3000);
+        }
+      }
+    );
+  }
+
+  function setup() {
+    $('#addNewMember').on('click', addNewMember);
+  }
+
+  $('document').ready(setup);
+
+</script>

@@ -34,7 +34,7 @@
 
 <script>
     'use strict';
-    let request = null;
+    let transferOwnershipRequest = null;
   
     function changeOwner() {
       let member = $('#NewGroupOwner :selected').val();
@@ -43,21 +43,18 @@
       let url = '/transfer_ownership?group=' + '{{ this_group.id }}'
       url += '&member=' + member
   
-      if (request != null)
-        request.abort();
+      if (transferOwnershipRequest != null)
+        transferOwnershipRequest.abort();
   
-      request = $.ajax(
+      transferOwnershipRequest = $.ajax(
         {
           type: 'GET',
           url: url,
         }
       );
     }
-</script>
-
-<script>
-    'use strict';
-    let requestB = null;
+    
+    let updateGroupNameRequest = null;
 
     function changeName() {
       let name = $('#UpdateGroupName').val();
@@ -66,10 +63,10 @@
       let url = '/change_group_name?group=' + '{{ this_group.id }}'
       url += '&name=' + name
   
-      if (requestB != null)
-        requestB.abort();
+      if (updateGroupNameRequest != null)
+        updateGroupNameRequest.abort();
   
-      requestB = $.ajax(
+      updateGroupNameRequest = $.ajax(
         {
           type: 'GET',
           url: url,

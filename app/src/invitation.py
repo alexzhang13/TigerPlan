@@ -78,8 +78,6 @@ def invitation_del_response_time(id: int, timeid: int) -> Invitation:
     """Removes a specified time from the invitation. If such a time doesn't already exist, do nothing."""
     try:
         invitation = get_invitation(id)
-        print("finalized?")
-        print(invitation.event.finalized)
         if (invitation.event.finalized):
             raise ValueError("Event is already finalized")
     except Exception as ex:

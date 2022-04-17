@@ -1,6 +1,7 @@
 from app.models.models import Invitation, Invitation_Timeblock, Member_Group, User, Group, Event
 from app import db
 from app.src.event import delete_event
+from app.src.user import get_user_from_id
 
 #---------------------------- CRUD Functions -------------------------#
 def create_group(name: str, owner: User) -> Group: 
@@ -46,13 +47,25 @@ def delete_group(id: int) -> bool:
 
 #---------------------------- Spec Functions -------------------------#
 def add_member(id: int, memberId: int) -> bool:
+    '''Makes a user a member of a group. If the user is already a
+    member, do nothing and return false. Otherwise, return true.'''
+    group = get_group(id)
+    user = get_user_from_id(memberId)
+
+    for mem_group in user.groups:
+        if group.id == mem_group.group_id:
+            print("User", memberId, "is already a part of group", id)
+            return False
+
     new_mem_group = Member_Group(member_id=memberId, group_id=id)
     db.session.add(new_mem_group)
     db.session.commit()
-    return new_mem_group.id != None
+    return True
 
 def delete_member(id: int, memberId: int) -> bool:
-    del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).one()
+    del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).first()
+    if (del_mem_group is None):
+        return
     db.session.delete(del_mem_group)
     db.session.commit()
     return del_mem_group.id == None

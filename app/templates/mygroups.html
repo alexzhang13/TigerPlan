@@ -123,7 +123,7 @@
 <script>
 
     'use strict';
-    let request = null;
+    let myGroupsRequest = null;
 
     function newGroupResults() {
       let name = $('#NewGroupName').val();
@@ -131,12 +131,12 @@
   
       let url = '/add_custom_group?name=' + name
   
-      if (request != null)
-        request.abort();
+      if (myGroupsRequest != null)
+        myGroupsRequest.abort();
   
-      request = $.ajax(
+      myGroupsRequest = $.ajax(
         {
-          type: 'GET',
+          type: 'POST',
           url: url,
         }
       );

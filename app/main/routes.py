@@ -1,6 +1,6 @@
 from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
-from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
+from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -405,24 +405,58 @@ def add_invitations(id):
 #         title='Login to TigerPlan')
 
 # ------------------------ REMOVE MEMBER ----------------------------- #
-@bp.route("/remove_member/<groupid>/<id>", methods=['GET', 'POST'])
-def remove_member(groupid, id):
+@bp.route("/remove_member", methods=['POST'])
+def remove_member():
     if 'username' in session:
-        # TODO: Authorization checking
-        delete_member(groupid, id)
-        return redirect("/mygroups?groupId=" + groupid)
+        try:
+            user = get_user_from_netid(session['username'])
+            group_id = request.args.get('groupId')
+            member_id = request.args.get('memberId')
+            
+            group = get_group(group_id)
+            if (user.id != group.owner_id):
+                raise Exception("User is not group owner")
+            delete_member(group_id, member_id)
+        except Exception as ex:
+            print("An exception occured at '/remove_member':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        response_json = json.dumps({"success":True})
+        response = make_response(response_json)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
     return render_template("login.html", 
         title='Login to TigerPlan')
 
 # ----------------------- ADD GROUP MEMBER ------------------------- #
-@bp.route("/add_new_member", methods=['GET', 'POST'])
+@bp.route("/add_new_member", methods=['POST'])
 def add_new_member():
     if 'username' in session:
         # TODO: Authorization checking
-        groupId = request.args.get('group')
-        member = request.args.get('member')
-        add_member(id=groupId, memberId=member)
-        return redirect("/mygroups?groupId=" + groupId)
+        try:
+            user = get_user_from_netid(session['username'])
+            group_id = request.args.get('group')
+            group = get_group(group_id)
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            member_id = request.args.get('member')
+            redudant = not add_member(id=group_id, memberId=member_id)
+            member = get_user_from_id(member_id)
+            response_json = json.dumps({"success": True,
+                "redundant": redudant, "memberName": member.name, "memberNetid": member.netid})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/add_new_member':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     return render_template("login.html", 
         title='Login to TigerResearch')
 

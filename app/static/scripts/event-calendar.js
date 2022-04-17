@@ -105,7 +105,9 @@ function renderTimeSelectionCalendar(calendarDivId) {
 
             // prevent changes from overwriting calendarId
             // DOES NOT WORK WITHOUT
-            delete changes.calendarId;
+            if (changes && changes.calendarId) {
+                delete changes.calendarId;
+            }
 
             cal.updateSchedule(schedule.id, schedule.calendarId, changes);
 
