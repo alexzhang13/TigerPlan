@@ -50,10 +50,10 @@
 <hr>
 <br>
 
-<div id="main" class="container px-4" style="height: 70%;">
+<div id="main" class="container px-4" style="height: 70vh;">
     <div class="row gx-5">
         <div class="col-md-4">
-            <div class="panel panel-primary border border-primary rounded overflow-auto" style="height: 70%;" id="group_panel">
+            <div class="panel panel-primary border-primary rounded overflow-auto" style="border: 3px solid; height: 70vh;" id="group_panel">
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
@@ -81,10 +81,9 @@
                         <div class="btn-group-vertical d-flex justify-content-center">
                             {% if events is defined and groups != '' %}
                             {% for event in events %}
-                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="#"> Event {{ event.id }} (Group {{ event.group_id }})</a>
+                                <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="/event/{{ event.id }}"> Event {{ event.id }} (Group {{ event.group_id }})</a>
                             {% endfor %}
                             {% endif %}
-                            <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="/events1"> Event A </a>
                         </div>
                     </div>
                     <div class="col-md-1"></div>
@@ -93,7 +92,7 @@
             </div>
         </div>
         <div class="col-md-8">
-            <div class="panel panel-primary border border-primary rounded" id="event_panel">
+            <div class="panel panel-primary border-primary rounded overflow-auto" style="border: 3px solid; height: 70vh;" id="event_panel">
                 <br>
                 <div class="panel-heading">
                     <h3 class="panel-title center">My Events</h3>

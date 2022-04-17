@@ -238,8 +238,8 @@ $(document).ready(function () {
                     dueDateClass: '',
                     start: response[i].start + 'Z',
                     end: response[i].end + 'Z',
-                    bgColor: "#" + randomColor,
-                    dragBgColor: "#" + randomColor,
+                    bgColor: "#9bd912",
+                    dragBgColor: "#9bd912",
                     }
                 toCreate.push(d);
                 console.log(toCreate)

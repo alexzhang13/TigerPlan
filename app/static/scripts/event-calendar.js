@@ -82,7 +82,6 @@ cal.on({
         console.log('clickDayname', date);
     },
     'beforeCreateSchedule': function (e) {
-
         // $("#create").fadeIn();
         saveNewSchedule(e);
     },
@@ -101,22 +100,6 @@ cal.on({
             end: e.changes.end.toUTCString(),
         }
 
-        var url = '/update_conflict'
-
-        console.log(data)
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify(data),
-            dataType: "json",
-            success: function (response) {
-                console.log(response)
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-
         // UPDATE ON DB ON FLASK
 
         refreshScheduleVisibility();
@@ -129,6 +112,11 @@ cal.on({
     },
     'afterRenderSchedule': function (e) {
         var schedule = e.schedule;
+        let subject = document.querySelector('tui-full-calendar-schedule-title')
+        subject.value = "Conflict.";
+        let button = document.querySelector('tui-full-calendar-popup-save');
+        console.log(button)
+        button.click();
         // var element = cal.getElement(schedule.id, schedule.calendarId);
         // console.log('afterRenderSchedule', element);
     },
@@ -167,39 +155,16 @@ function saveNewSchedule(scheduleData) {
         start: scheduleData.start,
         end: scheduleData.end,
         color: "#111111",
-        bgColor: "#" + randomColor,
-        dragBgColor: "#" + randomColor,
+        bgColor: "#93ea7f",
+        dragBgColor: "#93ea7f",
         borderColor: '#FDF8F3',
         category: 'time',
         // category: scheduleData.isAllDay ? 'allday' : 'time',
         // dueDateClass: '',
         location: scheduleData.location,
-        // raw: {
-        //     class: scheduleData.raw['class']
-        // },
-        // state: scheduleData.state
     };
 
-    // call ajax to save calendar
-    let url = '/saveNewSchedule'
-
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify(schedule),
-        dataType: "json",
-        success: function (response) {
-            console.log(response)
-            schedule['id'] = response.id
-            console.log(schedule)
-            cal.createSchedules([schedule]);
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-
-    // refreshScheduleVisibility();
+    cal.createSchedules([schedule]);
 }
 
 function refreshScheduleVisibility() {
