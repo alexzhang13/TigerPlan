@@ -88,6 +88,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
             console.log('clickMore', e);
         },
         'clickSchedule': function (e) {
+            console.log(e);
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);

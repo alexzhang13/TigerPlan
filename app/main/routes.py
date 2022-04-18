@@ -152,10 +152,13 @@ def groups():
         groupId = request.args.get("groupId")
         if (groupId):
             group = get_group(groupId)
+            if group.owner_id != user.id:
+                return render_template("mygroups.html", title='TigerPlan Manage Groups',
+                    user=session['username'], groups=groups)
             members = get_members(groupId)
             events = get_group_events(groupId)
-            return render_template("mygroups.html",
-            title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users, members=members, this_group=group, events=events)
+            return render_template("mygroups.html", title='TigerPlan Manage Groups', user=session['username'],
+                groups=groups, users=users, members=members, this_group=group, events=events)
         return render_template("mygroups.html", title='TigerPlan Manage Groups', user=session['username'], groups=groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
@@ -492,7 +495,7 @@ def change_ownership():
         # TODO: Authorization checking
         groupId = request.args.get('group')
         member = request.args.get('member')
-        update_owner(groupid=groupId, memberId=member)
+        update_owner(groupid=groupId, newOwnerId=member)
         return redirect("/mygroups?groupId=" + groupId)
     return render_template("login.html", 
         title='Login to TigerResearch')

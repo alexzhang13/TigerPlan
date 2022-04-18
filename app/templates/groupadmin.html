@@ -2,7 +2,7 @@
 <div><strong>{{ this_group.name }}</strong></div>
 <div>Group Owner</div>
 
-<form action="" method="get">
+<!-- <form action="" method="get"> -->
     <div>
         <select id="NewGroupOwner" class="form-select form-select-sm">
             {% if members != '' %}
@@ -13,7 +13,7 @@
         </select> <span>Select New Owner</span>
         <button id="changeOwner">Transfer Ownership to This Member (CANNOT BE UNDONE)</button>
     </div>
-</form>
+<!-- </form> -->
 
 <br>
 <p class="card-text">UPDATE GROUP NAME: Please specify a name for your group.</p>
@@ -34,21 +34,21 @@
 
 <script>
     'use strict';
-    let transferOwnershipRequest = null;
+    let changeOwnershipRequest = null;
   
     function changeOwner() {
       let member = $('#NewGroupOwner :selected').val();
       member = encodeURIComponent(member);
   
-      let url = '/transfer_ownership?group=' + '{{ this_group.id }}'
+      let url = '/change_ownership?group=' + '{{ this_group.id }}'
       url += '&member=' + member
   
-      if (transferOwnershipRequest != null)
-        transferOwnershipRequest.abort();
+      if (changeOwnershipRequest != null)
+        changeOwnershipRequest.abort();
   
-      transferOwnershipRequest = $.ajax(
+      changeOwnershipRequest = $.ajax(
         {
-          type: 'GET',
+          type: 'POST',
           url: url,
         }
       );
@@ -68,7 +68,7 @@
   
       updateGroupNameRequest = $.ajax(
         {
-          type: 'GET',
+          type: 'POST',
           url: url,
         }
       );
