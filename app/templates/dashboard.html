@@ -268,7 +268,7 @@
                     <div id="calendar"></div>
                 </div>
                 <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
-                    <div id="banner"></div>
+                    <div id="invitationBanner"></div>
                     <div id="invitationRespond">
                         <span id="InvitationDetails">
 
@@ -287,32 +287,160 @@
 
 <script>
     'use strict';
-    
+    let finalizeInvitationRequest = null;
+    let currentlyViewedInvitationId = null;
+
+    function addBanner(message, success) {
+        let banner = $('<div>', {
+            text: message
+        });
+        banner.addClass(success ? "alert alert-success" : "alert alert-warning");
+        banner.appendTo("#invitationBanner");
+
+        setTimeout(function () {
+            banner.hide(1000);
+            setTimeout(function () {
+                banner.remove()
+            }, 1000);
+        }, 3000);
+    }
+
+    function onFinalizeSuccess(response) {
+        $('#finalizeInvitationButton').hide();
+        $('#invitationCard' + currentlyViewedInvitationId).remove();
+        addBanner("Success!", true);
+        $('#invitationDetails').empty();
+        console.log("Sucessfully finalized " + currentlyViewedInvitationId);
+        currentlyViewedInvitationId = null;
+        destroyInvitationCalendar();
+    }
+
+    function finalize(inviteid) {
+        if (!currentlyViewedInvitationId) {
+            return;
+        }
+
+        $('#finalizeInvitationButton').prop('disabled', true);
+        console.log("Finalizing invitation " + currentlyViewedInvitationId);
+        if (finalizeInvitationRequest != null) {
+            return;
+        }
+
+        let chosenTimeBlockIdList = [];
+        let selections = getAllSelections();
+        for (var id of Object.keys(selections)) {
+            if (selections[id]) {
+                chosenTimeBlockIdList.push(id);
+            }
+        }
+
+        let url = "/finalize_invitation/" + currentlyViewedInvitationId;
+        finalizeInvitationRequest = $.ajax(
+            {
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(chosenTimeBlockIdList),
+                dataType: "json",
+                success: onFinalizeSuccess,
+                error: function (response) {
+                    addBanner(response.message ? response.message : "An error occurred", true);
+                }
+            }
+        );
+    }
+
+    function showInvitationEventDetails(eventName, eventDescription, eventLocation) {
+        let invitationDetails = $('#invitationDetails');
+        if (eventName) {
+            let eventNameHeader = $('<h3>');
+            eventNameHeader.append($('<strong>', { text: "Responding to event \"" + eventName + "\""}));
+            invitationDetails.append(eventNameHeader);
+            invitationDetails.append($('<br>'));
+        }
+        if (eventDescription) {
+            invitationDetails.append($('<strong>', { text: "Event description: " }));
+            invitationDetails.append($('<span>', { text: eventDescription }));
+            invitationDetails.append($('<br>'));
+        }
+        if (eventLocation) {
+            invitationDetails.append($('<strong>', { text: "Event location: " }));
+            invitationDetails.append($('<span>', { text: eventLocation }));
+            invitationDetails.append($('<br>'));
+        }
+
+    }
+
+    // TODO: Make more descriptive (show banner?)
+    function errorWhileFetchingTimeBlocks(error) {
+        console.log(error);
+        // addBanner(error, false);
+    }
+
+    function getAndRenderTimeBlocks(invitationId) {
+        let conflictsUrl = '/load_conflicts'
+        addCalendar(cal);
+
+        // get user conflicts
+        $.ajax({
+            type: "GET",
+            url: conflictsUrl,
+            success: renderUserConflicts,
+            error: errorWhileFetchingTimeBlocks
+        });
+
+        let respondToInvitationUrl = "respond_to_invitation/" + invitationId;
+        $.ajax({
+            type: "GET",
+            url: respondToInvitationUrl,
+            success: function (response) {
+                let eventTimes = response.eventTimes;
+                renderEventTimeBlocks(eventTimes);
+                showInvitationEventDetails(response.eventName, response.eventDescription, response.eventLocation);
+            },
+            error: function () {
+                errorWhileFetchingTimeBlocks("Error while fetching time blocks");
+            }
+        });
+    }
+
+    function respondToInvitation(id) {
+        currentlyViewedInvitationId = id;
+        $('#finalizeInvitationButton').show();
+        renderTimeSelectionCalendar();
+        getAndRenderTimeBlocks(id);
+    }
+
+    function setup() {
+        console.log("Setting up page");
+        $('#finalizeInvitationButton').on("click", finalize);
+    }
+
+    $('document').ready(setup);
 </script>
 
-    <!-- Github buttons -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    
-    <!--   Core JS Files   -->
-    <script src="{{ url_for('static', filename='scripts/core/popper.min.js') }}"></script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
 
-    <!-- Plugin for the charts, full documentation here: https://www.chartjs.org/ -->
-    <script src="{{ url_for('static', filename='scripts/plugins/chartjs.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/plugins/Chart.extension.js') }}"></script>
+<!--   Core JS Files   -->
+<script src="{{ url_for('static', filename='scripts/core/popper.min.js') }}"></script>
 
-    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="{{ url_for('static', filename='scripts/soft-ui-dashboard.min.js') }}"></script>
+<!-- Plugin for the charts, full documentation here: https://www.chartjs.org/ -->
+<script src="{{ url_for('static', filename='scripts/plugins/chartjs.min.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/plugins/Chart.extension.js') }}"></script>
 
-    <footer class="site-footer">
-        <div class="container fixed-bottom">
-            <hr>
-            <div class="row flex-shrink-0">
-                <div class="col-md-12">
-                    <h5 style="font-size: 15px;">TigerPlan 2022</h5>
-                </div>
+<!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="{{ url_for('static', filename='scripts/soft-ui-dashboard.min.js') }}"></script>
+
+<footer class="site-footer">
+    <div class="container fixed-bottom">
+        <hr>
+        <div class="row flex-shrink-0">
+            <div class="col-md-12">
+                <h5 style="font-size: 15px;">TigerPlan 2022</h5>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 </body>

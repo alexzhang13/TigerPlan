@@ -330,8 +330,8 @@ def add_event():
     return render_template("login.html", 
         title='Login to TigerPlan')
 
-# ------------------------- FINALIZE EVENT -------------------------- # 
-@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['POST'])
+# ------------------------- FINALIZE EVENT -------------------------- # TODO: FIX THIS PLEASE!!!!!!!!
+@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
 def finalize_event(eventid, timeid):
     if 'username' in session:
         try:
@@ -448,7 +448,9 @@ def respond_to_invitation(id):
             response_json = json.dumps({"success":True, 
                 "eventTimes": event_times,
                 "eventName": invitation.event.name,
-                "eventId": invitation.event_id
+                "eventId": invitation.event_id,
+                "eventDescription": invitation.event.description,
+                "eventLocation": invitation.event.location
                 })
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
@@ -531,21 +533,20 @@ def del_invitation_response_time(invitationid, timeid):
 def finalize_invitation(invitationid):
     if 'username' in session:
         try:
-            print("finalizing", invitationid)
+            print("finalizing invitation", invitationid)
             invitationid = int(invitationid)
             user = get_user_from_netid(session['username'])
             invitation = get_invitation(invitationid)
             if (invitation.user_id != user.id):
                 raise Exception("Invitiation is not owned by user")
             timeblocks_chosen = json.loads(request.get_data())
-            print(timeblocks_chosen)
-            # invitation_finalize(invitationid, timeblocks_chosen)
+            invitation_finalize(invitationid, timeblocks_chosen)
             response_json = json.dumps({"success":True})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
 
-        except:
+        except Exception as ex:
             print("An exception occured at '/add_event':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)

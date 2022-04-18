@@ -224,33 +224,67 @@
                                         <span id="existingEvents">
                                             {% for event in events %}
                                             <div class="card mt-3 mb-3" id="eventCard{{event.id}}">
-                                                <h6 class="text-dark text-sm font-weight-bold mb-0">Event name: <strong>{{event.name}}</strong></h6>
-                                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">Group: {{event.group.name}}</p>
-                                                <div class="card-body p-3">
-                                                    <a>
-                                                        <button onclick="deleteEvent({{event.id}})"> Delete Event </button>
-                                                    </a>
-                                                    {% if not event.finalized and event.invitations|length == 0 %}
-                                                    <a>
-                                                        <button onclick="createEventInvitations('{{event.id}}')"> Create Event Invitations </button>
-                                                    </a>
+                                                {% if not event.finalized and event.invitations|length == 0 %}
+                                                <div class="card-header text-white bg-primary">
                                                     {% else %}
-                                                    <a href="/view_event_details/{{event.id}}" target="_blank">
-                                                        <button>View details</button>
-                                                    </a>
-                                                    {% endif %}
+                                                    <div class="card-header text-black bg-teal">
+                                                        {% endif %}
+                                                        Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        {% if not event.finalized and event.invitations|length == 0 %}
+                                                        <strong>Invitations for this event have not been sent out yet!</strong>
+                                                        <br>
+                                                        {% endif %}
+                                                        <a>
+                                                            <button onclick="deleteEvent('{{event.id}}')"> Delete Event </button>
+                                                        </a>
+                                                        {% if not event.finalized and event.invitations|length == 0 %}
+                                                        <a>
+                                                            <button onclick="createEventInvitations('{{event.id}}')"> Create Event
+                                                                Invitations </button>
+                                                        </a>
+                                                        {% else %}
+                                                        <a href="/view_event_details/{{event.id}}" target="_blank">
+                                                            <button>View details</button>
+                                                        </a>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {% endfor %}
+                                                {% endfor %}
                                         </span>
+                                        <button id="showCreateEventCardButton" onclick="showCreateEventCard(true)">
+                                            Create Event!
+                                        </button>
+                                        <div class="card mt-3 mb-3" id="createEventCard" style="display: none;">
+                                            <div class="card-header text-white bg-teal"><strong>Create New Event</strong></div>
+                                            <div class="card-body">
+                                                <p class="card-text">Which group are you creating the event for?</p>
+                                                <form>
+                                                    <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
+                                                        {% if groups is defined and groups != '' %}
+                                                        {% for group in groups %}
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                    </select> <span>Select Group</span>
+                                                    <input type="text" name="newEventName" id="NewEventName" class="form-control"
+                                                        placeholder="Event Name" autofocus>
+                                                    <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control"
+                                                        placeholder="Event Location" autofocus>
+                                                    <input type="text" name="newEventDescription" id="NewEventDescription"
+                                                        class="form-control" placeholder="Event Description" autofocus>
+                                                    <small id="passwordHelpBlock" class="form-text text-muted">
+                                                        Specify times by dragging in the calendar!
+                                                    </small>
+                                                    <br>
+                                                </form>
+                                                <button onclick="showCreateEventCard(false)">Cancel</button>
+                                                <button id="createNewEventButton">Create Event</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- <div class="col-4 text-end">
-                                    <div
-                                        class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -262,188 +296,134 @@
         </div>
     </main>
     
-    <script>
-        var ctx = document.getElementById("chart-bars").getContext("2d");
+<script>
+    'use strict';
+    let request = null;
+    let variable = "does this work";
 
-        new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Sales",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    borderSkipped: false,
-                    backgroundColor: "#fff",
-                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-                    maxBarThickness: 6
-                },],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                        },
-                        ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 500,
-                            beginAtZero: true,
-                            padding: 15,
-                            font: {
-                                size: 14,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                            color: "#fff"
-                        },
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false
-                        },
-                        ticks: {
-                            display: false
-                        },
-                    },
-                },
-            },
-        });
-
-
-        var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-        new Chart(ctx2, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#cb0c9f",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                },
-                {
-                    label: "Websites",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke2,
-                    fill: true,
-                    data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
-                    maxBarThickness: 6
-                },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#b2b9bf',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#b2b9bf',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                },
-            },
-        });
-    </script>
-    <script>
-        var win = navigator.platform.indexOf('Win') > -1;
-        if (win && document.querySelector('#sidenav-scrollbar')) {
-            var options = {
-                damping: '0.5'
+    function createEventInvitations(eventId) {
+        $(this).prop("disabled", true);
+        let url = "cr_event_invitations/" + eventId;
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (response) {
+                console.log("Success");
+                document.location.reload();
             }
-            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        });
+    }
+
+    function deleteEvent(eventId) {
+        let url = "/del_event/" + eventId;
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    let html = "<div class='alert alert-success'>";
+                    html += "Event deleted!</div>"
+                    $("#eventCard" + eventId).html(html);
+
+                    setTimeout(function () {
+                        $("#eventCard" + eventId).hide(1000);
+                        setTimeout(function () {
+                            $("#eventCard" + eventId).remove();
+                        }, 1000);
+                    }, 3000);
+                    return;
+                } else {
+                    let banner = $('<div>',
+                        { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    $("#eventCard" + eventId).append(banner);
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return;
+                }
+            },
+        });
+    }
+
+    function showCreateEventCard(show) {
+        if (show) {
+            $("#createEventCard").show();
+            $("#showCreateEventCardButton").hide();
+            renderTimeSelectionCalendar();
+        } else {
+            $("#createEventCard").hide(500);
+            $("#showCreateEventCardButton").show();
+            destroyTimeSelectionCalendar();
         }
-    </script>
+    }
 
-    <script>
+    function makeNewEventCard(eventId, eventName, groupName) {
+        let deleteButton = $('<button>', { text: "Delete Event" });
+        deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
+        let deleteLink = $('<a>');
+        deleteLink.append(deleteButton);
 
+        let createInvitesButton = $('<button>',
+            { text: "Create Event Invitations" });
+        let createInvitesLink = $('<a>');
+        createInvitesButton.attr("onclick",
+            "createEventInvitations(" + eventId + ")");
+        createInvitesLink.append(createInvitesButton);
+        // <a>
+        //     <button onclick="createEventInvitations('')"> Create Event Invitations </button>
+        // </a>
+
+        let cardBody = $('<div>');
+        cardBody.addClass("card-body");
+        // <strong>Invitations for this event have not been sent out yet!</strong>
+        //                         <br>
+        cardBody.append($('<strong>', {text: "Invitations for this event have not been sent out yet!"}));
+        cardBody.append($('<br>'));
+        cardBody.append(deleteLink);
+        cardBody.append(createInvitesLink);
+
+        let cardHead = $('<div>');
+        cardHead.addClass("card-header text-white bg-primary");
+        cardHead.append(document.createTextNode("Event name: "));
+        let eventNameStrong = $('<strong>', { text: eventName });
+        cardHead.append(eventNameStrong);
+        cardHead.append(document.createTextNode(" - Group: " + groupName));
+
+        let card = $('<div>');
+        card.attr({ class: "card mt-3 mb-3" })
+        card.addClass("card mt-3 mb-3");
+        card.attr("id", "eventCard" + eventId);
+        card.append(cardHead);
+        card.append(cardBody);
+        card.hide();
+
+        $("#existingEvents").append(card);
+        card.show(1000);
+    }
+
+
+    function checkNewEventValidity(id, name, schedules) {
+        if (!id || id.trim() === "") {
+            return "Issue identifying associated group";
+        }
+        if (!name || name.trim() === "") {
+            return "A name is required";
+        }
+        if (!schedules || schedules.length == 0) {
+            return "At least one timeblock is required";
+        }
+        return "";
+    }
+
+    function createNewEvent() {
         'use strict';
         let request = null;
 
@@ -451,37 +431,80 @@
             $("#banner").html(response)
         }
 
-        function finalize(inviteid) {
-            let url = "/finalize_invitation/" + inviteid;
 
-            request = $.ajax(
-                {
-                    type: 'POST',
-                    url: url,
-                    success: (response) => responseHelper(inviteid, response)
+
+        let newEventData = {};
+        newEventData.groupId = id;
+        newEventData.name = name;
+        newEventData.location = location;
+        newEventData.description = description;
+        newEventData.timeblocks = timeblocks;
+
+        console.log(newEventData);
+        let url = '/add_event'
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(newEventData),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                let banner;
+                if (response.success) {
+                    banner = $('<div>', { text: "Success!" });
+                    banner.addClass("alert alert-success");
+                } else {
+                    banner = $('<div>', {
+                        text: response.message ?
+                            response.message : "An error occured"
+                    });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return;
                 }
-            );
-        }
+                banner.appendTo("#eventCreationResponse");
 
-        function handleResponse(response) {
-            $('#invitationRespond').html(response);
-        }
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
 
-
-        function getResults(id) {
-            let url = "/respond_to_invitation/" + id
-
-            if (request != null)
-                request.abort();
-
-            request = $.ajax(
-                {
-                    type: 'GET',
-                    url: url,
-                    success: handleResponse
-                }
-            );
-        }
+                $("createNewEventButton").prop("disabled", false);
+                makeNewEventCard(response.newEventId,
+                    name, response.groupName);
+                showCreateEventCard(false);
+                $('#select-box').prop('selectedIndex', 0);
+                $('#NewEventName').val('');
+                $('#NewEventLocation').val('');
+                $('#NewEventDescription').val('');
+            },
+            error: function (error) {
+                console.log(error);
+                let banner = $('<div>', { text: "An error occurred" });
+                banner.addClass("alert alert-warning");
+                banner.appendTo("#eventCreationResponse");
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+                $("createNewEventButton").prop("disabled", false);
+            }
+        });
+        $("createNewEventButton").on('click', function () {
+            $(this).prop("disabled", true);
+        });
+    }
 
         function responseHelper(inviteid, response) {
             updateBanner(response);
@@ -500,7 +523,6 @@
                 }
             );
         }
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
