@@ -200,13 +200,10 @@ function renderEventTimeBlocks(eventTimes) {
     cal.createSchedules(eventTimesList);
 }
 
-function errorWhileFetchingTimeBlocks(error) {
-    console.log(error);
-}
-
 function destroyInvitationCalendar() {
     cal.destroy();
     cal = null;
+    timeblockAvailabilities = null;
 }
 
 function getAllSelections() {

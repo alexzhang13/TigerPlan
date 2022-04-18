@@ -99,12 +99,14 @@
                     </div>
                     {% for invite in invitations %}
                     {% if not invite.finalized and not invite.event.finalized %}
-                    <div class="card-header text-white bg-iris" id="invitationCard{{invite.id}}">
-                        <h5>{{ invite.event.name }}</h5>
-                        <p>{{ invite.event.group.name }}</p>
-                        <a>
+                    <div class="card mt-3 mb-3" id="invitationCard{{invite.id}}">
+                        <div class="card-header text-white bg-iris">
+                            <h5>{{ invite.event.name }}</h5>
+                            <p>{{ invite.event.group.name }}</p>
+                        </div>
+                        <div class="card-body">
                             <button onclick="respondToInvitation('{{invite.id}}')">Respond</button>
-                        </a>
+                        </div>
                     </div>
                     {% endif %}
                     {% endfor %}
@@ -116,10 +118,9 @@
         <!-- Right Column -->
         <div class="col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
-                <div id="banner"></div>
+                <div id="invitationBanner"></div>
                 <div id="invitationRespond">
-                    <span id="InvitationDetails">
-
+                    <span id="invitationDetails">
                     </span>
                     <button id="finalizeInvitationButton" style="display: none;">
                         Finalize Invitation!
@@ -140,21 +141,36 @@
     let finalizeInvitationRequest = null;
     let currentlyViewedInvitationId = null;
 
-    function updateBanner(response) {
-        $("#banner").html(response)
+    function addBanner(message, success) {
+        let banner = $('<div>', {
+            text: message
+        });
+        banner.addClass(success ? "alert alert-success" : "alert alert-warning");
+        banner.appendTo("#invitationBanner");
+
+        setTimeout(function () {
+            banner.hide(1000);
+            setTimeout(function () {
+                banner.remove()
+            }, 1000);
+        }, 3000);
     }
 
     function onFinalizeSuccess(response) {
         $('#finalizeInvitationButton').hide();
-        $('invitationCard' + currentlyViewedInvitationId).remove();
+        $('#invitationCard' + currentlyViewedInvitationId).remove();
+        addBanner("Success!", true);
+        $('#invitationDetails').empty();
+        console.log("Sucessfully finalized " + currentlyViewedInvitationId);
         currentlyViewedInvitationId = null;
+        destroyInvitationCalendar();
     }
 
     function finalize(inviteid) {
         if (!currentlyViewedInvitationId) {
             return;
         }
-        
+
         $('#finalizeInvitationButton').prop('disabled', true);
         console.log("Finalizing invitation " + currentlyViewedInvitationId);
         if (finalizeInvitationRequest != null) {
@@ -168,7 +184,7 @@
                 chosenTimeBlockIdList.push(id);
             }
         }
-        
+
         let url = "/finalize_invitation/" + currentlyViewedInvitationId;
         finalizeInvitationRequest = $.ajax(
             {
@@ -176,9 +192,39 @@
                 url: url,
                 data: JSON.stringify(chosenTimeBlockIdList),
                 dataType: "json",
-                success: onFinalizeSuccess
+                success: onFinalizeSuccess,
+                error: function (response) {
+                    addBanner(response.message ? response.message : "An error occurred", true);
+                }
             }
         );
+    }
+
+    function showInvitationEventDetails(eventName, eventDescription, eventLocation) {
+        let invitationDetails = $('#invitationDetails');
+        if (eventName) {
+            let eventNameHeader = $('<h3>');
+            eventNameHeader.append($('<strong>', { text: "Responding to event \"" + eventName + "\""}));
+            invitationDetails.append(eventNameHeader);
+            invitationDetails.append($('<br>'));
+        }
+        if (eventDescription) {
+            invitationDetails.append($('<strong>', { text: "Event description: " }));
+            invitationDetails.append($('<span>', { text: eventDescription }));
+            invitationDetails.append($('<br>'));
+        }
+        if (eventLocation) {
+            invitationDetails.append($('<strong>', { text: "Event location: " }));
+            invitationDetails.append($('<span>', { text: eventLocation }));
+            invitationDetails.append($('<br>'));
+        }
+
+    }
+
+    // TODO: Make more descriptive (show banner?)
+    function errorWhileFetchingTimeBlocks(error) {
+        console.log(error);
+        // addBanner(error, false);
     }
 
     function getAndRenderTimeBlocks(invitationId) {
@@ -198,9 +244,9 @@
             type: "GET",
             url: respondToInvitationUrl,
             success: function (response) {
-
                 let eventTimes = response.eventTimes;
                 renderEventTimeBlocks(eventTimes);
+                showInvitationEventDetails(response.eventName, response.eventDescription, response.eventLocation);
             },
             error: function () {
                 errorWhileFetchingTimeBlocks("Error while fetching time blocks");
