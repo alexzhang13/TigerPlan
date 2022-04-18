@@ -185,13 +185,14 @@
                     
                         <div class="nav-item btn-group dropdown">
                             {% if user is defined and user != '' %}
-                            <button class="btn dropdown-toggle" id="login" role="button" data-bs-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false" style="color:#000">
+                            <a class="btn dropdown-toggle" id="login" data-bs-toggle="dropdown" style="color:#000">
                                 {{ user }}
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="login">
-                                <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
-                            </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="login">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
+                                </li>
+                            </ul>
                             {% else %}
                             <a href="{{ url_for('main.login') }}">
                                 <button class="btn btn-primary navbar-btn navbar-right" type="button"
@@ -302,12 +303,6 @@
     </main>
     
     </div>
-    <!--   Core JS Files   -->
-    <script src="../assets/js/core/popper.min.js"></script>
-    <script src="../assets/js/core/bootstrap.min.js"></script>
-    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-    <script src="../assets/js/plugins/chartjs.min.js"></script>
     <script>
         var ctx = document.getElementById("chart-bars").getContext("2d");
 
@@ -523,7 +518,6 @@
     
     <!--   Core JS Files   -->
     <script src="{{ url_for('static', filename='scripts/core/popper.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/core/bootstrap.min.js') }}"></script>
 
     <!-- Plugin for the charts, full documentation here: https://www.chartjs.org/ -->
     <script src="{{ url_for('static', filename='scripts/plugins/chartjs.min.js') }}"></script>
