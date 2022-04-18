@@ -241,9 +241,7 @@
                                                 <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}</h6>
                                                 <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{ invite.event.group.name }}</p>
                                                 <br style="line-height: 5px;">
-                                                <a onclick="updateBanner('{{invite.id}}')">
-                                                    <a class = "btn btn-white btn-sm w-100 mb-0">Respond</a>
-                                                </a>
+                                                <a class = "btn btn-white btn-sm w-100 mb-0" onclick="getResults('{{invite.id}}')">Respond</a>
                                             </div>
                                             {% endif %}
                                             {% endfor %}
@@ -350,11 +348,6 @@
         </div>
     </div>
     <!--   Core JS Files   -->
-    <script src="../assets/js/core/popper.min.js"></script>
-    <script src="../assets/js/core/bootstrap.min.js"></script>
-    <script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
-    <script src="../assets/js/plugins/smooth-scrollbar.min.js"></script>
-    <script src="../assets/js/plugins/chartjs.min.js"></script>
     <script>
         var ctx = document.getElementById("chart-bars").getContext("2d");
 
@@ -557,6 +550,7 @@
         }
 
         function handleResponse(response) {
+            console.log("handling...")
             $('#invitationRespond').html(response);
         }
 
