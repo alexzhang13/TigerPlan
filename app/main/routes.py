@@ -237,7 +237,7 @@ def add_new_member():
 def change_ownership():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             member = request.args.get('member')
@@ -260,7 +260,7 @@ def change_ownership():
 def change_group_name():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             name = request.args.get('name')

@@ -306,6 +306,8 @@
     }
 
     function onFinalizeSuccess(response) {
+        
+        $('#finalizeInvitationButton').prop('disabled', false);
         $('#finalizeInvitationButton').hide();
         $('#invitationCard' + currentlyViewedInvitationId).remove();
         addBanner("Success!", true);
