@@ -162,13 +162,13 @@ def del_group(id):
     if 'username' in session:
         try:
             user = get_user_from_netid(session['username'])
-            event = get_event(id)
-            if user.id != event.owner_id:
+            group = get_group(id)
+            if user.id != group.owner_id:
                 raise Exception("User is not group owner.")
             delete_group(id) 
             return redirect("/mygroups")
         except Exception as ex:
-            print("An exception occured at '/add_custom_group':", ex)
+            print("An exception occured at '/del_group':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'

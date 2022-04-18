@@ -1,7 +1,6 @@
 <div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
-{% if members is defined and members|length != 0 %}
 <table class="table" id="membersTable">
   <thead class="thead-dark">
     <tr>
@@ -22,9 +21,6 @@
 
   {% endfor %}
 </table>
-{% else %}
-<div>No members yet!</div>
-{% endif %}
 
 <!-- <form action="" method="get"> -->
 <div>
