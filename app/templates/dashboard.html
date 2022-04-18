@@ -237,14 +237,18 @@
                                         {% if invitations is defined and invitations != '' %}
                                         
                                             {% for invite in invitations %}
-                                            {% if not invite.finalized and not invite.event.finalized %}
-                                            <div class="card-body p-3">
-                                                <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}</h6>
-                                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{ invite.event.group.name }}</p>
-                                                <br style="line-height: 5px;">
-                                                <a class = "btn btn-white btn-sm w-100 mb-0" onclick="getResults('{{invite.id}}')">Respond</a>
-                                            </div>
-                                            {% endif %}
+                                                {% if invite is not none and not invite.finalized and not invite.event.finalized %}
+                                                <div class="card-body p-3">
+                                                    {% if invite.event is not none %}
+                                                        <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}</h6>
+                                                        {% if invite.event.group is not none %}
+                                                            <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{ invite.event.group.name }}</p>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    <br style="line-height: 5px;">
+                                                    <a class = "btn btn-white btn-sm w-100 mb-0" onclick="getResults('{{invite.id}}')">Respond</a>
+                                                </div>
+                                                {% endif %}
                                             {% endfor %}
                                         {% endif %}
 
