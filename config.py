@@ -7,7 +7,9 @@ class Config(object):
     # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 
     # 'postgresql+psycopg2://postgres:lu@localhost/mydb').replace(
     # 'postgres://', 'postgresql://') 
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'TigerPlan.db'))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 
+    'postgresql+psycopg2://postgres:1871@localhost/postgres').replace(
+    'postgres://', 'postgresql://') 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_AUTO_RELOAD = True
     JSONIFY_PRETTYPRINT_REGULAR = True
