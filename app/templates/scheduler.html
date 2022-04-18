@@ -400,7 +400,7 @@
         let card = $('<div>');
         card.attr({ class: "card mt-3 mb-3" })
         card.addClass("card mt-3 mb-3");
-        card.attr("id", "eventCard" + eventId);
+        card.attr({id: "eventCard" + eventId});
         card.append(cardHead);
         card.append(cardBody);
         card.hide();
@@ -424,14 +424,43 @@
     }
 
     function createNewEvent() {
-        'use strict';
-        let request = null;
+        let id = $('#NewEventGroupId :selected').val();
+        let name = $('#NewEventName').val();
+        let location = $('#NewEventLocation').val();
+        let description = $('#NewEventDescription').val();
+        let schedules = getAllSchedules();
 
-        function updateBanner(response) {
-            $("#banner").html(response)
+        let validity = checkNewEventValidity(id, name, schedules);
+
+        if (validity != "") {
+            console.log(validity);
+
+            let banner = $('<div>', { text: validity });
+            banner.addClass("alert alert-warning");
+            banner.appendTo("#eventCreationResponse");
+
+            setTimeout(function () {
+                banner.hide(1000);
+                setTimeout(function () {
+                    banner.remove()
+                }, 1000);
+            }, 3000);
+            return;
         }
 
+        console.log("creating new event");
 
+        let timeblocks = []
+        for (let i = 0; i < schedules.length; i++) {
+            let schedule = schedules[i];
+            let timeblock = {};
+            if (schedule.start && schedule.end) {
+                timeblock.start = schedule.start;
+                timeblock.end = schedule.end;
+                timeblock.name = schedule.title;
+            }
+            timeblocks.push(timeblock);
+        }
 
         let newEventData = {};
         newEventData.groupId = id;
@@ -523,6 +552,13 @@
                 }
             );
         }
+
+        function setup() {
+            console.log("Setting up page");
+            $('#createNewEventButton').on('click', createNewEvent);
+        }
+
+        $('document').ready(setup);
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -549,11 +585,6 @@
     </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-<script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
-
-<script>
- 
-</script>
 
 <script src="{{ url_for('static', filename='scripts/event-calendar.js') }}"></script>
 
