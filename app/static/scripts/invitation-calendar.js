@@ -11,7 +11,7 @@ function addCalendar(calendar) {
 const calendarId = "1";
 let cal = null;
 
-function renderTimeSelectionCalendar(invitationId, calendarDivId) {
+function renderTimeSelectionCalendar(calendarDivId) {
     if (cal != null) {
         destroyInvitationCalendar();
     }
@@ -92,7 +92,6 @@ function renderTimeSelectionCalendar(invitationId, calendarDivId) {
             console.log('clickMore', e);
         },
         'clickSchedule': function (e) {
-            console.log(e);
             if (e.schedule.raw != "EventTimeBlock") {
                 return;
             }
@@ -110,7 +109,6 @@ function renderTimeSelectionCalendar(invitationId, calendarDivId) {
                 });
                 timeblockAvailabilities[e.schedule.id] = true;
             }
-            console.log(timeblockAvailabilities);
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
@@ -149,78 +147,57 @@ function renderTimeSelectionCalendar(invitationId, calendarDivId) {
         }
 
     });
-
-    getAndRenderTimeBlocks(invitationId);
 }
 
 const conflictColor = "#dddddd";
 const eventColorSelected = "#f7349e";
 const eventColorUnselected = "#ffe7ff";
-function getAndRenderTimeBlocks(invitationId) {
-    let conflictsUrl = '/load_conflicts'
-    addCalendar(cal);
 
+function renderUserConflicts(response) {
     var userConflictsList = [];
-    // get user conflicts
-    $.ajax({
-        type: "GET",
-        url: conflictsUrl,
-        success: function (response) {
-            for (let i = 0; i < response.length; i++) {
-                
-                var d = {
-                    id: response[i].id,
-                    calendarId: '1',
-                    title: response[i].name,
-                    category: 'time',
-                    dueDateClass: '',
-                    start: response[i].start + 'Z',
-                    end: response[i].end + 'Z',
-                    bgColor: conflictColor,
-                    dragBgColor: conflictColor,
-                    raw: "UserConflict"
-                }
-                userConflictsList.push(d);
-            }
-            console.log(userConflictsList);
-            cal.createSchedules(userConflictsList);
-        },
-        error: errorWhileFetchingTimeBlocks
-    });
+    for (let i = 0; i < response.length; i++) {
 
-    var eventTimesList = [];
-    let eventTimesUrl = "respond_to_invitation/" + invitationId;
-    $.ajax({
-        type: "GET",
-        url: eventTimesUrl,
-        success: function (response) {
-            timeblockAvailabilities = {};
-            let eventTimes = response.eventTimes;
-            console.log(eventTimes);
-            for (let i = 0; i < eventTimes.length; i++) {
-                
-                var d = {
-                    id: eventTimes[i].id,
-                    calendarId: '1',
-                    title: eventTimes[i].name,
-                    category: 'time',
-                    dueDateClass: '',
-                    start: eventTimes[i].start + 'Z',
-                    end: eventTimes[i].end + 'Z',
-                    bgColor: eventColorUnselected,
-                    color: "#999999",
-                    raw: "EventTimeBlock"
-                }
-                eventTimesList.push(d);
-                timeblockAvailabilities[String(eventTimes[i].id)] = false;
-            }
-            console.log(eventTimesList);
-            cal.createSchedules(eventTimesList);
-        },
-        error: function() {
-            errorWhileFetchingTimeBlocks("Error while fetching time blocks");
+        var d = {
+            id: response[i].id,
+            calendarId: '1',
+            title: response[i].name,
+            category: 'time',
+            dueDateClass: '',
+            start: response[i].start + 'Z',
+            end: response[i].end + 'Z',
+            bgColor: conflictColor,
+            dragBgColor: conflictColor,
+            raw: "UserConflict"
         }
-    });
+        userConflictsList.push(d);
+    }
+    console.log(userConflictsList);
+    cal.createSchedules(userConflictsList);
+}
+
+function renderEventTimeBlocks(eventTimes) {
+    var eventTimesList = [];
+    timeblockAvailabilities = {};
+    console.log(eventTimes);
+    for (let i = 0; i < eventTimes.length; i++) {
+
+        var d = {
+            id: eventTimes[i].id,
+            calendarId: '1',
+            title: eventTimes[i].name,
+            category: 'time',
+            dueDateClass: '',
+            start: eventTimes[i].start + 'Z',
+            end: eventTimes[i].end + 'Z',
+            bgColor: eventColorUnselected,
+            color: "#999999",
+            raw: "EventTimeBlock"
+        }
+        eventTimesList.push(d);
+        timeblockAvailabilities[eventTimes[i].id] = false;
+    }
+    console.log(eventTimesList);
+    cal.createSchedules(eventTimesList);
 }
 
 function errorWhileFetchingTimeBlocks(error) {

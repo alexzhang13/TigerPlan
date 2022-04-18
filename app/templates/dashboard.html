@@ -99,11 +99,11 @@
                     </div>
                     {% for invite in invitations %}
                     {% if not invite.finalized and not invite.event.finalized %}
-                    <div class="card-header text-white bg-iris">
+                    <div class="card-header text-white bg-iris" id="invitationCard{{invite.id}}">
                         <h5>{{ invite.event.name }}</h5>
                         <p>{{ invite.event.group.name }}</p>
-                        <a onclick="respondToInvitation('{{invite.id}}')">
-                            <button>Respond</button>
+                        <a>
+                            <button onclick="respondToInvitation('{{invite.id}}')">Respond</button>
                         </a>
                     </div>
                     {% endif %}
@@ -117,38 +117,16 @@
         <div class="col-md-8">
             <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
                 <div id="banner"></div>
-                <div id="invitationRespond"></div>
-                <div id="calendar"></div>
-                <!-- <div class="card">
-                    <div class="card-header text-white bg-iris">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="members-tab" data-toggle="tab" href="#members" role="tab"
-                                    aria-controls="members" aria-selected="true">Members</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="events-tab" data-toggle="tab" href="#events" role="tab"
-                                    aria-controls="events" aria-selected="false">Events</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="members" role="tabpanel" aria-labelledby="members-tab">
-                            <div class="card-body">
-                                <h5 class="card-title">Special title treatment</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional
-                                    content.</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="events" role="tabpanel" aria-labelledby="events-tab">
-                            <div class="card-body">
-                                <h5 class="card-title">Special title treatment</h5>
-                                <p class="card-text">With supporting text below as a natural lead-in to additional
-                                    content.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
+                <div id="invitationRespond">
+                    <span id="InvitationDetails">
+
+                    </span>
+                    <button id="finalizeInvitationButton" style="display: none;">
+                        Finalize Invitation!
+                    </button>
+                    <div id="calendar"></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -160,55 +138,86 @@
 
     'use strict';
     let finalizeInvitationRequest = null;
+    let currentlyViewedInvitationId = null;
 
     function updateBanner(response) {
         $("#banner").html(response)
     }
 
+    function onFinalizeSuccess(response) {
+        $('#finalizeInvitationButton').hide();
+        $('invitationCard' + currentlyViewedInvitationId).remove();
+        currentlyViewedInvitationId = null;
+    }
+
     function finalize(inviteid) {
-        let url = "/finalize_invitation/" + inviteid;
+        if (!currentlyViewedInvitationId) {
+            return;
+        }
+        
+        $('#finalizeInvitationButton').prop('disabled', true);
+        console.log("Finalizing invitation " + currentlyViewedInvitationId);
         if (finalizeInvitationRequest != null) {
             return;
         }
 
+        let chosenTimeBlockIdList = [];
+        let selections = getAllSelections();
+        for (var id of Object.keys(selections)) {
+            if (selections[id]) {
+                chosenTimeBlockIdList.push(id);
+            }
+        }
+        
+        let url = "/finalize_invitation/" + currentlyViewedInvitationId;
         finalizeInvitationRequest = $.ajax(
             {
                 type: 'POST',
                 url: url,
-                success: (response) => responseHelper(inviteid, response)
+                data: JSON.stringify(chosenTimeBlockIdList),
+                dataType: "json",
+                success: onFinalizeSuccess
             }
         );
     }
 
-    function handleResponse(response) {
-        $('#invitationRespond').html(response);
+    function getAndRenderTimeBlocks(invitationId) {
+        let conflictsUrl = '/load_conflicts'
+        addCalendar(cal);
+
+        // get user conflicts
+        $.ajax({
+            type: "GET",
+            url: conflictsUrl,
+            success: renderUserConflicts,
+            error: errorWhileFetchingTimeBlocks
+        });
+
+        let respondToInvitationUrl = "respond_to_invitation/" + invitationId;
+        $.ajax({
+            type: "GET",
+            url: respondToInvitationUrl,
+            success: function (response) {
+
+                let eventTimes = response.eventTimes;
+                renderEventTimeBlocks(eventTimes);
+            },
+            error: function () {
+                errorWhileFetchingTimeBlocks("Error while fetching time blocks");
+            }
+        });
     }
 
-    let respondToInviteRequest = null;
     function respondToInvitation(id) {
-        renderTimeSelectionCalendar(id);
-    }
-
-    function responseHelper(inviteid, response) {
-        updateBanner(response);
-        respondToInvitation(inviteid);
-    }
-
-    function setAvailability(inviteid, timeid, action) {
-        let url = action + "_invitation_response_time/";
-        url += inviteid + "/" + timeid;
-
-        finalizeInvitationRequest = $.ajax(
-            {
-                type: 'POST',
-                url: url,
-                success: (response) => responseHelper(inviteid, response)
-            }
-        );
+        currentlyViewedInvitationId = id;
+        $('#finalizeInvitationButton').show();
+        renderTimeSelectionCalendar();
+        getAndRenderTimeBlocks(id);
     }
 
     function setup() {
         console.log("Setting up page");
+        $('#finalizeInvitationButton').on("click", finalize);
     }
 
     $('document').ready(setup);

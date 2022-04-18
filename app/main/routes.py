@@ -2,7 +2,7 @@ from app.src.group import add_member, create_group, delete_group, delete_member,
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
-from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_update_finalized, invitation_update_response
+from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_finalize, invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
@@ -437,9 +437,6 @@ def respond_to_invitation(id):
 
             for timeblock in invitation.event.times:
                 event_times.append(timeblock.to_json())
-            print("Dumping json")
-            
-            print(event_times)
             response_json = json.dumps({"success":True, 
                 "eventTimes": event_times,
                 "eventName": invitation.event.name,
@@ -449,7 +446,7 @@ def respond_to_invitation(id):
             response.headers['Content-Type'] = 'application/json'
             return response
         except Exception as ex:
-            print("An exception occured at '/add_event':", ex)
+            print("An exception occured at '/respond_to_invitation':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
@@ -525,24 +522,29 @@ def del_invitation_response_time(invitationid, timeid):
 @bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
 def finalize_invitation(invitationid):
     if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if (invitation.user_id != user.id):
-            html = "<strong>Error fetching invitation<strong>"
-            print("Invitation is not owned by user")
-            # TODO: Make JSON
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_update_finalized(invitationid, True)
-            except ValueError as ex:
-                # TODO: Make JSON
-                html = "<strong>%s<strong>" % str(ex)
-                print("value error", str(ex))
-                return make_response(html, 400)
-            return "Success!"
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+        try:
+            print("finalizing", invitationid)
+            invitationid = int(invitationid)
+            user = get_user_from_netid(session['username'])
+            invitation = get_invitation(invitationid)
+            if (invitation.user_id != user.id):
+                raise Exception("Invitiation is not owned by user")
+            timeblocks_chosen = json.loads(request.get_data())
+            print(timeblocks_chosen)
+            # invitation_finalize(invitationid, timeblocks_chosen)
+            response_json = json.dumps({"success":True})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        except:
+            print("An exception occured at '/add_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    else:
+        return render_template("login.html", title='Login to TigerPlan')
 
 
 # ------------------------------------------------------------------- #
