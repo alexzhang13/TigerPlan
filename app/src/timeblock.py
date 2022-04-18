@@ -14,10 +14,10 @@ def create_timeblock(name: str, user: User, start: DateTime, end: DateTime, isco
     db.session.commit()
     return new_tb
 
-def create_event_timeblock(start: DateTime, end: DateTime, isconflict: bool, eventId: int, commit: bool = True) -> TimeBlock:
+def create_event_timeblock(start: DateTime, end: DateTime, isconflict: bool, eventId: int, name: str, commit: bool = True) -> TimeBlock:
     """Create a time block. Returns created time block."""
     new_tb = TimeBlock(start=start,
-                      end=end,
+                      end=end, name=name,
                       is_conflict=isconflict,
                       event_id=eventId)
     db.session.add(new_tb)

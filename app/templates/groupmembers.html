@@ -1,7 +1,7 @@
 <div><strong>{{ this_group.name }}</strong></div>
 <div>Group Members</div>
 
-{% if members is defined %}
+{% if members is defined and members|length != 0 %}
 <table class="table" id="membersTable">
   <thead class="thead-dark">
     <tr>

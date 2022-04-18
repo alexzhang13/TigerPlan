@@ -25,7 +25,8 @@ def create_event(name: str, owner: User, location: str, description: str, groupi
     for timeblock in timeblocks:
         start = datetime.fromisoformat(timeblock['start']['_date'][:-1])
         end = datetime.fromisoformat(timeblock['end']['_date'][:-1])
-        _ = create_event_timeblock(eventId=new_event.id, start=start, end=end, isconflict=False, commit=False)
+        name = timeblock['name']
+        _ = create_event_timeblock(eventId=new_event.id, start=start, end=end, name=name, isconflict=False, commit=False)
 
     db.session.commit()
     return new_event
