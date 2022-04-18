@@ -225,14 +225,12 @@ def about():
 # ------------------------------------------------------------------- #
 
 # ------------------------------------------------------------------- #
-@bp.route("/moveEvent/", methods=["POST"])
+@bp.route("/testPage/")
 def move_event():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        print(request.form['data'])
-        a = datetime(2018, 11, 28)
-        b = datetime(2018, 12, 28)
-        create_timeblock(name="example", user=user, start=a, end=b)
+        return render_template("test.html", 
+                title='TigerPlan Event Page', user=session['username'])
         
     return render_template("login.html", 
         title='Login to TigerResearch') 
