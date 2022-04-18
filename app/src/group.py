@@ -35,11 +35,11 @@ def delete_group(id: int) -> bool:
     events = db.session.query(Event).filter(Event.group_id == id).all()
     for event in events:
         del_responses = db.session.query(Invitation_Timeblock).filter(Invitation.event_id == id, Invitation_Timeblock.invitation_id == Invitation.id).all()
-        for del_response  in del_responses:
+        for del_response in del_responses:
             db.session.delete(del_response)
         del_invitations = db.session.query(Invitation).filter(Invitation.event_id == id).all()
         for del_inv in del_invitations:
-            db.session(del_inv)
+            db.session.delete(del_inv)
         db.session.delete(event)
     db.session.delete(del_group)
     db.session.commit()
