@@ -156,8 +156,8 @@ def add_custom_group():
     return render_template("login.html", 
         title='Login to TigerResearch')
 
-# -------------------------- DELETE GROUP --------------------------- #
-@bp.route("/del_group/<id>", methods=['POST'])
+# -------------------------- DELETE GROUP --------------------------- # TODO: change to POST
+@bp.route("/del_group/<id>", methods=['POST', 'GET'])
 def del_group(id):
     if 'username' in session:
         try:
