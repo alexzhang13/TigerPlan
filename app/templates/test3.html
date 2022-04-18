@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-teal">
+    <div class="container-fluid">
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+            <a class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2 navbar-brand"
+                href="#">TigerPlan</a>
+        </div>
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarCollapse">
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ url_for('main.index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">Manage
+                        Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('main.scheduler') }}" tabindex="-1"
+                        aria-disabled="true">Scheduler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.about') }}" tabindex="-1" aria-disabled="true">About</a>
+                </li>
+            </ul>
+            <div class="nav-item btn-group dropdown">
+                {% if user is defined and user != '' %}
+                <button class="btn dropdown-toggle" id="login" role="button" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" style="color:#fff">
+                    {{ user }}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="login">
+                    <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
+                </div>
+                {% else %}
+                <a href="{{ url_for('main.login') }}">
+                    <button class="btn btn-primary navbar-btn navbar-right" type="button"
+                        style="background-color:rgb(185, 176, 187);">
+                        Login
+                    </button>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<br>
+<br>
+<br>
+
+<div class="container pb-5">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <strong>Scheduling page in progress!</strong>
+    {% if user is defined and user != '' %}
+    <div>
+        Showing scheduling page for user <strong>{{ user }}</strong>:
+    </div>
+    {% endif %}
+</div>
+
+<div id="main" class="container-fluid px-5" style="height: 100%;">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-4">
+            <div class="container pt-4 pb-4 border rounded-3 border-teal border-3">
+                {% if events is defined and events != '' %}
+                <div class="card-columns">
+                    <div class="card mb-3">
+                        <div class="card-header text-white bg-teal">
+                            <h5 class="card-title">Planned Events</h5>
+                        </div>
+                    </div>
+
+                    
+                    <span id="existingEvents">
+                        {% for event in events %}
+                        <div class="card mt-3 mb-3" id="eventCard{{event.id}}">
+                            <div class="card-header text-white bg-teal">
+                                Event name: <strong>{{event.name}}</strong> - Group: {{event.group.name}}
+                            </div>
+                            <div class="card-body">
+                                <a>
+                                    <button onclick="deleteEvent({{event.id}})"> Delete Event </button>
+                                </a>
+                                {% if not event.finalized and event.invitations|length == 0 %}
+                                <a href="/cr_event_invitations/{{ event.id }}">
+                                    <button> Create Event Invitations </button>
+                                </a>
+                                {% else %}
+                                <a href="/view_event_details/{{event.id}}" target="_blank">
+                                    <button>View details</button>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </span>
+                    <button id="showCreateEventCardButton" onclick="showCreateEventCard(true)">
+                        Create Event!
+                    </button>
+                    <div class="card mt-3 mb-3" id="createEventCard" style="display: none;">
+                        <div class="card-header text-white bg-teal"><strong>Create New Event</strong></div>
+                        <div class="card-body">
+                            <p class="card-text">Which group are you creating the event for?</p>
+                            <form>
+                                <select id="NewEventGroupId" class="custom-select custom-select-lg mb-3">
+                                    {% if groups is defined and groups != '' %}
+                                    {% for group in groups %}
+                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                </select> <span>Select Group</span>
+                                <input type="text" name="newEventName" id="NewEventName" class="form-control"
+                                    placeholder="Event Name" autofocus>
+                                <input type="text" name="newEventLocation" id="NewEventLocation" class="form-control"
+                                    placeholder="Event Location" autofocus>
+                                <input type="text" name="newEventDescription" id="NewEventDescription"
+                                    class="form-control" placeholder="Event Description" autofocus>
+                                <small id="passwordHelpBlock" class="form-text text-muted">
+                                    Specify times by dragging in the calendar!
+                                </small>
+                                <br>
+                            </form>
+                            <button onclick="showCreateEventCard(false)">Cancel</button>
+                            <button id="createNewEventButton">Create Event</button>
+                        </div>
+                    </div>
+                    <div id="eventCreationResponse">
+
+                    </div>
+
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Right Column -->
+        <div class="col-md-8">
+            <div class="container pt-4 pb-4 border rounded-3 border-teal border-3" id="currentlyViewedEvent">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    'use strict';
+    let request = null;
+    let variable = "does this work";
+
+    function deleteEvent(eventId) {
+        let url = "/del_event/" + eventId;
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    let html = "<div class='alert alert-success'>";
+                    html += "Event deleted!</div>"
+                    $("#eventCard" + eventId).html(html);
+
+                    setTimeout(function () {
+                        $("#eventCard" + eventId).hide(1000);
+                        setTimeout(function () {
+                            $("#eventCard" + eventId).remove();
+                        }, 1000);
+                    }, 3000);
+                    return;
+                } else {
+                    let banner = $('<div>',
+                        { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    $("#eventCard" + eventId).append(banner);
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return; 
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    function showCreateEventCard(show) {
+        if (show) {
+            $("#createEventCard").show();
+            $("#showCreateEventCardButton").hide();
+            renderTimeSelectionCalendar();
+        } else {
+            $("#createEventCard").hide(500);
+            $("#showCreateEventCardButton").show();
+            destroyTimeSelectionCalendar();
+        }
+    }
+
+    function makeNewEventCard(eventId, eventName, groupName) {
+        let deleteButton = $('<button>', { text: "Delete Event" });
+        deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
+        let deleteLink = $('<a>');
+        deleteLink.append(deleteButton);
+
+        let createInvitesButton = $('<button>',
+            { text: "Create Event Invitations" });
+        let createInvitesLink = $('<a>');
+        createInvitesLink.attr("href",
+            "cr_event_invitations/" + eventId);
+        createInvitesLink.append(createInvitesButton);
+
+        let detailsButton = $('<button>', { text: "View details" });
+        let detailsLink = $('<a>');
+        detailsLink.attr("href", "view_event_details/" + eventId);
+        detailsLink.attr("target", "_blank");
+        detailsLink.append(detailsButton);
+
+        let cardBody = $('<div>');
+        cardBody.addClass("card-body");
+        cardBody.append(deleteLink);
+        cardBody.append(createInvitesLink);
+        cardBody.append(detailsLink);
+
+        let cardHead = $('<div>');
+        cardHead.addClass("card-header text-white bg-teal");
+        cardHead.append(document.createTextNode("Event name: "));
+        let eventNameStrong = $('<strong>', { text: eventName });
+        cardHead.append(eventNameStrong);
+        cardHead.append(document.createTextNode(" - Group: " + groupName));
+
+        let card = $('<div>');
+        card.attr({ class: "card mt-3 mb-3" })
+        card.addClass("card mt-3 mb-3");
+        card.attr("id", "eventCard" + eventId);
+        card.append(cardHead);
+        card.append(cardBody);
+
+        $("#existingEvents").append(card);
+    }
+
+
+    function checkNewEventValidity(id, name, schedules) {
+        if (!id || id.trim() === "") {
+            return "Issue identifying associated group";
+        }
+        if (!name || name.trim() === "") {
+            return "A name is required";
+        }
+        if (!schedules || schedules.length == 0) {
+            return "At least one timeblock is required";
+        }
+        return "";
+    }
+
+    function createNewEvent() {
+        let id = $('#NewEventGroupId :selected').val();
+        let name = $('#NewEventName').val();
+        let location = $('#NewEventLocation').val();
+        let description = $('#NewEventDescription').val();
+        let schedules = getAllSchedules();
+
+        let validity = checkNewEventValidity(id, name, schedules);
+
+        if (validity != "") {
+            console.log(validity);
+
+            let banner = $('<div>', { text: validity });
+            banner.addClass("alert alert-warning");
+            banner.appendTo("#eventCreationResponse");
+
+            setTimeout(function () {
+                banner.hide(1000);
+                setTimeout(function () {
+                    banner.remove()
+                }, 1000);
+            }, 3000);
+            return;
+        }
+
+        console.log("creating new event");
+
+        let timeblocks = []
+        for (let i = 0; i < schedules.length; i++) {
+            let schedule = schedules[i];
+            let timeblock = {};
+            if (schedule.start && schedule.end) {
+                timeblock.start = schedule.start;
+                timeblock.end = schedule.end;
+            }
+            timeblocks.push(timeblock);
+        }
+
+        let newEventData = {};
+        newEventData.groupId = id;
+        newEventData.name = name;
+        newEventData.location = location;
+        newEventData.description = description;
+        newEventData.timeblocks = timeblocks;
+
+        console.log(newEventData);
+        let url = '/add_event'
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(newEventData),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                let banner;
+                if (response.success) {
+                    banner = $('<div>', { text: "Success!" });
+                    banner.addClass("alert alert-success");
+                } else {
+                    banner = $('<div>', { text: "An error occured" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    return;
+                }
+                banner.appendTo("#eventCreationResponse");
+
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+
+                $("createNewEventButton").prop("disabled", false);
+                makeNewEventCard(response.newEventId,
+                    name, response.groupName);
+                showCreateEventCard(false);
+                $('#select-box').prop('selectedIndex',0);
+                $('#NewEventName').val('');
+                $('#NewEventLocation').val('');
+                $('#NewEventDescription').val('');
+            },
+            error: function (error) {
+                console.log(error);
+                let banner = $('<div>', { text: "An error occurred" });
+                banner.addClass("alert alert-warning");
+                banner.appendTo("#eventCreationResponse");
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
+                $("createNewEventButton").prop("disabled", false);
+            }
+        });
+        $("createNewEventButton").on('click', function () {
+            $(this).prop("disabled", true);
+        });
+    }
+
+    function setup() {
+        console.log("Setting up page");
+        $('#createNewEventButton').on('click', createNewEvent);
+    }
+
+    $('document').ready(setup);
+
+</script>
+
+<script>
+
+</script>
+<script src="{{ url_for('static', filename='scripts/event-calendar.js') }}"></script>
+
+{% endblock %}

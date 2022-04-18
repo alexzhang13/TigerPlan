@@ -1,8 +1,8 @@
-from app.src.group import add_member, create_group, delete_group
+from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
-from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_groups, get_user_from_netid, get_users
+from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
-from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_update_finalized, invitation_update_response
+from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_finalize, invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
@@ -23,64 +23,21 @@ cas_client = CASClient(
 #                           PAGE ROUTES                               #
 # ------------------------------------------------------------------- #
 
-# ----------------------------- TEST -------------------------------- #
-@bp.route("/test", methods=["GET", "POST"])
-def test():
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        events = get_user_events(user.id)
-        event = get_event(2)
-        
-        print(event.invitations)
-        print("-----------")
-        print(get_invitation_response_times(event.id))
-        return render_template("about.html")
-    return render_template("login.html", 
-        title='Login to TigerPlan')
-
-@bp.route("/eventtest", methods=["GET", "POST"])
-def event_test():
-    if 'username' in session:
-        invitation_update_response(1, time_ids = [3, 5])
-        invitation_update_response(2, time_ids = [3, 4])
-        invitation_update_response(3, time_ids = [3])
-        invitation_update_finalized(2, True)
-        return render_template("about.html")
-    return render_template("login.html", 
-            title='Login to TigerPlan')
-
-
-@bp.route("/events1", methods=["GET", "POST"])
-def event1():
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        groups = get_user_groups(user.id)
-        events = get_user_events(user.id)
-        return render_template("event.html", 
-            title='TigerPlan Event Page', user=session['username'], 
-            groups=groups, events=events)
-    return render_template("login.html", 
-        title='Login to TigerPlan') 
-
 # ----------------------------- HOME -------------------------------- #
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET"])
 def index():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         events = get_user_events(user.id)
-        return render_template("index.html", 
-            title='TigerPlan Homepage', user=session['username'], 
+        return render_template("index.html",
+            title='TigerPlan Homepage', user=session['username'],
             groups=groups, events=events)
-    return render_template("login.html", 
-        title='Login to TigerPlan') 
+    return render_template("login.html",
+        title='Login to TigerPlan')
 
-
-@bp.route("/testingstuff", methods=["GET", "POST"])
-def test_calendar():
-    return render_template("calendar.html")
 # ---------------------------- DASHBOARD ---------------------------- #
-@bp.route("/dashboard", methods=['GET', 'POST'])
+@bp.route("/dashboard", methods=['GET'])
 def dashboard():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
@@ -90,56 +47,59 @@ def dashboard():
             title='TigerPlan User Dashboard', user=session['username'], 
             conflicts=conflicts, invitations=invitations)
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerResearch')
 
-
-### Respond to an invitation as an invitee. Called using AJAX in dashboard ###
-@bp.route("/respond_to_invitation/<id>", methods=['GET', 'POST'])
-def respond_to_invitation(id):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        try:
-            invitation = get_invitation(id)
-        except:
-            html = "<strong>Error fetching invitation<strong>"
-            return make_response(html)
-        if invitation.user_id != user.id:
-            html = "<strong>Error fetching invitation<strong>"
-            return make_response(html)
-        
-        response_timeblockids = []
-
-        for invtb in invitation.responses:
-            response_timeblockids.append(invtb.timeblock_id)
-
-        return render_template("respondtoinvitation.html", invitation=invitation, response_timeblockids=response_timeblockids)
-
-    return render_template("login.html", 
-        title='Login to TigerPlan')
 # -------------------------- MANAGE GROUPS -------------------------- #
-@bp.route("/mygroups", methods=['GET', 'POST'])
+@bp.route("/mygroups", methods=['GET'])
 def groups():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         users = get_users()
-        return render_template("mygroups.html",
-        title='TigerPlan Manage Groups', user=session['username'], groups=groups, users=users)
-    return render_template("login.html", 
-        title='Login to TigerResearch') 
+        groupId = request.args.get("groupId")
+        if (groupId):
+            group = get_group(groupId)
+            if group.owner_id != user.id:
+                return render_template("mygroups.html", 
+                    title='TigerPlan Manage Groups',
+                    user=session['username'], groups=groups)
+            members = get_members(groupId)
+            events = get_group_events(groupId)
+            return render_template("mygroups.html", 
+                title='TigerPlan Manage Groups', 
+                user=session['username'],
+                groups=groups, users=users, members=members, 
+                this_group=group, events=events)
+        return render_template("mygroups.html", 
+            title='TigerPlan Manage Groups', 
+            user=session['username'], groups=groups)
+    return render_template("login.html",
+        title='Login to TigerResearch')
 
 # ---------------------------- SCHEDULER ---------------------------- #
-@bp.route("/scheduler", methods=['GET', 'POST'])
+@bp.route("/scheduler", methods=['GET'])
 def scheduler():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         events = get_user_events(user.id)
         return render_template("scheduler.html",
-            title='TigerPlan Scheduler', user=session['username'], 
+            title='TigerPlan Scheduler', 
+            user=session['username'], 
             groups=groups, events=events)
     return render_template("login.html", 
         title='Login to TigerResearch') 
+
+# ----------------------------- ABOUT ------------------------------- #
+@bp.route("/about", methods=['GET', 'POST'])
+def about():
+    if 'username' in session:
+        return render_template("about.html",
+        title='TigerPlan About', user=session['username'])
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ------------------------- EVENT DETAILS --------------------------- #
 
 @bp.route("/view_event_details/<id>", methods=['GET', 'POST'])
 def view_event_details(id):
@@ -156,40 +116,449 @@ def view_event_details(id):
             return make_response(html)
         if not event.finalized:
             responses, num = get_invitation_response_times(event.id)
-            return render_template("eventdetails.html", finalized=False, event=event, responses=responses, num=num)
+            return render_template("eventdetails.html", 
+                finalized=False, event=event, responses=responses,
+                num=num)
+        else:
+            # TODO: Ensure that there is a time
+            return render_template("eventdetails.html", finalized=True,
+            event=event, time=event.times[0])
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
+# ------------------------------------------------------------------- #
+#                         GROUP MUTATIONS                             #
+# ------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------- #
+@bp.route("/testPage/")
+def move_event():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        return render_template("test.html", 
+                title='TigerPlan Event Page', user=session['username'])
+        
+# -------------------------- ADD GROUP ------------------------------ #
+@bp.route("/add_custom_group", methods=['POST'])
+def add_custom_group():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            name = request.args.get('name')
+            create_group(name=name, owner=user)
+            return redirect("/mygroups")
+        except Exception as ex:
+            print("An exception occured at '/add_custom_group':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# -------------------------- DELETE GROUP --------------------------- #
+@bp.route("/del_group/<id>", methods=['POST'])
+def del_group(id):
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            event = get_event(id)
+            if user.id != event.owner_id:
+                raise Exception("User is not group owner.")
+            delete_group(id) 
+            return redirect("/mygroups")
+        except Exception as ex:
+            print("An exception occured at '/add_custom_group':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ------------------------ REMOVE MEMBER ----------------------------- #
+@bp.route("/remove_member", methods=['POST'])
+def remove_member():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            group_id = request.args.get('groupId')
+            member_id = request.args.get('memberId')
+            group = get_group(group_id)
+            if (user.id != group.owner_id):
+                raise Exception("User is not group owner.")
+            delete_member(group_id, member_id)
+        except Exception as ex:
+            print("An exception occured at '/remove_member':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        response_json = json.dumps({"success":True})
+        response = make_response(response_json)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ----------------------- ADD GROUP MEMBER ------------------------- #
+@bp.route("/add_new_member", methods=['POST'])
+def add_new_member():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            group_id = request.args.get('group')
+            group = get_group(group_id)
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            member_id = request.args.get('member')
+            redudant = not add_member(id=group_id, memberId=member_id)
+            member = get_user_from_id(member_id)
+            response_json = json.dumps({"success": True,
+                "redundant": redudant, "memberName": member.name, 
+                "memberNetid": member.netid})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/add_new_member':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- TRANSFER OWNERSHIP ------------------------- #
+@bp.route("/change_ownership", methods=['POST'])
+def change_ownership():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['userid'])
+            groupId = request.args.get('group')
+            group = get_group(groupId)
+            member = request.args.get('member')
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            update_owner(groupid=groupId, newOwnerId=member)
+            return redirect("/mygroups?groupId=" + groupId)
+        except Exception as ex:
+            print("An exception occured at '/change_ownership':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- CHANGE GROUP NAME ------------------------- #
+@bp.route("/change_group_name", methods=['POST'])
+def change_group_name():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['userid'])
+            groupId = request.args.get('group')
+            group = get_group(groupId)
+            name = request.args.get('name')
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            update_group_name(groupid=groupId, newName=name)
+            return redirect("/mygroups?groupId=" + groupId)
+        except Exception as ex:
+            print("An exception occured at '/change_ownership':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ------------------------------------------------------------------- #
+#                         EVENT MUTATIONS                             #
+# ------------------------------------------------------------------- #
+
+# --------------------- CREATE CUSTOM EVENT ------------------------- # TODO: Review Authorization
+@bp.route("/add_event", methods=['POST'])
+def add_event():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            schedule = json.loads(request.get_data())
+            group_id = schedule['groupId']
+            # TODO: Make sure group_id is valid?
+            group_id = int(group_id)
+            group = get_group(group_id)
+            # TODO: Make this error handling more precise; probably specialized exceptions
+            if (len(group.members) == 0):
+                response_json = json.dumps({"success": False, 
+                    "message": "Cannot create event for group with 0 members"
+                    })
+                response = make_response(response_json)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+            name = schedule['name']
+            if (name is None or name.strip() == ""):
+                raise Exception("Name is absent")
+            location = schedule['location']
+            description = schedule['description']
+            timeblocks = schedule['timeblocks']
+            if (len(timeblocks) == 0):
+                raise Exception("No timeblocks included")
+            
+            new_event = create_event(groupid=group_id, name=name,
+                                    owner=user, location=location, 
+                                    description=description,
+                                    timeblocks=timeblocks)
+            response_json = json.dumps({"success":True, 
+                "newEventId":new_event.id,
+                "groupName":new_event.group.name
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/add_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ------------------------- FINALIZE EVENT -------------------------- # TODO: FIX THIS PLEASE!!!!!!!!
+@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
+def finalize_event(eventid, timeid):
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            event = get_event(eventid)
+            if user.id != event.owner_id:
+                raise Exception("User is not event owner.")
+            event_finalize(eventid, timeid)
+            return redirect("/scheduler")
+        except Exception as ex:
+            print("An exception occured at '/finalize_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# --------------------------- VIEW EVENT ---------------------------- # TODO: Review Authorization
+@bp.route("/event/<id>", methods=['GET'])
+def view_event(id):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        # TODO: Make an error html file for these cases
+        try:
+            event = get_event(id)
+        except:
+            html = "<strong>Error fetching event<strong>"
+            return make_response(html)
+        # if event.owner_id != user.id:
+        #    html = "<strong>Error fetching event<strong>"
+        #    return make_response(html)
+        if not event.finalized:
+            user = get_user_from_netid(session['username'])
+            groups = get_user_groups(user.id)
+            events = get_user_events(user.id)
+            return render_template("event.html", 
+                title='TigerPlan Event Page', user=session['username'], 
+                groups=groups, myevent=event, events=events)
         else:
             # TODO: Ensure that there is a time
             return render_template("eventdetails.html", finalized=True,event=event, time=event.times[0])
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerResearch')
 
-
-# ----------------------------- ABOUT ------------------------------- #
-@bp.route("/about", methods=['GET', 'POST'])
-def about():
+# ------------------------ DELETE EVENT ----------------------------- #
+@bp.route("/del_event/<id>", methods=['POST'])
+def del_event(id):
     if 'username' in session:
-        return render_template("about.html",
-        title='TigerPlan About', user=session['username'])
+        try:
+            user = get_user_from_netid(session['username'])
+            event = get_event(id)
+            if (event.owner_id != user.id):
+                raise Exception("User is not event owner")
+            delete_event(id)
+        except Exception as ex:
+            print("An exception occured at '/del_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        response_json = json.dumps({"success":True})
+        response = make_response(response_json)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+# ------------------------------------------------------------------- #
+#                    INVITATION MUTATIONS                             #
+# ------------------------------------------------------------------- #
+
+# ------------------------------------------------------------------- # TODO: Review Authorization
+### Respond to an invitation as an invitee. Called using AJAX in dashboard ###
+# @bp.route("/respond_to_invitation/<id>", methods=['GET']) 
+# def respond_to_invitation(id):
+#     # TODO: Make JSON
+#     if 'username' in session:
+#         user = get_user_from_netid(session['username'])
+#         try:
+#             invitation = get_invitation(id)
+#         except:
+#             html = "<strong>Error fetching invitation<strong>"
+#             return make_response(html)
+#         if invitation.user_id != user.id:
+#             html = "<strong>Error fetching invitation<strong>"
+#             return make_response(html)
+        
+#         response_timeblockids = []
+
+#         for invtb in invitation.responses:
+#             response_timeblockids.append(invtb.timeblock_id)
+
+#         return render_template("respondtoinvitation.html",
+#             invitation=invitation, 
+#             response_timeblockids=response_timeblockids)
+
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
+
+@bp.route("/respond_to_invitation/<id>", methods=['GET']) 
+def respond_to_invitation(id):
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            id = int(id)
+            invitation = get_invitation(id)
+            if invitation.user_id != user.id:
+                raise Exception("User is not invitation owner")
+
+            event_times = []
+
+            for timeblock in invitation.event.times:
+                event_times.append(timeblock.to_json())
+            response_json = json.dumps({"success":True, 
+                "eventTimes": event_times,
+                "eventName": invitation.event.name,
+                "eventId": invitation.event_id,
+                "eventDescription": invitation.event.description,
+                "eventLocation": invitation.event.location
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/respond_to_invitation':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerPlan')
 
 
-# ------------------------------------------------------------------- #
-#                         MUTATION ROUTES                             #
-# ------------------------------------------------------------------- #
-
-# ------------------------------------------------------------------- #
-@bp.route("/moveEvent/", methods=["POST"])
-def move_event():
+# ------------------- CREATE EVENT INVITATIONS ---------------------- #
+@bp.route("/cr_event_invitations/<id>", methods=['POST'])
+def add_invitations(id):
     if 'username' in session:
         user = get_user_from_netid(session['username'])
-        print(request.form['data'])
-        a = datetime(2018, 11, 28)
-        b = datetime(2018, 12, 28)
-        create_timeblock(name="example", user=user, start=a, end=b)
-        
+        event = get_event(id)
+        if (event.owner_id != user.id):
+            # TODO: Make this JSON
+            html = "<strong>Error fetching event<strong>"
+            return make_response(html)
+        create_event_invitations(id) 
+        return redirect("/scheduler")
     return render_template("login.html", 
-        title='Login to TigerResearch') 
+        title='Login to TigerPlan') 
+
+# ------------------- EDIT INVITATION RESPONSE ---------------------- #
+@bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+def add_invitation_response_time(invitationid, timeid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        invitation = get_invitation(invitationid)
+        if invitation.user_id != user.id:
+            html = "<strong>Error fetching invitation<strong>"
+            # TODO: Make JSON
+            print("Invitation is not owned by user")
+            return make_response(html, 400)
+        else:
+            try:
+                invitation_add_response_time(invitationid, timeid)
+            except ValueError as ex:
+                html = "<strong>%s<strong>" % str(ex)
+                # TODO: Make JSON
+                print("value error", str(ex))
+                return make_response(html, 400)
+            # TODO: Make JSON
+            return "Success!"
+    # TODO: Make JSON
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+@bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+def del_invitation_response_time(invitationid, timeid):
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        invitation = get_invitation(invitationid)
+        if (invitation.user_id != user.id):
+            # TODO: Make JSON
+            html = "<strong>Error fetching invitation<strong>"
+            print("Invitation is not owned by user")
+            return make_response(html, 400)
+        else:
+            try:
+                invitation_del_response_time(invitationid, timeid)
+            except ValueError as ex:
+                # TODO: Make JSON
+                html = "<strong>%s<strong>" % str(ex)
+                print("value error", str(ex))
+                return make_response(html, 400)
+            # TODO: Make JSON
+            return "Success!"
+    return render_template("login.html", 
+        title='Login to TigerPlan')
+
+# ---------------------- FINALIZE INVITATION ------------------------ #
+@bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
+def finalize_invitation(invitationid):
+    if 'username' in session:
+        try:
+            print("finalizing invitation", invitationid)
+            invitationid = int(invitationid)
+            user = get_user_from_netid(session['username'])
+            invitation = get_invitation(invitationid)
+            if (invitation.user_id != user.id):
+                raise Exception("Invitiation is not owned by user")
+            timeblocks_chosen = json.loads(request.get_data())
+            invitation_finalize(invitationid, timeblocks_chosen)
+            response_json = json.dumps({"success":True})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        except Exception as ex:
+            print("An exception occured at '/add_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    else:
+        return render_template("login.html", title='Login to TigerPlan')
+
+
+# ------------------------------------------------------------------- #
+#                      CALENDAR MUTATIONS                             # TODO: Review Authorization
+# ------------------------------------------------------------------- #
 
 # --------------------- ADD DEFAULT CONFLICT ------------------------ #
 @bp.route("/saveNewSchedule/", methods=["GET", "POST"])
@@ -200,12 +569,13 @@ def saveNewSchedule():
         start = datetime.fromisoformat(schedule['start']['_date'][:-1])
         end = datetime.fromisoformat(schedule['end']['_date'][:-1])
 
-        create_timeblock(name=schedule['title'], user=user, start=start, 
+        tb = create_timeblock(name=schedule['title'], user=user, start=start, 
             end=end, isconflict=True)
-        return make_response(jsonify(success=True))
+        return make_response(jsonify(success=True, id=tb.id))
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+# ------------------------------------------------------------------- #
 @bp.route("/update_conflict/", methods=["GET", "POST"])
 def update_conflict():
     if 'username' in session:
@@ -222,163 +592,28 @@ def update_conflict():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
+# ------------------------------------------------------------------- #
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
 def add_conflict():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         a = datetime(2018, 11, 28)
         b = datetime(2018, 12, 28)
-        create_timeblock(name="example", user=user, start=a, end=b, isconflict=True)
+        create_timeblock(name="example", user=user, start=a, end=b, 
+            isconflict=True)
         return redirect("/dashboard")
     return render_template("login.html", 
         title='Login to TigerResearch') 
-
-# ----------------------- ADD CUSTOM GROUP ------------------------- #
-@bp.route("/add_custom_group", methods=['GET', 'POST'])
-def add_custom_group():
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        name = request.args.get('name')
-        member = request.args.get('member')
-        new_group = create_group(name=name, owner=user)
-        add_member(id=new_group.id, memberId=member)
-        return redirect("/mygroups")
-    return render_template("login.html", 
-        title='Login to TigerResearch') 
-
-# --------------------- CREATE CUSTOM EVENT ------------------------ #
-@bp.route("/add_event", methods=['GET', 'POST'])
-def add_event():
-    if 'username' in session:
-        user= get_user_from_netid(session['username'])
-        id = request.args.get('id')
-        name = request.args.get('name')
-        location = request.args.get('location')
-        description = request.args.get('description')
-        new_event = create_event(groupid=id, name=name, owner=user,
-            location=location, description=description)
-
-        start1 = request.args.get('start1')
-        start2 = request.args.get('start2')
-        end1 = request.args.get('end1')
-        end2 = request.args.get('end2')
-
-        create_event_timeblock(eventId=new_event.id, start=start1, end=end1, isconflict=False)
-        create_event_timeblock(eventId=new_event.id, start=start2, end=end2, isconflict=False)
-        return redirect("/scheduler")
-    return render_template("login.html", 
-        title='Login to TigerPlan')
-
-# ------------------------- FINALIZE EVENT -------------------------- #
-@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
-def finalize_event(eventid, timeid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        event_finalize(eventid, timeid)
-        return redirect("/scheduler")
-    return render_template("login.html", 
-        title='Login to TigerPlan')
 
 # ------------------------ DELETE CONFLICT -------------------------- #
 @bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
 def del_conflict(id):
     if 'username' in session:
+        #TODO: check authorization
         delete_timeblock(id) 
         return redirect("/dashboard")
     return render_template("login.html", 
         title='Login to TigerResearch') 
-
-# -------------------------- DELETE GROUP --------------------------- #
-@bp.route("/del_group/<id>", methods=['GET', 'POST'])
-def del_group(id):
-    if 'username' in session:
-        delete_group(id) 
-        return redirect("/mygroups")
-    return render_template("login.html", 
-        title='Login to TigerResearch') 
-
-# ------------------------ DELETE EVENT ----------------------------- #
-@bp.route("/del_event/<id>", methods=['GET', 'POST'])
-def del_event(id):
-    if 'username' in session:
-        delete_event(id) 
-        return redirect("/scheduler")
-
-# ------------------- CREATE EVENT INVITATIONS ---------------------- #
-@bp.route("/cr_event_invitations/<id>", methods=['GET', 'POST'])
-def add_invitations(id):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        event = get_event(id)
-        if (event.owner_id != user.id):
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        create_event_invitations(id) 
-        return redirect("/scheduler")
-    return render_template("login.html", 
-        title='Login to TigerPlan') 
-
-# ------------------- EDIT INVITATION RESPONSE ---------------------- #
-@bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-def add_invitation_response_time(invitationid, timeid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if invitation.user_id != user.id:
-            html = "<strong>Error fetching invitation<strong>"
-            print("Invitation is not owned by user")
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_add_response_time(invitationid, timeid)
-            except ValueError as ex:
-                html = "<strong>%s<strong>" % str(ex)
-                print("value error", str(ex))
-                return make_response(html, 400)
-            return "Success!"
-    return render_template("login.html", 
-        title='Login to TigerPlan')
-
-@bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-def del_invitation_response_time(invitationid, timeid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if (invitation.user_id != user.id):
-            html = "<strong>Error fetching invitation<strong>"
-            print("Invitation is not owned by user")
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_del_response_time(invitationid, timeid)
-            except ValueError as ex:
-                html = "<strong>%s<strong>" % str(ex)
-                print("value error", str(ex))
-                return make_response(html, 400)
-            return "Success!"
-    return render_template("login.html", 
-        title='Login to TigerPlan')
-
-# ---------------------- FINALIZE INVITATION ------------------------ #
-@bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
-def finalize_invitation(invitationid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if (invitation.user_id != user.id):
-            html = "<strong>Error fetching invitation<strong>"
-            print("Invitation is not owned by user")
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_update_finalized(invitationid, True)
-            except ValueError as ex:
-                html = "<strong>%s<strong>" % str(ex)
-                print("value error", str(ex))
-                return make_response(html, 400)
-            return "Success!"
-    return render_template("login.html", 
-        title='Login to TigerPlan')
 
 # ------------------------------------------------------------------- #
 #                       AUTHORIZATION ROUTES                          #

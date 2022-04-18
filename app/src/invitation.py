@@ -35,6 +35,7 @@ def get_proposed_times(id: int) -> TimeBlock:
     times = db.session.query(TimeBlock).filter(TimeBlock.event_id == Invitation.event_id, Invitation.id == id).all()
     return times
 
+# NOT USED
 def invitation_update_finalized(id: int, finalized: bool) -> Invitation:
     """Changes the invitation's finalization state. Returns the updated invitation"""
     try:
@@ -48,6 +49,28 @@ def invitation_update_finalized(id: int, finalized: bool) -> Invitation:
     db.session.commit()
     return invitation
 
+def invitation_finalize(id: int, timeblocks: int) -> Invitation:
+    """Finalizes the invitation using the given timeblocks. Returns the updated invitation"""
+    invitation = get_invitation(id)
+    
+    # TODO: Decide if we want this
+    # if (invitation.event.finalized):
+    #     raise ValueError("Event is already finalized")
+    if (invitation.finalized):
+        raise ValueError("Invitation is already finalized")
+    invitation.finalized = True
+    for timeid in timeblocks:
+        try:
+            _ = get_timeblock(timeid)
+        except Exception as ex:
+            raise ValueError("Issue with timeblock id: " + timeid) from ex
+        new_response = Invitation_Timeblock(timeblock_id=timeid, invitation_id=id)
+        db.session.add(new_response)
+    db.session.add(invitation)
+    db.session.commit()
+    return invitation
+
+# SHOULD NOT BE USED. SEE invitation_finalize
 def invitation_add_response_time(id: int, timeid: int) -> Invitation:
     """Adds a specified time to the invitation. If such a time already exists, do nothing."""
     try:
@@ -77,8 +100,6 @@ def invitation_del_response_time(id: int, timeid: int) -> Invitation:
     """Removes a specified time from the invitation. If such a time doesn't already exist, do nothing."""
     try:
         invitation = get_invitation(id)
-        print("finalized?")
-        print(invitation.event.finalized)
         if (invitation.event.finalized):
             raise ValueError("Event is already finalized")
     except Exception as ex:

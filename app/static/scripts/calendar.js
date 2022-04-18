@@ -152,32 +152,22 @@ cal.on({
     
 });
 
-function getHashId (startTime, endTime) {
-    var first = startTime.toString(36);
-    var second = endTime.toString(36);
-    return first + second;
-}
-
 function deleteSchedule(scheduleData) {
     
 }
 
 function saveNewSchedule(scheduleData) {
-    console.log('scheduleData ', scheduleData)
     var randomColor = Math.floor(Math.random() * 16777215).toString(16);
     var randomId = Math.floor(Math.random() * 22345679).toString(16);
 
     // figure out better ID genereation
-    var hashId = getHashId(scheduleData.start, scheduleData.end);
     var schedule = {
         id: randomId,
         title: scheduleData.title,
         start: scheduleData.start,
         end: scheduleData.end,
-        color: "#111111",
-        bgColor: "#" + randomColor,
-        dragBgColor: "#" + randomColor,
-        borderColor: '#FDF8F3',
+        bgColor: "#9bd912",
+        dragBgColor: "#9bd912",
         category: 'time',
         // category: scheduleData.isAllDay ? 'allday' : 'time',
         // dueDateClass: '',
@@ -188,11 +178,8 @@ function saveNewSchedule(scheduleData) {
         // state: scheduleData.state
     };
 
-    cal.createSchedules([schedule]);
-
     // call ajax to save calendar
     let url = '/saveNewSchedule'
-    console.log(JSON.stringify( schedule ))
 
     $.ajax({
         type: "POST",
@@ -201,6 +188,9 @@ function saveNewSchedule(scheduleData) {
         dataType: "json",
         success: function (response) {
             console.log(response)
+            schedule['id'] = response.id
+            console.log(schedule)
+            cal.createSchedules([schedule]);
         },
         error: function (error) {
             console.log(error);
@@ -246,8 +236,8 @@ $(document).ready(function () {
                     dueDateClass: '',
                     start: response[i].start + 'Z',
                     end: response[i].end + 'Z',
-                    bgColor: "#" + randomColor,
-                    dragBgColor: "#" + randomColor,
+                    bgColor: "#9bd912",
+                    dragBgColor: "#9bd912",
                     }
                 toCreate.push(d);
                 console.log(toCreate)
