@@ -167,15 +167,6 @@ function getAllSchedules() {
     return schedules;
 }
 
-function uploadToServer() {
-    console.log(scheduleIds);
-    if (scheduleIds[0]) {
-        console.log(scheduleIds[0], calendarId);
-        console.log(cal.getSchedule(scheduleIds[0], calendarId));
-    }
-    console.log(variable);
-}
-
 function saveNewSchedule(scheduleData) {
     console.log("Saving " + scheduleData);
     var randomColor = Math.floor(Math.random() * 16777215).toString(16);

@@ -102,7 +102,7 @@
                     <div class="card-header text-white bg-iris">
                         <h5>{{ invite.event.name }}</h5>
                         <p>{{ invite.event.group.name }}</p>
-                        <a onclick="getResults('{{invite.id}}')">
+                        <a onclick="respondToInvitation('{{invite.id}}')">
                             <button>Respond</button>
                         </a>
                     </div>
@@ -118,6 +118,7 @@
             <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
                 <div id="banner"></div>
                 <div id="invitationRespond"></div>
+                <div id="calendar"></div>
                 <!-- <div class="card">
                     <div class="card-header text-white bg-iris">
                         <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -153,10 +154,12 @@
     </div>
 </div>
 
+<script src="{{ url_for('static', filename='scripts/invitation-calendar.js') }}"></script>
+
 <script>
 
     'use strict';
-    let request = null;
+    let finalizeInvitationRequest = null;
 
     function updateBanner(response) {
         $("#banner").html(response)
@@ -164,8 +167,11 @@
 
     function finalize(inviteid) {
         let url = "/finalize_invitation/" + inviteid;
+        if (finalizeInvitationRequest != null) {
+            return;
+        }
 
-        request = $.ajax(
+        finalizeInvitationRequest = $.ajax(
             {
                 type: 'POST',
                 url: url,
@@ -178,32 +184,21 @@
         $('#invitationRespond').html(response);
     }
 
-
-    function getResults(id) {
-        let url = "/respond_to_invitation/" + id
-
-        if (request != null)
-            request.abort();
-
-        request = $.ajax(
-            {
-                type: 'GET',
-                url: url,
-                success: handleResponse
-            }
-        );
+    let respondToInviteRequest = null;
+    function respondToInvitation(id) {
+        renderTimeSelectionCalendar(id);
     }
 
     function responseHelper(inviteid, response) {
         updateBanner(response);
-        getResults(inviteid);
+        respondToInvitation(inviteid);
     }
 
     function setAvailability(inviteid, timeid, action) {
         let url = action + "_invitation_response_time/";
         url += inviteid + "/" + timeid;
 
-        request = $.ajax(
+        finalizeInvitationRequest = $.ajax(
             {
                 type: 'POST',
                 url: url,
@@ -211,6 +206,14 @@
             }
         );
     }
+
+    function setup() {
+        console.log("Setting up page");
+    }
+
+    $('document').ready(setup);
+
+
 
 </script>
 

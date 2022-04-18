@@ -2,18 +2,20 @@
 var calendarList = [];
 
 /* List of scheduleIds */
-var timeblockIds = [];
 var timeblockAvailabilities;
-var nextId = 0;
 
 function addCalendar(calendar) {
     calendarList.push(calendar);
 }
 
 const calendarId = "1";
-let cal;
+let cal = null;
 
-function renderTimeSelectionCalendar(calendarDivId) {
+function renderTimeSelectionCalendar(invitationId, calendarDivId) {
+    if (cal != null) {
+        destroyInvitationCalendar();
+    }
+
     if (!calendarDivId) {
         calendarDivId = "#calendar";
     }
@@ -21,7 +23,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
         id: calendarId,
         defaultView: 'week',
         taskView: false,
-        // isReadOnly: true,
+        isReadOnly: true,
         scheduleView: ['time'],
         useCreationPopup: true,
         useDetailPopup: true,
@@ -91,9 +93,24 @@ function renderTimeSelectionCalendar(calendarDivId) {
         },
         'clickSchedule': function (e) {
             console.log(e);
-            cal.updateSchedule(e.schedule.id, calendarId, {
-                bgColor: "#93ea7f"
-            });
+            if (e.schedule.raw != "EventTimeBlock") {
+                return;
+            }
+
+            if (timeblockAvailabilities[e.schedule.id]) {
+                cal.updateSchedule(e.schedule.id, calendarId, {
+                    bgColor: eventColorUnselected,
+                    color: "#999999"
+                });
+                timeblockAvailabilities[e.schedule.id] = false;
+            } else {
+                cal.updateSchedule(e.schedule.id, calendarId, {
+                    bgColor: eventColorSelected,
+                    color: "#000000"
+                });
+                timeblockAvailabilities[e.schedule.id] = true;
+            }
+            console.log(timeblockAvailabilities);
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
@@ -132,36 +149,91 @@ function renderTimeSelectionCalendar(calendarDivId) {
         }
 
     });
+
+    getAndRenderTimeBlocks(invitationId);
 }
 
-function deleteSchedule(e) {
-    console.log('beforeDeleteSchedule', e);
-    const index = timeblockIds.indexOf(e.schedule.id);
-    if (index > -1) {
-        timeblockIds.splice(index, 1);
-    }
-    cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
+const conflictColor = "#dddddd";
+const eventColorSelected = "#f7349e";
+const eventColorUnselected = "#ffe7ff";
+function getAndRenderTimeBlocks(invitationId) {
+    let conflictsUrl = '/load_conflicts'
+    addCalendar(cal);
+
+    var userConflictsList = [];
+    // get user conflicts
+    $.ajax({
+        type: "GET",
+        url: conflictsUrl,
+        success: function (response) {
+            for (let i = 0; i < response.length; i++) {
+                
+                var d = {
+                    id: response[i].id,
+                    calendarId: '1',
+                    title: response[i].name,
+                    category: 'time',
+                    dueDateClass: '',
+                    start: response[i].start + 'Z',
+                    end: response[i].end + 'Z',
+                    bgColor: conflictColor,
+                    dragBgColor: conflictColor,
+                    raw: "UserConflict"
+                }
+                userConflictsList.push(d);
+            }
+            console.log(userConflictsList);
+            cal.createSchedules(userConflictsList);
+        },
+        error: errorWhileFetchingTimeBlocks
+    });
+
+    var eventTimesList = [];
+    let eventTimesUrl = "respond_to_invitation/" + invitationId;
+    $.ajax({
+        type: "GET",
+        url: eventTimesUrl,
+        success: function (response) {
+            timeblockAvailabilities = {};
+            let eventTimes = response.eventTimes;
+            console.log(eventTimes);
+            for (let i = 0; i < eventTimes.length; i++) {
+                
+                var d = {
+                    id: eventTimes[i].id,
+                    calendarId: '1',
+                    title: eventTimes[i].name,
+                    category: 'time',
+                    dueDateClass: '',
+                    start: eventTimes[i].start + 'Z',
+                    end: eventTimes[i].end + 'Z',
+                    bgColor: eventColorUnselected,
+                    color: "#999999",
+                    raw: "EventTimeBlock"
+                }
+                eventTimesList.push(d);
+                timeblockAvailabilities[String(eventTimes[i].id)] = false;
+            }
+            console.log(eventTimesList);
+            cal.createSchedules(eventTimesList);
+        },
+        error: function() {
+            errorWhileFetchingTimeBlocks("Error while fetching time blocks");
+        }
+    });
+}
+
+function errorWhileFetchingTimeBlocks(error) {
+    console.log(error);
 }
 
 function destroyInvitationCalendar() {
     cal.destroy();
+    cal = null;
 }
 
 function getAllSelections() {
-    var schedules = [];
-    for (let i = 0; i < timeblockIds.length; i++) {
-        var schedule = cal.getSchedule(timeblockIds[i], calendarId);
-        schedules.push(schedule);
-    }
-    return schedules;
+    return timeblockAvailabilities;
 }
 
-function uploadToServer() {
-    console.log(timeblockIds);
-    if (timeblockIds[0]) {
-        console.log(timeblockIds[0], calendarId);
-        console.log(cal.getSchedule(timeblockIds[0], calendarId));
-    }
-    console.log(variable);
-}
 

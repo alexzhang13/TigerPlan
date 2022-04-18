@@ -87,8 +87,8 @@
                                     <button onclick="deleteEvent({{event.id}})"> Delete Event </button>
                                 </a>
                                 {% if not event.finalized and event.invitations|length == 0 %}
-                                <a href="/cr_event_invitations/{{ event.id }}">
-                                    <button> Create Event Invitations </button>
+                                <a>
+                                    <button onclick="createEventInvitations('{{event.id}}')"> Create Event Invitations </button>
                                 </a>
                                 {% else %}
                                 <a href="/view_event_details/{{event.id}}" target="_blank">
@@ -151,6 +151,19 @@
     'use strict';
     let request = null;
     let variable = "does this work";
+
+    function createEventInvitations(eventId) {
+        $(this).prop("disabled", true);
+        let url = "cr_event_invitations/" + eventId;
+        $.ajax({
+            type: "POST",
+            url: url,
+            success: function(response) {
+                console.log("Success");
+                document.location.reload();
+            }
+        });
+    }
 
     function deleteEvent(eventId) {
         let url = "/del_event/" + eventId;
@@ -215,21 +228,17 @@
         let createInvitesButton = $('<button>',
             { text: "Create Event Invitations" });
         let createInvitesLink = $('<a>');
-        createInvitesLink.attr("href",
-            "cr_event_invitations/" + eventId);
+        createInvitesButton.attr("onclick",
+            "createEventInvitations(" + eventId + ")");
         createInvitesLink.append(createInvitesButton);
-
-        let detailsButton = $('<button>', { text: "View details" });
-        let detailsLink = $('<a>');
-        detailsLink.attr("href", "view_event_details/" + eventId);
-        detailsLink.attr("target", "_blank");
-        detailsLink.append(detailsButton);
+        // <a>
+        //     <button onclick="createEventInvitations('')"> Create Event Invitations </button>
+        // </a>
 
         let cardBody = $('<div>');
         cardBody.addClass("card-body");
         cardBody.append(deleteLink);
         cardBody.append(createInvitesLink);
-        cardBody.append(detailsLink);
 
         let cardHead = $('<div>');
         cardHead.addClass("card-header text-white bg-teal");
@@ -296,6 +305,7 @@
             if (schedule.start && schedule.end) {
                 timeblock.start = schedule.start;
                 timeblock.end = schedule.end;
+                timeblock.name = schedule.title;
             }
             timeblocks.push(timeblock);
         }
@@ -321,7 +331,8 @@
                     banner = $('<div>', { text: "Success!" });
                     banner.addClass("alert alert-success");
                 } else {
-                    banner = $('<div>', { text: "An error occured" });
+                    banner = $('<div>', { text: response.message ? 
+                        response.message : "An error occured" });
                     banner.addClass("alert alert-warning");
                     banner.appendTo("#eventCreationResponse");
 

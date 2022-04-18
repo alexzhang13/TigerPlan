@@ -284,9 +284,18 @@ def add_event():
             group_id = schedule['groupId']
             # TODO: Make sure group_id is valid?
             group_id = int(group_id)
+            group = get_group(group_id)
+            # TODO: Make this error handling more precise; probably specialized exceptions
+            if (len(group.members) == 0):
+                response_json = json.dumps({"success": False, 
+                    "message": "Cannot create event for group with 0 members"
+                    })
+                response = make_response(response_json)
+                response.headers['Content-Type'] = 'application/json'
+                return response
             name = schedule['name']
             if (name is None or name.strip() == ""):
-                raise Exception("Name is abscent")
+                raise Exception("Name is absent")
             location = schedule['location']
             description = schedule['description']
             timeblocks = schedule['timeblocks']
@@ -388,31 +397,66 @@ def del_event(id):
 
 # ------------------------------------------------------------------- # TODO: Review Authorization
 ### Respond to an invitation as an invitee. Called using AJAX in dashboard ###
-@bp.route("/respond_to_invitation/<id>", methods=['POST']) 
-def respond_to_invitation(id):
-    # TODO: Make JSON
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        try:
-            invitation = get_invitation(id)
-        except:
-            html = "<strong>Error fetching invitation<strong>"
-            return make_response(html)
-        if invitation.user_id != user.id:
-            html = "<strong>Error fetching invitation<strong>"
-            return make_response(html)
+# @bp.route("/respond_to_invitation/<id>", methods=['GET']) 
+# def respond_to_invitation(id):
+#     # TODO: Make JSON
+#     if 'username' in session:
+#         user = get_user_from_netid(session['username'])
+#         try:
+#             invitation = get_invitation(id)
+#         except:
+#             html = "<strong>Error fetching invitation<strong>"
+#             return make_response(html)
+#         if invitation.user_id != user.id:
+#             html = "<strong>Error fetching invitation<strong>"
+#             return make_response(html)
         
-        response_timeblockids = []
+#         response_timeblockids = []
 
-        for invtb in invitation.responses:
-            response_timeblockids.append(invtb.timeblock_id)
+#         for invtb in invitation.responses:
+#             response_timeblockids.append(invtb.timeblock_id)
 
-        return render_template("respondtoinvitation.html",
-            invitation=invitation, 
-            response_timeblockids=response_timeblockids)
+#         return render_template("respondtoinvitation.html",
+#             invitation=invitation, 
+#             response_timeblockids=response_timeblockids)
 
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
+
+@bp.route("/respond_to_invitation/<id>", methods=['GET']) 
+def respond_to_invitation(id):
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            id = int(id)
+            invitation = get_invitation(id)
+            if invitation.user_id != user.id:
+                raise Exception("User is not invitation owner")
+
+            event_times = []
+
+            for timeblock in invitation.event.times:
+                event_times.append(timeblock.to_json())
+            print("Dumping json")
+            
+            print(event_times)
+            response_json = json.dumps({"success":True, 
+                "eventTimes": event_times,
+                "eventName": invitation.event.name,
+                "eventId": invitation.event_id
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/add_event':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     return render_template("login.html", 
         title='Login to TigerPlan')
+
 
 # ------------------- CREATE EVENT INVITATIONS ---------------------- #
 @bp.route("/cr_event_invitations/<id>", methods=['POST'])
