@@ -81,6 +81,20 @@ def update_owner(groupid: int, newOwnerId: int) -> bool:
     db.session.commit()
     return db.session.query(Group).filter(Group.id == groupid, Group.owner_id == newOwnerId).one() != None
 
+def add_admin(groupid: int, newAdminId: int) -> bool:
+    newAdmin = db.session.query(Member_Group).filter(Member_Group.group_id == groupid, Member_Group.member_id == newAdminId).one()
+    newAdmin.is_admin = True
+    db.session.add(newAdmin)
+    db.session.commit()
+    return db.session.query(Member_Group).filter(Member_Group.group_id == groupid, Member_Group.member_id == newAdminId, Member_Group.is_admin == True).one() != None
+
+def delete_admin(groupid: int, newAdminId: int) -> bool:
+    newAdmin = db.session.query(Member_Group).filter(Member_Group.group_id == groupid, Member_Group.member_id == newAdminId).one()
+    newAdmin.is_admin = False
+    db.session.add(newAdmin)
+    db.session.commit()
+    return db.session.query(Member_Group).filter(Member_Group.group_id == groupid, Member_Group.member_id == newAdminId, Member_Group.is_admin == False).one() != None
+
 def update_group_name(groupid: int, newName: str) -> bool:
     group = db.session.query(Group).filter(Group.id == groupid).one()
     group.name = newName
