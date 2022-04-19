@@ -74,6 +74,10 @@ def get_members(groupid: int) -> User:
     '''Get the group's members. Returns a list of users.'''
     return db.session.query(User).filter(Member_Group.group_id == groupid, Member_Group.member_id == User.id).all()
 
+def get_group_admin(groupid: int) -> User:
+    """Get the group's officers/admin. Returns a list of users."""
+    return db.session.query(User).filter(Member_Group.group_id == groupid, Member_Group.member_id == User.id, Member_Group.is_admin == True).all()
+
 def update_owner(groupid: int, newOwnerId: int) -> bool:
     group = db.session.query(Group).filter(Group.id == groupid).one()
     group.owner_id = newOwnerId

@@ -1,7 +1,34 @@
 {% if members is defined %}
 <div><strong>{{ this_group.name }}</strong></div>
-<div>Group Owner</div>
 
+<div>Group Admin</div>
+{% if admins is defined and admins|length != 0 %}
+<table class="table" id="membersTable">
+  <thead class="thead-dark">
+    <tr>
+      <th>Name</th>
+      <th>Netid</th>
+    </tr>
+  </thead>
+  {% for admin in admins %}
+  <tr id="adminRow{{admin.id}}">
+    <td>{{ admin.name }}</td>
+    <td>{{ admin.netid }}</td>
+    <td>
+      <!-- TODO: Implement Remove Admin javascript -->
+      <button onclick="removeAdmin('{{admin.id}}')"> 
+        Remove Member
+      </button>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<div>No admins yet!</div>
+{% endif %}
+
+
+<div>Group Owner</div>
 <!-- <form action="" method="get"> -->
     <div>
         <select id="NewGroupOwner" class="form-select form-select-sm">

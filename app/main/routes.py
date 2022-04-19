@@ -1,4 +1,4 @@
-from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_events, get_members, update_group_name, update_owner
+from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
 from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
@@ -66,11 +66,13 @@ def groups():
                     user=session['username'], groups=groups)
             members = get_members(groupId)
             events = get_group_events(groupId)
+            admins = get_group_admin(groupId)
             return render_template("mygroups.html", 
                 title='TigerPlan Manage Groups', 
                 user=session['username'],
-                groups=groups, admin_groups=admin_groups, users=users, 
-                members=members, this_group=group, events=events)
+                groups=groups, admin_groups=admin_groups, 
+                admins=admins, users=users, members=members, 
+                this_group=group, events=events)
         return render_template("mygroups.html", 
             title='TigerPlan Manage Groups', 
             user=session['username'], groups=groups, 
