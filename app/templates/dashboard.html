@@ -246,7 +246,8 @@
                                                         {% endif %}
                                                     {% endif %}
                                                     <br style="line-height: 5px;">
-                                                    <a class = "btn btn-white btn-sm w-100 mb-0" onclick="respondToInvitation('{{invite.id}}')">Respond</a>
+                                                    <a class="btn btn-white btn-sm w-100 mb-0" onclick="respondToInvitation('{{invite.id}}')"
+                                                        id="respondToInvitationButton{{invite.id}}">Respond</a>
                                                 </div>
                                                 {% endif %}
                                             {% endfor %}
@@ -406,6 +407,9 @@
     }
 
     function respondToInvitation(id) {
+        if (currentlyViewedInvitationId) {
+            $('#respondToInvitationButton' + currentlyViewedInvitationId).show();
+        }
         currentlyViewedInvitationId = id;
         $('#finalizeInvitationButton').show();
         renderTimeSelectionCalendar();

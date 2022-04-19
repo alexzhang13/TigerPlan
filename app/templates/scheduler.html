@@ -282,6 +282,7 @@
                                                 <button onclick="showCreateEventCard(false)">Cancel</button>
                                                 <button id="createNewEventButton">Create Event</button>
                                             </div>
+                                            <span id="eventCreationResponse"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -478,12 +479,8 @@
             dataType: "json",
             success: function (response) {
                 console.log(response);
-                let banner;
-                if (response.success) {
-                    banner = $('<div>', { text: "Success!" });
-                    banner.addClass("alert alert-success");
-                } else {
-                    banner = $('<div>', {
+                if (!response.success) {
+                    let banner = $('<div>', {
                         text: response.message ?
                             response.message : "An error occured"
                     });
@@ -498,14 +495,6 @@
                     }, 3000);
                     return;
                 }
-                banner.appendTo("#eventCreationResponse");
-
-                setTimeout(function () {
-                    banner.hide(1000);
-                    setTimeout(function () {
-                        banner.remove()
-                    }, 1000);
-                }, 3000);
 
                 $("createNewEventButton").prop("disabled", false);
                 makeNewEventCard(response.newEventId,

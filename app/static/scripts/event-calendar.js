@@ -143,6 +143,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
         }
 
     });
+    scheduleIds = [];
 }
 
 function deleteSchedule(e) {
@@ -156,6 +157,7 @@ function deleteSchedule(e) {
 
 function destroyTimeSelectionCalendar() {
     cal.destroy();
+    scheduleIds = [];
 }
 
 function getAllSchedules() {
