@@ -1,5 +1,6 @@
-<div><strong>{{ this_group.name }}</strong></div>
-<div>Group Members</div>
+<p class="card-text"><strong>Group Members</strong><br>
+  View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.
+</p>
 
 {% if members is defined and members|length != 0 %}
 <table class="table" id="membersTable">
@@ -26,19 +27,24 @@
 <div>No members yet!</div>
 {% endif %}
 
-<!-- <form action="" method="get"> -->
+<hr>
+
+<p class="card-text"><strong>Add Group Members</strong><br>
+  To add a member to your group, select their netid from the dropdown and click Add Member.
+</p>
+
 <div>
-  <select id="NewGroupMember" class="form-select form-select-sm">
+  <select id="NewGroupMember" class="form-select form-select-md">
     {% if users is defined and users != '' %}
     {% for user in users %}
     <option value="{{ user.id }}">{{ user.netid }}</option>
     {% endfor %}
     {% endif %}
-  </select> <span>Select Group Members</span>
-  <button id="addNewMember">Add Member</button>
+  </select>
+  <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
 </div>
 <div id = "groupMembersResponse"></div>
-<!-- </form> -->
+
 
 <script>
 
