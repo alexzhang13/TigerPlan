@@ -305,6 +305,18 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
+                    <div id="calendarMenu" style="display: none;">
+                        <span id="menu-navi">
+                            <!-- TODO: UI -->
+                            <button type="button" class="btn btn-default btn-sm" id="calendarMenuPrev">
+                                &lt;
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" id="calendarMenuNext">
+                                &gt;
+                            </button>
+                        </span>
+                        <h3 style="display:inline" id="renderRange" class="mx-3"></h3>
+                    </div>
                     <div id="calendar"></div>
                 </div>
             </div>
@@ -353,7 +365,6 @@
                         let banner = $('<div>',
                             { text: "An error occured" });
                         banner.addClass("alert alert-warning");
-                        banner.appendTo("#eventCreationResponse");
 
                         $("#eventCard" + eventId).append(banner);
                         setTimeout(function () {
@@ -373,10 +384,13 @@
                 $("#createEventCard").show();
                 $("#showCreateEventCardButton").hide();
                 renderTimeSelectionCalendar();
+                setRenderRangeText();
+                $("#calendarMenu").show();
             } else {
                 $("#createEventCard").hide(500);
                 $("#showCreateEventCardButton").show();
                 destroyTimeSelectionCalendar();
+                $("#calendarMenu").hide();
             }
         }
 
@@ -392,14 +406,9 @@
             createInvitesButton.attr("onclick",
                 "createEventInvitations(" + eventId + ")");
             createInvitesLink.append(createInvitesButton);
-            // <a>
-            //     <button onclick="createEventInvitations('')"> Create Event Invitations </button>
-            // </a>
 
             let cardBody = $('<div>');
             cardBody.addClass("card-body");
-            // <strong>Invitations for this event have not been sent out yet!</strong>
-            //                         <br>
             cardBody.append($('<strong>', { text: "Invitations for this event have not been sent out yet!" }));
             cardBody.append($('<br>'));
             cardBody.append(deleteLink);
@@ -538,27 +547,55 @@
             });
         }
 
-        function responseHelper(inviteid, response) {
-            updateBanner(response);
-            getResults(inviteid);
+        // function responseHelper(inviteid, response) {
+        //     updateBanner(response);
+        //     getResults(inviteid);
+        // }
+
+        // function setAvailability(inviteid, timeid, action) {
+        //     let url = action + "_invitation_response_time/";
+        //     url += inviteid + "/" + timeid;
+
+        //     request = $.ajax(
+        //         {
+        //             type: 'POST',
+        //             url: url,
+        //             success: (response) => responseHelper(inviteid, response)
+        //         }
+        //     );
+        // }
+
+        function setRenderRangeText() {
+            let start = cal.getDateRangeStart().toDate();
+            let end = cal.getDateRangeEnd().toDate();
+            let startString = (start.getMonth() + 1) + "/" + start.getDate() + "/" + start.getFullYear();
+            let endString = (end.getMonth() + 1) + "/" + end.getDate() + "/" + end.getFullYear();
+            let newRange = $('<span>', {text: startString + " ~ " + endString });
+            $('#renderRange').empty();
+            $("#renderRange").append(newRange);
         }
 
-        function setAvailability(inviteid, timeid, action) {
-            let url = action + "_invitation_response_time/";
-            url += inviteid + "/" + timeid;
-
-            request = $.ajax(
-                {
-                    type: 'POST',
-                    url: url,
-                    success: (response) => responseHelper(inviteid, response)
-                }
-            );
+        function changeCalendarRange(direction) {
+            if (!cal) {
+                return;
+            }
+            if (direction < 0) {
+                cal.prev();
+            } else if (direction > 0) {
+                cal.next();
+            }
+            setRenderRangeText();
         }
 
         function setup() {
             console.log("Setting up page");
             $('#createNewEventButton').on('click', createNewEvent);
+            $('#calendarMenuPrev').on('click', function () {
+                changeCalendarRange(-1);
+            });
+            $('#calendarMenuNext').on('click', function () {
+                changeCalendarRange(1);
+            });
         }
 
         $('document').ready(setup);
