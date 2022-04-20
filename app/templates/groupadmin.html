@@ -11,7 +11,7 @@
             {% endfor %}
             {% endif %}
         </select> <span>Select New Owner</span>
-        <button id="changeOwner">Transfer Ownership to This Member (CANNOT BE UNDONE)</button>
+        <button id="changeOwner">Transfer Ownership to This Member</button>
     </div>
 <!-- </form> -->
 
@@ -37,6 +37,10 @@
     let changeOwnershipRequest = null;
   
     function changeOwner() {
+      let memberName = $("#NewGroupOwner :selected").text();
+      if (!confirm("Are you sure you want to transfer ownership to " + memberName + "? This action cannot be undone!")) {
+        return;
+      }
       let member = $('#NewGroupOwner :selected').val();
       member = encodeURIComponent(member);
   

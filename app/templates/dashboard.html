@@ -238,7 +238,7 @@
                                         
                                             {% for invite in invitations %}
                                                 {% if invite is not none and not invite.finalized and not invite.event.finalized %}
-                                                <div class="card-body p-3" id="invitationCard{{invite.id}}">
+                                                <div class="card mt-3 p-3" id="invitationCard{{invite.id}}">
                                                     {% if invite.event is not none %}
                                                         <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}</h6>
                                                         {% if invite.event.group is not none %}
@@ -266,9 +266,9 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
-                    <div id="calendar"></div>
+                    <!-- <div id="calendar"></div>
                 </div>
-                <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
+                <div class="container pt-4 pb-4 border rounded-3 border-iris border-3"> -->
                     <div id="invitationBanner"></div>
                     <div id="invitationRespond">
                         <span id="InvitationDetails">
@@ -325,9 +325,6 @@
 
         $('#finalizeInvitationButton').prop('disabled', true);
         console.log("Finalizing invitation " + currentlyViewedInvitationId);
-        if (finalizeInvitationRequest != null) {
-            return;
-        }
 
         let chosenTimeBlockIdList = [];
         let selections = getAllSelections();

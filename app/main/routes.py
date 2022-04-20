@@ -23,6 +23,24 @@ cas_client = CASClient(
 #                           PAGE ROUTES                               #
 # ------------------------------------------------------------------- #
 
+@bp.before_request
+def before_request():
+    if not 'username' in session:
+        print('user is not logged in')
+        return render_template("login.html", title='Login to TigerPlan')
+    else:
+        try:
+            user = get_user_from_netid(session['username'])
+            # TODO: This is only here because get...netid uses .one()
+            # instead of .first(). one() throws an exception when nothing
+            # is found, while .first() simply returns None. This is here
+            # in case we change that.
+            if (user is None):
+                raise Exception()
+        except:
+            return render_template("login.html", title='Login to TigerPlan')
+
+
 # ----------------------------- HOME -------------------------------- #
 @bp.route("/", methods=["GET"])
 def index():
