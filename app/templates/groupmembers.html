@@ -3,11 +3,13 @@
 </p>
 
 {% if members is defined and members|length != 0 %}
+<div class="container border rounded pt-2">
 <table class="table" id="membersTable">
   <thead class="thead-dark">
     <tr>
       <th>Name</th>
       <th>Netid</th>
+      <th></th>
     </tr>
   </thead>
   {% for member in members %}
@@ -15,19 +17,17 @@
     <td>{{ member.name }}</td>
     <td>{{ member.netid }}</td>
     <td>
-      <button onclick="removeMember('{{member.id}}')">
-        Remove Member
-      </button>
+      <a class="btn btn-outline-default btn-sm mb-0" onclick="removeMember('{{member.id}}')">Remove Member</a>
     </td>
   </tr>
-
   {% endfor %}
 </table>
 {% else %}
 <div>No members yet!</div>
 {% endif %}
+</div>
 
-<hr>
+<br>
 
 <p class="card-text"><strong>Add Group Members</strong><br>
   To add a member to your group, select their netid from the dropdown and click Add Member.
@@ -61,8 +61,10 @@
     tableRow.append($('<td>', { text: memberNetid }));
     tableRow.attr('id', "memberRow" + memberId);
     let deleteUserTd = $('<td>');
-    let deleteUserButton = $('<button>', { text: "Remove member"});
+    let deleteUserButton = $('<a>', { text: "Remove member"});
     deleteUserButton.attr('onclick', "removeMember(" + memberId + ")");
+    deleteUserButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+    deleteUserButton.attr('style', "margin: 9px 0 5px;")
     deleteUserTd.append(deleteUserButton);
     tableRow.append(deleteUserTd);
     $('#membersTable').append(tableRow);

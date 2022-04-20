@@ -29,43 +29,41 @@
 {% else %}
 <div><br>No admins yet!</div>
 {% endif %}
+<br>
+<br>
 
-
-<hr>
 <p class="card-text"><strong>Transfer Ownership</strong><br>
   To transfer ownership of this group, select the new owner from the dropdown menu. Transferring
   owership will transfer all admin privileges. Ownership of existing events will not be transferred.
 </p>
-<!-- <form action="" method="get"> -->
-    <div>
-      <span>Select New Owner</span>
-        <select id="NewGroupOwner" class="form-select form-select-sm">
-            {% if members != '' %}
-            {% for user in members %}
-            <option value="{{ user.id }}">{{ user.netid }}</option>
-            {% endfor %}
-            {% endif %}
-        </select> 
-        <a id="changeOwner" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Transfer Ownership</a>
-    </div>
-<!-- </form> -->
+<div>
+  <select id="NewGroupOwner" class="form-select form-select-md">
+      {% if members != '' %}
+      <option>Select New Owner</option>
+      {% for user in members %}
+      <option value="{{ user.id }}">{{ user.netid }}</option>
+      {% endfor %}
+      {% endif %}
+  </select> 
+  <a id="changeOwner" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Transfer Ownership</a>
+</div>
+<br>
+<br>
 
-<hr>
 <p class="card-text"><strong>Rename Group</strong></p>
 <form action="" method="get">
     <div>
-        <input type="text" id="UpdateGroupName" class="form-control" placeholder="{{ this_group.name }}" autofocus>
+        <input type="text" id="UpdateGroupName" class="form-control" placeholder="Enter New Group Name" autofocus>
         <a id="changeGroupName" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Rename Group</a>
     </div>
 </form>
-
-<hr>
+<br>
+<br>
 
 <p class="card-text"><strong>Delete Group</strong><br>
   Deleting this group will also permanently delete all its related events, invitation responses, and any pending invitations.
 </p>
 <a class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;" href="/del_group/{{ this_group.id }}">Delete Group</a>
-
 
 {% endif %}
 
