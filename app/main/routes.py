@@ -235,7 +235,7 @@ def add_new_member():
 def change_ownership():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             member = request.args.get('member')
@@ -258,7 +258,7 @@ def change_ownership():
 def add_group_admin():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             member = request.args.get('member')
@@ -281,7 +281,7 @@ def add_group_admin():
 def remove_group_admin():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             member = request.args.get('member')
@@ -304,7 +304,7 @@ def remove_group_admin():
 def change_group_name():
     if 'username' in session:
         try:
-            user = get_user_from_netid(session['userid'])
+            user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
             name = request.args.get('name')
@@ -313,7 +313,7 @@ def change_group_name():
             update_group_name(groupid=groupId, newName=name)
             return redirect("/mygroups?groupId=" + groupId)
         except Exception as ex:
-            print("An exception occured at '/change_ownership':", ex)
+            print("An exception occured at '/change_group_name':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'

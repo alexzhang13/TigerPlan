@@ -269,7 +269,7 @@
                                                         {% endif %}
                                                         {% if admin_groups is defined and admin_groups != '' %}
                                                         {% for admin_group in admin_groups %}
-                                                        <option value="{{ group.id }}">{{ admin_group.name }} (*)</option>
+                                                        <option value="{{ admin_group.id }}">{{ admin_group.name }} (*)</option>
                                                         {% endfor %}
                                                         {% endif %}
                                                     </select> <span>Select Group</span>

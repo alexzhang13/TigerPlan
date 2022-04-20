@@ -31,8 +31,7 @@
         </div>
         <div class="tab-pane" id="settings">
             <div class="card-body">
-                <h5 class="card-title">Settings</h5>
-                <p class="card-text">Transfer ownership of your group or give event privileges to existing members.</p>
+                <h5 class="card-title">{{ this_group.name }}</h5>
                 <div class="container">
                     {% if this_group is defined %}
                         {% include 'groupadmin.html' %}

@@ -252,8 +252,7 @@
                                         {% endif %}
                                         {% if admin_groups is defined and admin_groups != '' %}
                                             {% for admin_group in admin_groups %}
-                                                <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) (* Event priviledges only *)</a>
-                                            {% endif %}
+                                                <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) <br> (* Event privileges only *)</a>
                                         {% endfor %}
                                         {% endif %}
                                     </div>
