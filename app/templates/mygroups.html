@@ -225,22 +225,13 @@
         <!-- End Navbar -->
         <div class="container-fluid py-4">
             <div class="row">
-                
-
-
-
-
-
-
-                
                 <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row">
                                 <div>
                                     <div class="numbers">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">My Groups</p>
-                                        <!-- Left Column -->
+                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">My Owned Groups</p>
                                         {% if groups is defined and groups != '' %}
                                             {% for group in groups %}
                                             {% if this_group is defined and this_group == group %}
@@ -248,6 +239,13 @@
                                             {% else %}
                                                 <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;" href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id }}) </a>
                                             {% endif %}
+                                        {% endfor %}
+                                        {% endif %}
+                                        <br>
+                                        <p class="text-sm mb-0 pt-3 text-capitalize font-weight-bold">My Shared Groups</p>
+                                        {% if admin_groups is defined and admin_groups != '' %}
+                                            {% for admin_group in admin_groups %}
+                                                <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) <br> (* Event privileges only *)</a>
                                         {% endfor %}
                                         {% endif %}
                                     </div>
@@ -258,9 +256,7 @@
                                         <form action="" method="get">
                                             <div>
                                                 <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                                <br>
-                                                <!-- <a class = "btn btn-white btn-sm w-100 mb-0">Create New Group</a> -->
-                                                <button id="createNewGroup">Create New Group</button>
+                                                <a id="createNewGroup" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Create Group</a>
                                             </div>
                                         </form>
 
@@ -282,6 +278,7 @@
                                 <div class="numbers">
                                     <!-- Right Column -->
                                     {% if this_group is defined %}
+                                        <h3>{{ this_group.name }}</h3>
                                         {% include 'managegrouptab.html' %}
                                     {% else %}
                                         <h5>Please select a group.</h5>

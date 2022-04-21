@@ -1,14 +1,25 @@
-{% if this_group is defined %}
-<div class="panel-heading">
-  <h3 class="panel-title center" style="color: #7bd7ee">{{ this_group.name }} Events </h3>
-</div>
+<p class="card-text"><strong>View Events</strong><br>
+  View details for your group's events all in one place! Click on an event to view details.
+</p>
 <div class="btn-group-vertical d-flex justify-content-center">
-  {% if events is defined and events != '' %}
+  {% if events is defined and events|length != 0 %}
   {% for event in events %}
-  <a class="btn btn-lg btn-outline-info border rounded" style="margin: 9px 0 5px;" href="/view_event_details/{{event.id}}" target = "_blank">
-      {{ event.name }}
+  <a href="/view_event_details/{{event.id}}" target = "_blank">
+    <div class="card">
+      <div class="card-header p-2 text-center" style=" color: white !important; background-color: #850b68 !important;">{{ event.name }}</div>
+      <div class="card-body">
+        <div class="card-text font-weight-light">Location: {{ event.location }}</div>
+        <div class="card-text font-weight-light">Finalized: {{ event.finalized }}</div>
+        <br>
+        <div class="card-text">{{ event.description }}</div>
+      </div>
+    </div>
   </a>
   {% endfor %}
+  {% else %}
+  <p class="card-text">
+    This group has no scheduled events.
+  </p>
   {% endif %}
 </div>
-{% endif %}
+

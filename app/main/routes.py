@@ -1,6 +1,6 @@
-from app.src.group import add_member, create_group, delete_group, delete_member, get_group, get_group_events, get_members, update_group_name, update_owner
+from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
-from app.src.user import get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
+from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_finalize, invitation_update_finalized, invitation_update_response
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -73,6 +73,7 @@ def groups():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
+        admin_groups = get_admin_groups(user.id)
         users = get_users()
         groupId = request.args.get("groupId")
         if (groupId):
@@ -83,14 +84,17 @@ def groups():
                     user=session['username'], groups=groups)
             members = get_members(groupId)
             events = get_group_events(groupId)
+            admins = get_group_admin(groupId)
             return render_template("mygroups.html", 
                 title='TigerPlan Manage Groups', 
                 user=session['username'],
-                groups=groups, users=users, members=members, 
+                groups=groups, admin_groups=admin_groups, 
+                admins=admins, users=users, members=members, 
                 this_group=group, events=events)
         return render_template("mygroups.html", 
             title='TigerPlan Manage Groups', 
-            user=session['username'], groups=groups)
+            user=session['username'], groups=groups, 
+            admin_groups=admin_groups)
     return render_template("login.html",
         title='Login to TigerResearch')
 
@@ -100,11 +104,13 @@ def scheduler():
     if 'username' in session:
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
+        admin_groups = get_admin_groups(user.id)
         events = get_user_events(user.id)
         return render_template("scheduler.html",
             title='TigerPlan Scheduler', 
             user=session['username'], 
-            groups=groups, events=events)
+            groups=groups, events=events,
+            admin_groups = admin_groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
@@ -148,14 +154,6 @@ def view_event_details(id):
 #                         GROUP MUTATIONS                             #
 # ------------------------------------------------------------------- #
 
-# ------------------------------------------------------------------- #
-@bp.route("/testPage/")
-def move_event():
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        return render_template("test.html", 
-                title='TigerPlan Event Page', user=session['username'])
-        
 # -------------------------- ADD GROUP ------------------------------ #
 @bp.route("/add_custom_group", methods=['POST'])
 def add_custom_group():
@@ -273,6 +271,52 @@ def change_ownership():
     return render_template("login.html", 
         title='Login to TigerResearch')
 
+# ----------------------- ADD GROUP OFFICER ------------------------- #
+@bp.route("/add_group_admin", methods=['POST'])
+def add_group_admin():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            groupId = request.args.get('group')
+            group = get_group(groupId)
+            member = request.args.get('member')
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            add_admin(groupid=groupId, newAdminId=member)
+            return redirect("/mygroups?groupId=" + groupId)
+        except Exception as ex:
+            print("An exception occured at '/add_group_admin':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- ADD GROUP OFFICER ------------------------- #
+@bp.route("/remove_group_admin", methods=['POST'])
+def remove_group_admin():
+    if 'username' in session:
+        try:
+            user = get_user_from_netid(session['username'])
+            groupId = request.args.get('group')
+            group = get_group(groupId)
+            member = request.args.get('member')
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            delete_admin(groupid=groupId, newAdminId=member)
+            return redirect("/mygroups?groupId=" + groupId)
+        except Exception as ex:
+            print("An exception occured at '/remove_group_admin':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
 # ----------------------- CHANGE GROUP NAME ------------------------- #
 @bp.route("/change_group_name", methods=['POST'])
 def change_group_name():
@@ -287,7 +331,7 @@ def change_group_name():
             update_group_name(groupid=groupId, newName=name)
             return redirect("/mygroups?groupId=" + groupId)
         except Exception as ex:
-            print("An exception occured at '/change_ownership':", ex)
+            print("An exception occured at '/change_group_name':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'

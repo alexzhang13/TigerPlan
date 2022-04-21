@@ -1,11 +1,15 @@
-<div><strong>{{ this_group.name }}</strong></div>
-<div>Group Members</div>
+<p class="card-text"><strong>Group Members</strong><br>
+  View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.
+</p>
 
+{% if members is defined and members|length != 0 %}
+<div class="container border rounded pt-2">
 <table class="table" id="membersTable">
   <thead class="thead-dark">
     <tr>
       <th>Name</th>
       <th>Netid</th>
+      <th></th>
     </tr>
   </thead>
   {% for member in members %}
@@ -13,28 +17,76 @@
     <td>{{ member.name }}</td>
     <td>{{ member.netid }}</td>
     <td>
-      <button onclick="removeMember('{{member.id}}')">
-        Remove Member
-      </button>
+      <a class="btn btn-outline-default btn-sm mb-0" onclick="removeMember('{{member.id}}')">Remove Member</a>
     </td>
   </tr>
-
   {% endfor %}
 </table>
+</div>
+{% else %}
+<div>No members yet!</div>
+{% endif %}
 
-<!-- <form action="" method="get"> -->
-<div>
-  <select id="NewGroupMember" class="form-select form-select-sm">
+<br>
+
+<p class="card-text"><strong>Add Group Members</strong><br>
+  To add a member to your group, select their netid from the dropdown and click Add Member.
+</p>
+
+<!-- <div>
+  <select id="NewGroupMember" class="form-select form-select-md">
     {% if users is defined and users != '' %}
     {% for user in users %}
     <option value="{{ user.id }}">{{ user.netid }}</option>
     {% endfor %}
     {% endif %}
-  </select> <span>Select Group Members</span>
-  <button class="my-3" id="addNewMember">Add Member</button>
+  </select>
+  <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
+</div>
+<div id = "groupMembersResponse"></div> -->
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+<style>
+  .select2-container .select2-selection--single{
+    height:42px !important;
+  }
+  .select2-container--default .select2-selection--single{
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    -moz-padding-start: calc(0.75rem - 3px);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4rem;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #d2d6da;
+    border-radius: 0.5rem;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    appearance: none;
+}
+</style>
+
+<div class="container">
+  <select id="NewGroupMember" class="form-select select2 form-select-md">
+    {% if users is defined and users != '' %}
+    {% for user in users %}
+    <option value="{{ user.id }}">{{ user.netid }}</option>
+    {% endfor %}
+    {% endif %}
+  </select>
+  <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
 </div>
 <div id = "groupMembersResponse"></div>
-<!-- </form> -->
+
+<script>
+    $('.select2').select2();
+</script>
+
 
 <script>
 
@@ -51,8 +103,10 @@
     tableRow.append($('<td>', { text: memberNetid }));
     tableRow.attr('id', "memberRow" + memberId);
     let deleteUserTd = $('<td>');
-    let deleteUserButton = $('<button>', { text: "Remove member"});
+    let deleteUserButton = $('<a>', { text: "Remove member"});
     deleteUserButton.attr('onclick', "removeMember(" + memberId + ")");
+    deleteUserButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+    deleteUserButton.attr('style', "margin: 9px 0 5px;")
     deleteUserTd.append(deleteUserButton);
     tableRow.append(deleteUserTd);
     $('#membersTable').append(tableRow);
