@@ -19,7 +19,6 @@ cas_client = CASClient(
     server_url='https://fed.princeton.edu/cas/login'
 )
 
-
 # ----------------------- HELPER FUNCTIONS -------------------------- #
 
 def check_user_validity():
@@ -106,6 +105,22 @@ def scheduler():
         admin_groups = get_admin_groups(user.id)
         events = get_user_events(user.id)
         return render_template("scheduler.html",
+            title='TigerPlan Scheduler', 
+            user=session['username'], 
+            groups=groups, events=events,
+            admin_groups = admin_groups)
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
+# -------------------------- MANAGE EVENTS -------------------------- #
+@bp.route("/manage_events", methods=['GET'])
+def manage_events():
+    if 'username' in session:
+        user = get_user_from_netid(session['username'])
+        groups = get_user_groups(user.id)
+        admin_groups = get_admin_groups(user.id)
+        events = get_user_events(user.id)
+        return render_template("manage_events.html",
             title='TigerPlan Scheduler', 
             user=session['username'], 
             groups=groups, events=events,
@@ -415,33 +430,6 @@ def finalize_event(eventid, timeid):
             return response
     return render_template("login.html", 
         title='Login to TigerPlan')
-
-# --------------------------- VIEW EVENT ---------------------------- # TODO: Review Authorization
-@bp.route("/event/<id>", methods=['GET'])
-def view_event(id):
-    if check_user_validity():
-        user = get_user_from_netid(session['username'])
-        # TODO: Make an error html file for these cases
-        try:
-            event = get_event(id)
-        except:
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        # if event.owner_id != user.id:
-        #    html = "<strong>Error fetching event<strong>"
-        #    return make_response(html)
-        if not event.finalized:
-            user = get_user_from_netid(session['username'])
-            groups = get_user_groups(user.id)
-            events = get_user_events(user.id)
-            return render_template("event.html", 
-                title='TigerPlan Event Page', user=session['username'], 
-                groups=groups, myevent=event, events=events)
-        else:
-            # TODO: Ensure that there is a time
-            return render_template("eventdetails.html", finalized=True,event=event, time=event.times[0])
-    return render_template("login.html", 
-        title='Login to TigerResearch')
 
 # ------------------------ DELETE EVENT ----------------------------- #
 @bp.route("/del_event/<id>", methods=['POST'])
