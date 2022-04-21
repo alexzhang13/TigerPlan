@@ -44,7 +44,9 @@
       {% if members != '' %}
       <option>Select New Admin</option>
       {% for user in members %}
-      <option value="{{ user.id }}">{{ user.netid }}</option>
+        {% if user.id != this_group.owner_id %}
+        <option value="{{ user.id }}">{{ user.netid }}</option>
+        {% endif %}
       {% endfor %}
       {% endif %}
   </select> 
