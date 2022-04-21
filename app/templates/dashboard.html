@@ -238,7 +238,7 @@
                                         
                                             {% for invite in invitations %}
                                                 {% if invite is not none and not invite.finalized and not invite.event.finalized %}
-                                                <div class="card-body p-3" id="invitationCard{{invite.id}}">
+                                                <div class="card mt-3 p-3" id="invitationCard{{invite.id}}">
                                                     {% if invite.event is not none %}
                                                         <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}</h6>
                                                         {% if invite.event.group is not none %}
@@ -246,7 +246,8 @@
                                                         {% endif %}
                                                     {% endif %}
                                                     <br style="line-height: 5px;">
-                                                    <a class = "btn btn-white btn-sm w-100 mb-0" onclick="respondToInvitation('{{invite.id}}')">Respond</a>
+                                                    <a class="btn btn-white btn-sm w-100 mb-0" onclick="respondToInvitation('{{invite.id}}')"
+                                                        id="respondToInvitationButton{{invite.id}}">Respond</a>
                                                 </div>
                                                 {% endif %}
                                             {% endfor %}
@@ -265,9 +266,9 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
-                    <div id="calendar"></div>
+                    <!-- <div id="calendar"></div>
                 </div>
-                <div class="container pt-4 pb-4 border rounded-3 border-iris border-3">
+                <div class="container pt-4 pb-4 border rounded-3 border-iris border-3"> -->
                     <div id="invitationBanner"></div>
                     <div id="invitationRespond">
                         <span id="InvitationDetails">
@@ -306,6 +307,8 @@
     }
 
     function onFinalizeSuccess(response) {
+        
+        $('#finalizeInvitationButton').prop('disabled', false);
         $('#finalizeInvitationButton').hide();
         $('#invitationCard' + currentlyViewedInvitationId).remove();
         addBanner("Success!", true);
@@ -322,9 +325,6 @@
 
         $('#finalizeInvitationButton').prop('disabled', true);
         console.log("Finalizing invitation " + currentlyViewedInvitationId);
-        if (finalizeInvitationRequest != null) {
-            return;
-        }
 
         let chosenTimeBlockIdList = [];
         let selections = getAllSelections();
@@ -404,6 +404,9 @@
     }
 
     function respondToInvitation(id) {
+        if (currentlyViewedInvitationId) {
+            $('#respondToInvitationButton' + currentlyViewedInvitationId).show();
+        }
         currentlyViewedInvitationId = id;
         $('#finalizeInvitationButton').show();
         renderTimeSelectionCalendar();
