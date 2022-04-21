@@ -298,12 +298,11 @@
                                     <div class="card mt-3 mb-3 p-3">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Create New Group</p>
                                         <p class="text-secondary font-weight-bold text-sm mt-2 mb-3">Please specify a name for your new group.</p>
-                                        <form action="" method="get">
-                                            <div>
-                                                <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                                <a id="createNewGroup" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Create Group</a>
-                                            </div>
-                                        </form>
+                                        <div>
+                                            <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
+                                            <button id="createNewGroup" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Create Group</button>
+                                        </div>
+                                        <span id="groupCreationResponse"></span>
 
                                     </div>
                                 </div>
@@ -541,6 +540,7 @@
         function createNewGroup() {
             let name = $('#NewGroupName').val();
             name = encodeURIComponent(name);
+            console.log(name);
 
             if (!name.trim()) {
                 addBanner("A name is required", false);

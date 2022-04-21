@@ -113,6 +113,24 @@
       );
     }
 
+    function addMemberToSelection(memberid, membernetid) {
+      if (!$("#NewGroupOwner option[value='" + memberid + "']").length) {
+        $('#NewGroupOwner').append($('<option>').val(memberid).text(membernetid));
+      }
+      if (!$("#NewGroupAdmin option[value=" + memberid + "]").length) {
+        $('#NewGroupAdmin').append($('<option>').val(memberid).text(membernetid));
+      }
+    }
+
+    function removeMemberFromSelection(memberid) {
+      if ($("#NewGroupOwner option[value=" + memberid + "]").length) {
+        $("#NewGroupOwner option[value=" + memberid + "]").remove();
+      }
+      if ($("#NewGroupAdmin option[value=" + memberid + "]").length) {
+        $("#NewGroupAdmin option[value=" + memberid + "]").remove();
+      }
+    }
+
     let addAdminRequest = null;
     function addGroupAdmin() {
       let member = $('#NewGroupAdmin :selected').val();

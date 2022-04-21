@@ -156,8 +156,10 @@ function deleteSchedule(e) {
 }
 
 function destroyTimeSelectionCalendar() {
-    cal.destroy();
-    cal = null;
+    if (cal) {
+        cal.destroy();
+        cal = null;
+    }
     scheduleIds = [];
 }
 
