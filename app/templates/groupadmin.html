@@ -1,11 +1,12 @@
 {% if members is defined %}
 
-<div><strong>Manage Group Administrators</strong></div>
-<div>
+<p class="card-text"><strong>Manage Group Administrators</strong><br>
   Add group administrators from the list of existing members to give them event scheduling privileges. 
   Administrators can create, update, and delete group events bur cannot access or change group members.
-</div>
+</p>
+
 {% if admins is defined and admins|length != 0 %}
+<div class="container border rounded pt-2">
 <table class="table" id="membersTable">
   <thead class="thead-dark">
     <tr>
@@ -20,15 +21,35 @@
     <td>
       <!-- TODO: Implement Remove Admin javascript -->
       <button onclick="removeAdmin('{{admin.id}}')"> 
-        Remove Member
+        Remove Admin Privileges
       </button>
     </td>
   </tr>
   {% endfor %}
 </table>
+</div>
 {% else %}
 <div><br>No admins yet!</div>
 {% endif %}
+<br>
+<br>
+
+<p class="card-text"><strong>Add Group Admin</strong><br>
+  Specifying a user as a group administrator allows them to create and manage events for your group. Events 
+  that you create will still only be editable by you. Group administrators do not have access to view the list 
+  of members or change administrator privileges. 
+</p>
+<div>
+  <select id="NewGroupAdmin" class="form-select form-select-md">
+      {% if members != '' %}
+      <option>Select New Admin</option>
+      {% for user in members %}
+      <option value="{{ user.id }}">{{ user.netid }}</option>
+      {% endfor %}
+      {% endif %}
+  </select> 
+  <a id="addAdmin" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Admin</a>
+</div>
 <br>
 <br>
 
@@ -70,7 +91,6 @@
 <script>
     'use strict';
     let changeOwnershipRequest = null;
-  
     function changeOwner() {
       let member = $('#NewGroupOwner :selected').val();
       member = encodeURIComponent(member);
@@ -88,9 +108,28 @@
         }
       );
     }
+
+    let addAdminRequest = null;
+    function addGroupAdmin() {
+      let member = $('#NewGroupAdmin :selected').val();
+      member = encodeURIComponent(member);
+  
+      let url = '/add_group_admin?group=' + '{{ this_group.id }}'
+      url += '&member=' + member
+  
+      if (addAdminRequest != null)
+        addAdminRequest.abort();
+  
+      // TODO: Ajax to update the admin table without refresh, banners
+      addAdminRequest = $.ajax(
+        {
+          type: 'POST',
+          url: url,
+        }
+      );
+    }
     
     let updateGroupNameRequest = null;
-
     function changeName() {
       let name = $('#UpdateGroupName').val();
       name = encodeURIComponent(name);
@@ -112,6 +151,7 @@
     function setup() {
       $('#changeOwner').on('click', changeOwner);
       $('#changeGroupName').on('click', changeName);
+      $('#addAdmin').on('click', addGroupAdmin)
     }
   
     $('document').ready(setup);
