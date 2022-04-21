@@ -2,7 +2,6 @@
   View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.
 </p>
 
-{% if members is defined and members|length != 0 %}
 <div class="container border rounded pt-2">
 <table class="table" id="membersTable">
   <thead class="thead-dark">
@@ -12,6 +11,7 @@
       <th></th>
     </tr>
   </thead>
+  {% if members is defined and members|length != 0 %}
   {% for member in members %}
   <tr id="memberRow{{member.id}}">
     <td>{{ member.name }}</td>
@@ -21,11 +21,9 @@
     </td>
   </tr>
   {% endfor %}
+  {% endif %}
 </table>
 </div>
-{% else %}
-<div>No members yet!</div>
-{% endif %}
 
 <br>
 
@@ -113,6 +111,18 @@
     console.log("Table row")
   }
 
+  function addBanner(message, success) {
+    let banner = $('<div>', { text: message });
+    banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+    banner.appendTo("#groupMembersResponse");
+    setTimeout(function () {
+      banner.hide(1000);
+      setTimeout(function () {
+        banner.remove()
+      }, 1000);
+    }, 3000);
+  }
+
   let addNewMemberRequest = null;
   function addNewMember() {
     let memberId = $('#NewGroupMember :selected').val();
@@ -131,44 +141,18 @@
         success: function (response) {
           let banner;
           if (response.success) {
-            let bannerText = response.redundant ? response.memberNetid + " is already in group!" : "Success!";
-            banner = $('<div>', { text: bannerText });
-            banner.addClass("alert alert-success");
+            addBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
             if (!response.redundant) {
               makeNewMemberTableRow(response.memberName, response.memberNetid, memberId, groupId);
+              addMemberToSelection(memberId, response.memberNetid);
             }
-            banner.appendTo("#groupMembersResponse");
-
-            setTimeout(function () {
-              banner.hide(1000);
-              setTimeout(function () {
-                banner.remove()
-              }, 1000);
-            }, 3000);
           } else {
-            banner = $('<div>', { text: "Error fetching group" });
-            banner.addClass("alert alert-warning");
-            banner.appendTo("#groupMembersResponse");
-
-            setTimeout(function () {
-              banner.hide(1000);
-              setTimeout(function () {
-                banner.remove()
-              }, 1000);
-            }, 3000);
+            addBanner("Error fetching group", false);
           }
         },
         error: function (error) {
           console.log(error);
-          let banner = $('<div>', { text: "An error occurred" });
-          banner.addClass("alert alert-warning");
-          banner.appendTo("#groupMembersResponse");
-          setTimeout(function () {
-            banner.hide(1000);
-            setTimeout(function () {
-              banner.remove()
-            }, 1000);
-          }, 3000);
+          addBanner("An error occurred", false);
         }
       }
     );
@@ -176,9 +160,9 @@
 
   let removeMemberRequest = null;
   function removeMember(memberId) {
-    memberId = encodeURIComponent(memberId);
+    uriMemberId = encodeURIComponent(memberId);
     let url = '/remove_member?groupId=' + groupId;
-    url += '&memberId=' + memberId;
+    url += '&memberId=' + uriMemberId;
 
     if (removeMemberRequest != null)
     removeMemberRequest.abort();
@@ -189,44 +173,18 @@
         url: url,
         success: function (response) {
           let banner;
-          if (response.success) {
-            banner = $('<div>', { text: "Success!" });
-            banner.addClass("alert alert-success");
-          } else {
-            banner = $('<div>', { text: "Error deleting" });
-            banner.addClass("alert alert-warning");
-            banner.appendTo("#groupMembersResponse");
-
-            setTimeout(function () {
-              banner.hide(1000);
-              setTimeout(function () {
-                banner.remove()
-              }, 1000);
-            }, 3000);
+          if (!response.success) {
+            addBanner("Error deleting", false);
             return;
           }
 
-          $('#memberRow' + memberId).remove();
-          banner.appendTo("#groupMembersResponse");
-
-          setTimeout(function () {
-            banner.hide(1000);
-            setTimeout(function () {
-              banner.remove()
-            }, 1000);
-          }, 3000);
+          $('#memberRow' + uriMemberId).remove();
+          removeMemberFromSelection(memberId);
+          addBanner("Success!", true);
         },
         error: function (error) {
           console.log(error);
-          let banner = $('<div>', { text: "An error occurred" });
-          banner.addClass("alert alert-warning");
-          banner.appendTo("#groupMembersResponse");
-          setTimeout(function () {
-            banner.hide(1000);
-            setTimeout(function () {
-              banner.remove()
-            }, 1000);
-          }, 3000);
+          addBanner("An error occurred", false);
         }
       }
     );

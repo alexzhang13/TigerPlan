@@ -161,7 +161,7 @@ def add_custom_group():
         try:
             user = get_user_from_netid(session['username'])
             name = request.args.get('name')
-            if (name.strip() != ""):
+            if (name.strip() == ""):
                 raise Exception("A name is required")
             create_group(name=name, owner=user)
             response_json = json.dumps({"success":True})
