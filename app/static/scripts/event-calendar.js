@@ -157,6 +157,7 @@ function deleteSchedule(e) {
 
 function destroyTimeSelectionCalendar() {
     cal.destroy();
+    cal = null;
     scheduleIds = [];
 }
 
@@ -192,17 +193,18 @@ function saveNewSchedule(scheduleData) {
     scheduleIds.push(strId);
 }
 
-function refreshScheduleVisibility() {
-    var calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
 
-    calendarList.forEach(function (calendar) {
-        cal.toggleSchedules(calendar.id, !calendar.checked, false);
-    });
+// function refreshScheduleVisibility() {
+//     var calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
 
-    cal.render(true);
+//     calendarList.forEach(function (calendar) {
+//         cal.toggleSchedules(calendar.id, !calendar.checked, false);
+//     });
 
-    calendarElements.forEach(function (input) {
-        var span = input.nextElementSibling;
-        span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
-    });
-}
+//     cal.render(true);
+
+//     calendarElements.forEach(function (input) {
+//         var span = input.nextElementSibling;
+//         span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
+//     });
+// }

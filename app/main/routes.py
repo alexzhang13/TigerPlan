@@ -1,8 +1,8 @@
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
-from app.src.timeblock import create_event_timeblock, create_timeblock, delete_timeblock, update_timeblock
+from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
 from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
-from app.src.invitation import get_invitation, invitation_add_response_time, invitation_del_response_time, invitation_finalize, invitation_update_finalized, invitation_update_response
+from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
@@ -161,8 +161,13 @@ def add_custom_group():
         try:
             user = get_user_from_netid(session['username'])
             name = request.args.get('name')
+            if (name.strip() != ""):
+                raise Exception("A name is required")
             create_group(name=name, owner=user)
-            return redirect("/mygroups")
+            response_json = json.dumps({"success":True})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/add_custom_group':", ex)
             response_json = json.dumps({"success":False})
@@ -542,53 +547,53 @@ def add_invitations(id):
     return render_template("login.html", 
         title='Login to TigerPlan') 
 
-# ------------------- EDIT INVITATION RESPONSE ---------------------- #
-@bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-def add_invitation_response_time(invitationid, timeid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if invitation.user_id != user.id:
-            html = "<strong>Error fetching invitation<strong>"
-            # TODO: Make JSON
-            print("Invitation is not owned by user")
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_add_response_time(invitationid, timeid)
-            except ValueError as ex:
-                html = "<strong>%s<strong>" % str(ex)
-                # TODO: Make JSON
-                print("value error", str(ex))
-                return make_response(html, 400)
-            # TODO: Make JSON
-            return "Success!"
-    # TODO: Make JSON
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+# # ------------------- EDIT INVITATION RESPONSE ---------------------- #
+# @bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+# def add_invitation_response_time(invitationid, timeid):
+#     if 'username' in session:
+#         user = get_user_from_netid(session['username'])
+#         invitation = get_invitation(invitationid)
+#         if invitation.user_id != user.id:
+#             html = "<strong>Error fetching invitation<strong>"
+#             # TODO: Make JSON
+#             print("Invitation is not owned by user")
+#             return make_response(html, 400)
+#         else:
+#             try:
+#                 invitation_add_response_time(invitationid, timeid)
+#             except ValueError as ex:
+#                 html = "<strong>%s<strong>" % str(ex)
+#                 # TODO: Make JSON
+#                 print("value error", str(ex))
+#                 return make_response(html, 400)
+#             # TODO: Make JSON
+#             return "Success!"
+#     # TODO: Make JSON
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
 
-@bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-def del_invitation_response_time(invitationid, timeid):
-    if 'username' in session:
-        user = get_user_from_netid(session['username'])
-        invitation = get_invitation(invitationid)
-        if (invitation.user_id != user.id):
-            # TODO: Make JSON
-            html = "<strong>Error fetching invitation<strong>"
-            print("Invitation is not owned by user")
-            return make_response(html, 400)
-        else:
-            try:
-                invitation_del_response_time(invitationid, timeid)
-            except ValueError as ex:
-                # TODO: Make JSON
-                html = "<strong>%s<strong>" % str(ex)
-                print("value error", str(ex))
-                return make_response(html, 400)
-            # TODO: Make JSON
-            return "Success!"
-    return render_template("login.html", 
-        title='Login to TigerPlan')
+# @bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
+# def del_invitation_response_time(invitationid, timeid):
+#     if 'username' in session:
+#         user = get_user_from_netid(session['username'])
+#         invitation = get_invitation(invitationid)
+#         if (invitation.user_id != user.id):
+#             # TODO: Make JSON
+#             html = "<strong>Error fetching invitation<strong>"
+#             print("Invitation is not owned by user")
+#             return make_response(html, 400)
+#         else:
+#             try:
+#                 invitation_del_response_time(invitationid, timeid)
+#             except ValueError as ex:
+#                 # TODO: Make JSON
+#                 html = "<strong>%s<strong>" % str(ex)
+#                 print("value error", str(ex))
+#                 return make_response(html, 400)
+#             # TODO: Make JSON
+#             return "Success!"
+#     return render_template("login.html", 
+#         title='Login to TigerPlan')
 
 # ---------------------- FINALIZE INVITATION ------------------------ #
 @bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
@@ -668,12 +673,26 @@ def add_conflict():
         title='Login to TigerResearch') 
 
 # ------------------------ DELETE CONFLICT -------------------------- #
-@bp.route("/del_conflict/<id>", methods=['GET', 'POST'])
+@bp.route("/del_conflict/<id>", methods=['POST'])
 def del_conflict(id):
     if 'username' in session:
-        #TODO: check authorization
-        delete_timeblock(id) 
-        return redirect("/dashboard")
+        try:
+            user = get_user_from_netid(session['username'])
+            id = int(id)
+            timeblock = get_timeblock(id)
+            if (user.id != timeblock.user_id):
+                raise Exception("User is not Timeblock owner")        
+            delete_timeblock(id)
+            response_json = json.dumps({"success":True})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An error occurred at del_conflict:", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
