@@ -319,58 +319,6 @@
     <script>
         'use strict';
         let request = null;
-        let variable = "does this work";
-
-        function createEventInvitations(eventId) {
-            $(this).prop("disabled", true);
-            let url = "cr_event_invitations/" + eventId;
-            $.ajax({
-                type: "POST",
-                url: url,
-                success: function (response) {
-                    console.log("Success");
-                    document.location.reload();
-                }
-            });
-        }
-
-        function deleteEvent(eventId) {
-            let url = "/del_event/" + eventId;
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                success: function (response) {
-                    console.log(response);
-                    if (response.success) {
-                        let html = "<div class='alert alert-success'>";
-                        html += "Event deleted!</div>"
-                        $("#eventCard" + eventId).html(html);
-
-                        setTimeout(function () {
-                            $("#eventCard" + eventId).hide(1000);
-                            setTimeout(function () {
-                                $("#eventCard" + eventId).remove();
-                            }, 1000);
-                        }, 3000);
-                        return;
-                    } else {
-                        let banner = $('<div>',
-                            { text: "An error occured" });
-                        banner.addClass("alert alert-warning");
-
-                        $("#eventCard" + eventId).append(banner);
-                        setTimeout(function () {
-                            banner.hide(1000);
-                            setTimeout(function () {
-                                banner.remove()
-                            }, 1000);
-                        }, 3000);
-                        return;
-                    }
-                },
-            });
-        }
 
         function showCreateEventCard(show) {
             if (show) {
@@ -386,46 +334,6 @@
                 $("#calendarMenu").hide();
             }
         }
-
-        function makeNewEventCard(eventId, eventName, groupName) {
-            let deleteButton = $('<button>', { text: "Delete Event" });
-            deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
-            let deleteLink = $('<a>');
-            deleteLink.append(deleteButton);
-
-            let createInvitesButton = $('<button>',
-                { text: "Create Event Invitations" });
-            let createInvitesLink = $('<a>');
-            createInvitesButton.attr("onclick",
-                "createEventInvitations(" + eventId + ")");
-            createInvitesLink.append(createInvitesButton);
-
-            let cardBody = $('<div>');
-            cardBody.addClass("card-body");
-            cardBody.append($('<strong>', { text: "Invitations for this event have not been sent out yet!" }));
-            cardBody.append($('<br>'));
-            cardBody.append(deleteLink);
-            cardBody.append(createInvitesLink);
-
-            let cardHead = $('<div>');
-            cardHead.addClass("card-header text-white bg-primary");
-            cardHead.append(document.createTextNode("Event name: "));
-            let eventNameStrong = $('<strong>', { text: eventName });
-            cardHead.append(eventNameStrong);
-            cardHead.append(document.createTextNode(" - Group: " + groupName));
-
-            let card = $('<div>');
-            card.attr({ class: "card mt-3 mb-3" })
-            card.addClass("card mt-3 mb-3");
-            card.attr({ id: "eventCard" + eventId });
-            card.append(cardHead);
-            card.append(cardBody);
-            card.hide();
-
-            $("#existingEvents").append(card);
-            card.show(1000);
-        }
-
 
         function checkNewEventValidity(id, name, schedules) {
             if (!id || id.trim() === "") {
@@ -512,9 +420,7 @@
                         return;
                     }
 
-                    $("createNewEventButton").prop("disabled", false);
-                    makeNewEventCard(response.newEventId,
-                        name, response.groupName);
+                    $("#createNewEventButton").prop("disabled", false);
                     showCreateEventCard(false);
                     $('#select-box').prop('selectedIndex', 0);
                     $('#NewEventName').val('');
@@ -534,9 +440,6 @@
                     }, 3000);
                     $("createNewEventButton").prop("disabled", false);
                 }
-            });
-            $("createNewEventButton").on('click', function () {
-                $(this).prop("disabled", true);
             });
         }
 
@@ -564,12 +467,15 @@
 
         function setup() {
             console.log("Setting up page");
-            $('#createNewEventButton').on('click', createNewEvent);
             $('#calendarMenuPrev').on('click', function () {
                 changeCalendarRange(-1);
             });
             $('#calendarMenuNext').on('click', function () {
                 changeCalendarRange(1);
+            });
+            $("#createNewEventButton").on('click', function () {
+                $("#createNewEventButton").prop("disabled", true);                
+                createNewEvent();
             });
         }
 
