@@ -19,32 +19,28 @@ cas_client = CASClient(
     server_url='https://fed.princeton.edu/cas/login'
 )
 
+
+# ----------------------- HELPER FUNCTIONS -------------------------- #
+
+def check_user_validity():
+    if not 'username' in session:
+        return False
+    try:
+        user = get_user_from_netid(session['username'])
+        if user is None:
+            return False
+    except:
+        return False
+    return True
+
 # ------------------------------------------------------------------- #
 #                           PAGE ROUTES                               #
 # ------------------------------------------------------------------- #
 
-@bp.before_request
-def before_request():
-    if not 'username' in session:
-        print('user is not logged in')
-        return render_template("login.html", title='Login to TigerPlan')
-    else:
-        try:
-            user = get_user_from_netid(session['username'])
-            # TODO: This is only here because get...netid uses .one()
-            # instead of .first(). one() throws an exception when nothing
-            # is found, while .first() simply returns None. This is here
-            # in case we change that.
-            if (user is None):
-                raise Exception()
-        except:
-            return render_template("login.html", title='Login to TigerPlan')
-
-
 # ----------------------------- HOME -------------------------------- #
 @bp.route("/", methods=["GET"])
 def index():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         events = get_user_events(user.id)
@@ -57,7 +53,7 @@ def index():
 # ---------------------------- DASHBOARD ---------------------------- #
 @bp.route("/dashboard", methods=['GET'])
 def dashboard():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         conflicts = get_user_conflicts(user.id)
         invitations = get_member_invitations(user.id)
@@ -70,7 +66,7 @@ def dashboard():
 # -------------------------- MANAGE GROUPS -------------------------- #
 @bp.route("/mygroups", methods=['GET'])
 def groups():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         admin_groups = get_admin_groups(user.id)
@@ -104,7 +100,7 @@ def groups():
 # ---------------------------- SCHEDULER ---------------------------- #
 @bp.route("/scheduler", methods=['GET'])
 def scheduler():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         groups = get_user_groups(user.id)
         admin_groups = get_admin_groups(user.id)
@@ -120,7 +116,7 @@ def scheduler():
 # ----------------------------- ABOUT ------------------------------- #
 @bp.route("/about", methods=['GET', 'POST'])
 def about():
-    if 'username' in session:
+    if check_user_validity():
         return render_template("about.html",
         title='TigerPlan About', user=session['username'])
     return render_template("login.html", 
@@ -130,7 +126,7 @@ def about():
 
 @bp.route("/view_event_details/<id>", methods=['GET', 'POST'])
 def view_event_details(id):
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         # TODO: Make an error html file for these cases
         try:
@@ -160,7 +156,7 @@ def view_event_details(id):
 # -------------------------- ADD GROUP ------------------------------ #
 @bp.route("/add_custom_group", methods=['POST'])
 def add_custom_group():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             name = request.args.get('name')
@@ -183,7 +179,7 @@ def add_custom_group():
 # -------------------------- DELETE GROUP --------------------------- # TODO: change to POST
 @bp.route("/del_group/<id>", methods=['POST', 'GET'])
 def del_group(id):
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             group = get_group(id)
@@ -203,7 +199,7 @@ def del_group(id):
 # ------------------------ REMOVE MEMBER ----------------------------- #
 @bp.route("/remove_member", methods=['POST'])
 def remove_member():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             group_id = request.args.get('groupId')
@@ -230,7 +226,7 @@ def remove_member():
 # ----------------------- ADD GROUP MEMBER ------------------------- #
 @bp.route("/add_new_member", methods=['POST'])
 def add_new_member():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             group_id = request.args.get('group')
@@ -259,7 +255,7 @@ def add_new_member():
 # ----------------------- TRANSFER OWNERSHIP ------------------------- #
 @bp.route("/change_ownership", methods=['POST'])
 def change_ownership():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
@@ -282,7 +278,7 @@ def change_ownership():
 # ----------------------- ADD GROUP OFFICER ------------------------- #
 @bp.route("/add_group_admin", methods=['POST'])
 def add_group_admin():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
@@ -305,7 +301,7 @@ def add_group_admin():
 # ----------------------- ADD GROUP OFFICER ------------------------- #
 @bp.route("/remove_group_admin", methods=['POST'])
 def remove_group_admin():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
@@ -328,7 +324,7 @@ def remove_group_admin():
 # ----------------------- CHANGE GROUP NAME ------------------------- #
 @bp.route("/change_group_name", methods=['POST'])
 def change_group_name():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
@@ -355,7 +351,7 @@ def change_group_name():
 # --------------------- CREATE CUSTOM EVENT ------------------------- # TODO: Review Authorization
 @bp.route("/add_event", methods=['POST'])
 def add_event():
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             schedule = json.loads(request.get_data())
@@ -403,7 +399,7 @@ def add_event():
 # ------------------------- FINALIZE EVENT -------------------------- # TODO: FIX THIS PLEASE!!!!!!!!
 @bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
 def finalize_event(eventid, timeid):
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             event = get_event(eventid)
@@ -423,7 +419,7 @@ def finalize_event(eventid, timeid):
 # --------------------------- VIEW EVENT ---------------------------- # TODO: Review Authorization
 @bp.route("/event/<id>", methods=['GET'])
 def view_event(id):
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         # TODO: Make an error html file for these cases
         try:
@@ -450,7 +446,7 @@ def view_event(id):
 # ------------------------ DELETE EVENT ----------------------------- #
 @bp.route("/del_event/<id>", methods=['POST'])
 def del_event(id):
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             event = get_event(id)
@@ -478,7 +474,7 @@ def del_event(id):
 # @bp.route("/respond_to_invitation/<id>", methods=['GET']) 
 # def respond_to_invitation(id):
 #     # TODO: Make JSON
-#     if 'username' in session:
+#     if check_user_validity():
 #         user = get_user_from_netid(session['username'])
 #         try:
 #             invitation = get_invitation(id)
@@ -503,7 +499,7 @@ def del_event(id):
 
 @bp.route("/respond_to_invitation/<id>", methods=['GET']) 
 def respond_to_invitation(id):
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             id = int(id)
@@ -538,7 +534,7 @@ def respond_to_invitation(id):
 # ------------------- CREATE EVENT INVITATIONS ---------------------- #
 @bp.route("/cr_event_invitations/<id>", methods=['POST'])
 def add_invitations(id):
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         event = get_event(id)
         if (event.owner_id != user.id):
@@ -553,7 +549,7 @@ def add_invitations(id):
 # # ------------------- EDIT INVITATION RESPONSE ---------------------- #
 # @bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
 # def add_invitation_response_time(invitationid, timeid):
-#     if 'username' in session:
+#     if check_user_validity():
 #         user = get_user_from_netid(session['username'])
 #         invitation = get_invitation(invitationid)
 #         if invitation.user_id != user.id:
@@ -577,7 +573,7 @@ def add_invitations(id):
 
 # @bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
 # def del_invitation_response_time(invitationid, timeid):
-#     if 'username' in session:
+#     if check_user_validity():
 #         user = get_user_from_netid(session['username'])
 #         invitation = get_invitation(invitationid)
 #         if (invitation.user_id != user.id):
@@ -601,7 +597,7 @@ def add_invitations(id):
 # ---------------------- FINALIZE INVITATION ------------------------ #
 @bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
 def finalize_invitation(invitationid):
-    if 'username' in session:
+    if check_user_validity():
         try:
             print("finalizing invitation", invitationid)
             invitationid = int(invitationid)
@@ -633,7 +629,7 @@ def finalize_invitation(invitationid):
 # --------------------- ADD DEFAULT CONFLICT ------------------------ #
 @bp.route("/saveNewSchedule/", methods=["GET", "POST"])
 def saveNewSchedule():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         schedule = json.loads(request.get_data())
         start = datetime.fromisoformat(schedule['start']['_date'][:-1])
@@ -648,7 +644,7 @@ def saveNewSchedule():
 # ------------------------------------------------------------------- #
 @bp.route("/update_conflict/", methods=["GET", "POST"])
 def update_conflict():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         schedule = json.loads(request.get_data())
 
@@ -665,7 +661,7 @@ def update_conflict():
 # ------------------------------------------------------------------- #
 @bp.route("/add_conflict/", methods=['GET', 'POST'])
 def add_conflict():
-    if 'username' in session:
+    if check_user_validity():
         user = get_user_from_netid(session['username'])
         a = datetime(2018, 11, 28)
         b = datetime(2018, 12, 28)
@@ -678,7 +674,7 @@ def add_conflict():
 # ------------------------ DELETE CONFLICT -------------------------- #
 @bp.route("/del_conflict/<id>", methods=['POST'])
 def del_conflict(id):
-    if 'username' in session:
+    if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
             id = int(id)
@@ -708,7 +704,7 @@ def del_conflict(id):
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
     # Already logged in
-    if 'username' in session:
+    if check_user_validity():
         return redirect(url_for('main.index'))
 
     next = request.args.get('next')
