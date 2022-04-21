@@ -84,6 +84,7 @@
                     </a>
                 </li>
 
+
                 <li class="nav-item">
                     <a class="nav-link  " href="{{ url_for('main.dashboard') }}"">
                         <div
@@ -116,7 +117,7 @@
             <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Scheduler</h6>
         </li>
         <li class="nav-item">
-            <a class="nav-link  active" href="{{ url_for('main.groups') }}">
+            <a class="nav-link  " href="{{ url_for('main.groups') }}" tabindex="-1" aria-disabled="true">
                 <div
                     class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +146,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link  " href="{{ url_for('main.manage_events') }}" tabindex="-1" aria-disabled="true">
+            <a class="nav-link  active" href="{{ url_for('main.manage_events') }}" tabindex="-1" aria-disabled="true">
                 <div
                     class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -171,16 +172,16 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link  " href="{{ url_for('main.scheduler') }}" tabindex="-1" aria-disabled="true">
+            <a class="nav-link " href="{{ url_for('main.scheduler') }}">
                 <div
                     class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                     <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink">
                         <title>document</title>
                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g transform="translate(-1870.000000, -591.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                            <g transform="translate(-1869.000000, -293.000000)" fill="#FFFFFF" fill-rule="nonzero">
                                 <g transform="translate(1716.000000, 291.000000)">
-                                    <g transform="translate(154.000000, 300.000000)">
+                                    <g id="office" transform="translate(153.000000, 2.000000)">
                                         <path class="color-background opacity-6"
                                             d="M40,40 L36.3636364,40 L36.3636364,3.63636364 L5.45454545,3.63636364 L5.45454545,0 L38.1818182,0 C39.1854545,0 40,0.814545455 40,1.81818182 L40,40 Z">
                                         </path>
@@ -196,7 +197,6 @@
                 <span class="nav-link-text ms-1">Create Event</span>
             </a>
         </li>
-
         </ul>
         </div>
 
@@ -211,9 +211,9 @@
                         <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark"
                                 href="javascript:;">Scheduler</a>
                         </li>
-                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Manage Groups</li>
+                        <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Create Event</li>
                     </ol>
-                    <h6 class="font-weight-bolder mb-0">Manage Groups</h6>
+                    <h6 class="font-weight-bolder mb-0">Create Event</h6>
                 </nav>
                 <!-- <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar"> -->
                 <!-- <div class="ms-md-auto pe-md-3 d-flex align-items-center">
@@ -243,25 +243,6 @@
                     </a>
                     {% endif %}
                 </div>
-                <!-- <li class="nav-item d-flex align-items-center">
-                            <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
-                                <i class="fa fa-user me-sm-1"></i>
-                                <span class="d-sm-inline d-none">Sign In</span>
-                            </a>
-                        </li> -->
-                <!-- <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-                            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
-                                <div class="sidenav-toggler-inner">
-                                    <i class="sidenav-toggler-line"></i>
-                                    <i class="sidenav-toggler-line"></i>
-                                    <i class="sidenav-toggler-line"></i>
-                                </div>
-                            </a>
-                        </li> -->
-
-
-                <!-- </div> -->
-            </div>
         </nav>
         <!-- End Navbar -->
         <div class="container-fluid py-4">
@@ -272,310 +253,376 @@
                             <div class="row">
                                 <div>
                                     <div class="numbers">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">My Owned Groups</p>
-                                        {% if groups is defined and groups != '' %}
-                                        {% for group in groups %}
-                                        {% if this_group is defined and this_group == group %}
-                                        <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                            href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id
-                                            }}) </a>
-                                        {% else %}
-                                        <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                            href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id
-                                            }}) </a>
-                                        {% endif %}
-                                        {% endfor %}
-                                        {% endif %}
-                                        <br>
-                                        <p class="text-sm mb-0 pt-3 text-capitalize font-weight-bold">My Shared Groups</p>
-                                        {% if admin_groups is defined and admin_groups != '' %}
-                                            {% for admin_group in admin_groups %}
-                                                <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) <br> (* Event privileges only *)</a>
-                                        {% endfor %}
-                                        {% endif %}
-                                    </div>
-                                    <br>
-                                    <div class="card mt-3 mb-3 p-3">
-                                        <p class="text-sm mb-0 text-capitalize font-weight-bold">Create New Group</p>
-                                        <p class="text-secondary font-weight-bold text-sm mt-2 mb-3">Please specify a name for your new group.</p>
-                                        <form action="" method="get">
-                                            <div>
-                                                <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                                <a id="createNewGroup" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Create Group</a>
-                                            </div>
-                                        </form>
+                                        <span id="existingEvents">
+                                            {% for event in events %}
+                                            <div class="card">
+                                                <div class="card-header p-2 text-center" style=" color: white !important; background-color: #850b68 !important;">{{ event.name }} ({{ event.group.name }})</div>
+                                                <div class="card-body">
+                                                  <div class="card-text font-weight-light">Location: {{ event.location }}</div>
+                                                  <div class="card-text font-weight-light">Finalized: {{ event.finalized }}</div>
+                                                  <br>
+                                                  <div class="card-text font-weight-light">Description: {{ event.description }}</div>
+                                                  <br>
+                                                    {% if not event.finalized and event.invitations|length == 0 %}
+                                                    <strong>Invitations for this event have not been sent out
+                                                        yet!</strong>
+                                                    <br>
+                                                    {% endif %}
+                                                    {% if not event.finalized and event.invitations|length == 0 %}
+                                                    <a>
+                                                        <button onclick="createEventInvitations('{{event.id}}')">
+                                                            Create Event
+                                                            Invitations </button>
+                                                    </a>
+                                                    {% else %}
+                                                    <a class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;" href="/view_event_details/{{event.id}}">View Invitee Responses</a>
+                                                    <a class="btn btn-outline-danger btn-sm w-100 mb-0" style="margin: 9px 0 5px;" onclick="deleteEvent('{{event.id}}')">Delete Event</a>
+                                                    {% endif %}
+                                                </div>
+                                              </div>
+                                            {% endfor %}
+                                        </span>
 
+                                        <button id="showCreateEventCardButton" onclick="showCreateEventCard(true)">
+                                            Create Event!
+                                        </button>
+                                        <div class="card mt-3 mb-3" id="createEventCard" style="display: none;">
+                                            <div class="card-header text-white bg-primary"><strong>Create New
+                                                    Event</strong></div>
+                                            <div class="card-body">
+                                                <p class="card-text">Which group are you creating the event for?</p>
+                                                <form>
+                                                    <select id="NewEventGroupId"
+                                                        class="custom-select custom-select-lg mb-3">
+                                                        {% if groups is defined and groups != '' %}
+                                                        {% for group in groups %}
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                        {% if admin_groups is defined and admin_groups != '' %}
+                                                        {% for admin_group in admin_groups %}
+                                                        <option value="{{ admin_group.id }}">{{ admin_group.name }} (*)</option>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                    </select> <span>Select Group</span>
+                                                    <input type="text" name="newEventName" id="NewEventName"
+                                                        class="form-control" placeholder="Event Name" autofocus>
+                                                    <input type="text" name="newEventLocation" id="NewEventLocation"
+                                                        class="form-control" placeholder="Event Location" autofocus>
+                                                    <input type="text" name="newEventDescription"
+                                                        id="NewEventDescription" class="form-control"
+                                                        placeholder="Event Description" autofocus>
+                                                    <small id="passwordHelpBlock" class="form-text text-muted">
+                                                        Specify times by dragging in the calendar!
+                                                    </small>
+                                                    <br>
+                                                </form>
+                                                <button onclick="showCreateEventCard(false)">Cancel</button>
+                                                <button id="createNewEventButton">Create Event</button>
+                                            </div>
+                                            <span id="eventCreationResponse"></span>
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- <div class="col-4 text-end">
-                                    <div
-                                        class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                                        <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
-                    
-                        <div class="row">
-                                <div class="numbers">
-                                    <!-- Right Column -->
-                                    {% if this_group is defined %}
-                                        <h3>{{ this_group.name }}</h3>
-                                        {% include 'managegrouptab.html' %}
-                                    {% else %}
-                                        <h5>Please select a group.</h5>
-                                    {% endif %}
-                                </div>
-                        </div>
+                    <div id="calendarMenu" style="display: none;">
+                        <span id="menu-navi">
+                            <!-- TODO: UI -->
+                            <button type="button" class="btn btn-default btn-sm" id="calendarMenuPrev">
+                                &lt;
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" id="calendarMenuNext">
+                                &gt;
+                            </button>
+                        </span>
+                        <h3 style="display:inline" id="renderRange" class="mx-3"></h3>
                     </div>
+                    <div id="calendar"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    </div>
-    <!-- TODO: UI what is this??? -->
     <script>
-        var ctx = document.getElementById("chart-bars").getContext("2d");
-
-        new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Sales",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    borderSkipped: false,
-                    backgroundColor: "#fff",
-                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-                    maxBarThickness: 6
-                },],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                        },
-                        ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 500,
-                            beginAtZero: true,
-                            padding: 15,
-                            font: {
-                                size: 14,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                            color: "#fff"
-                        },
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false
-                        },
-                        ticks: {
-                            display: false
-                        },
-                    },
-                },
-            },
-        });
-
-
-        var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-        new Chart(ctx2, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#cb0c9f",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                },
-                {
-                    label: "Websites",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke2,
-                    fill: true,
-                    data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
-                    maxBarThickness: 6
-                },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#b2b9bf',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#b2b9bf',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                },
-            },
-        });
-    </script>
-    <script>
-        var win = navigator.platform.indexOf('Win') > -1;
-        if (win && document.querySelector('#sidenav-scrollbar')) {
-            var options = {
-                damping: '0.5'
-            }
-            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-        }
-    </script>
-
-    <!-- Script to create a new group -->
-    <script>
-
         'use strict';
-        let myGroupsRequest = null;
+        let request = null;
+        let variable = "does this work";
 
-        function addBanner(message, success) {
-            let banner = $('<div>', { text: message });
-            banner.addClass("alert alert-" + (success ? "success" : "warning"));
-            banner.appendTo("#groupCreationResponse");
-
-            setTimeout(function () {
-                banner.hide(1000);
-                setTimeout(function () {
-                    banner.remove()
-                }, 1000);
-            }, 3000);
-            return;
+        function createEventInvitations(eventId) {
+            $(this).prop("disabled", true);
+            let url = "cr_event_invitations/" + eventId;
+            $.ajax({
+                type: "POST",
+                url: url,
+                success: function (response) {
+                    console.log("Success");
+                    document.location.reload();
+                }
+            });
         }
 
-        function createNewGroup() {
-            let name = $('#NewGroupName').val();
-            name = encodeURIComponent(name);
+        function deleteEvent(eventId) {
+            let url = "/del_event/" + eventId;
 
-            if (!name.trim()) {
-                addBanner("A name is required", false);
+            $.ajax({
+                type: "POST",
+                url: url,
+                success: function (response) {
+                    console.log(response);
+                    if (response.success) {
+                        let html = "<div class='alert alert-success'>";
+                        html += "Event deleted!</div>"
+                        $("#eventCard" + eventId).html(html);
+
+                        setTimeout(function () {
+                            $("#eventCard" + eventId).hide(1000);
+                            setTimeout(function () {
+                                $("#eventCard" + eventId).remove();
+                            }, 1000);
+                        }, 3000);
+                        return;
+                    } else {
+                        let banner = $('<div>',
+                            { text: "An error occured" });
+                        banner.addClass("alert alert-warning");
+
+                        $("#eventCard" + eventId).append(banner);
+                        setTimeout(function () {
+                            banner.hide(1000);
+                            setTimeout(function () {
+                                banner.remove()
+                            }, 1000);
+                        }, 3000);
+                        return;
+                    }
+                },
+            });
+        }
+
+        function showCreateEventCard(show) {
+            if (show) {
+                $("#createEventCard").show();
+                $("#showCreateEventCardButton").hide();
+                renderTimeSelectionCalendar();
+                setRenderRangeText();
+                $("#calendarMenu").show();
+            } else {
+                $("#createEventCard").hide(500);
+                $("#showCreateEventCardButton").show();
+                destroyTimeSelectionCalendar();
+                $("#calendarMenu").hide();
+            }
+        }
+
+        function makeNewEventCard(eventId, eventName, groupName) {
+            let deleteButton = $('<button>', { text: "Delete Event" });
+            deleteButton.attr("onclick", "deleteEvent(" + eventId + ")");
+            let deleteLink = $('<a>');
+            deleteLink.append(deleteButton);
+
+            let createInvitesButton = $('<button>',
+                { text: "Create Event Invitations" });
+            let createInvitesLink = $('<a>');
+            createInvitesButton.attr("onclick",
+                "createEventInvitations(" + eventId + ")");
+            createInvitesLink.append(createInvitesButton);
+
+            let cardBody = $('<div>');
+            cardBody.addClass("card-body");
+            cardBody.append($('<strong>', { text: "Invitations for this event have not been sent out yet!" }));
+            cardBody.append($('<br>'));
+            cardBody.append(deleteLink);
+            cardBody.append(createInvitesLink);
+
+            let cardHead = $('<div>');
+            cardHead.addClass("card-header text-white bg-primary");
+            cardHead.append(document.createTextNode("Event name: "));
+            let eventNameStrong = $('<strong>', { text: eventName });
+            cardHead.append(eventNameStrong);
+            cardHead.append(document.createTextNode(" - Group: " + groupName));
+
+            let card = $('<div>');
+            card.attr({ class: "card mt-3 mb-3" })
+            card.addClass("card mt-3 mb-3");
+            card.attr({ id: "eventCard" + eventId });
+            card.append(cardHead);
+            card.append(cardBody);
+            card.hide();
+
+            $("#existingEvents").append(card);
+            card.show(1000);
+        }
+
+
+        function checkNewEventValidity(id, name, schedules) {
+            if (!id || id.trim() === "") {
+                return "Issue identifying associated group";
+            }
+            if (!name || name.trim() === "") {
+                return "A name is required";
+            }
+            if (!schedules || schedules.length == 0) {
+                return "At least one timeblock is required";
+            }
+            return "";
+        }
+
+        function createNewEvent() {
+            let id = $('#NewEventGroupId :selected').val();
+            let name = $('#NewEventName').val();
+            let location = $('#NewEventLocation').val();
+            let description = $('#NewEventDescription').val();
+            let schedules = getAllSchedules();
+
+            let validity = checkNewEventValidity(id, name, schedules);
+
+            if (validity != "") {
+                console.log(validity);
+
+                let banner = $('<div>', { text: validity });
+                banner.addClass("alert alert-warning");
+                banner.appendTo("#eventCreationResponse");
+
+                setTimeout(function () {
+                    banner.hide(1000);
+                    setTimeout(function () {
+                        banner.remove()
+                    }, 1000);
+                }, 3000);
                 return;
             }
 
-            let url = '/add_custom_group?name=' + name
+            console.log("creating new event");
 
-            if (myGroupsRequest != null)
-                myGroupsRequest.abort();
-
-            myGroupsRequest = $.ajax(
-                {
-                    type: 'POST',
-                    url: url,
-                    success: function (response) {
-                        if (response.success) {
-                            document.location.reload();
-                        } else {
-                            addBanner("An error occured", false);                            
-                        }
-                    },
-                    error: function (response) {
-                        addBanner("An error occured", false);
-                    }
+            let timeblocks = []
+            for (let i = 0; i < schedules.length; i++) {
+                let schedule = schedules[i];
+                let timeblock = {};
+                if (schedule.start && schedule.end) {
+                    timeblock.start = schedule.start;
+                    timeblock.end = schedule.end;
+                    timeblock.name = schedule.title;
                 }
-            );
+                timeblocks.push(timeblock);
+            }
+
+            let newEventData = {};
+            newEventData.groupId = id;
+            newEventData.name = name;
+            newEventData.location = location;
+            newEventData.description = description;
+            newEventData.timeblocks = timeblocks;
+
+            console.log(newEventData);
+            let url = '/add_event'
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(newEventData),
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (!response.success) {
+                        let banner = $('<div>', {
+                            text: response.message ?
+                                response.message : "An error occured"
+                        });
+                        banner.addClass("alert alert-warning");
+                        banner.appendTo("#eventCreationResponse");
+
+                        setTimeout(function () {
+                            banner.hide(1000);
+                            setTimeout(function () {
+                                banner.remove()
+                            }, 1000);
+                        }, 3000);
+                        return;
+                    }
+
+                    $("createNewEventButton").prop("disabled", false);
+                    makeNewEventCard(response.newEventId,
+                        name, response.groupName);
+                    showCreateEventCard(false);
+                    $('#select-box').prop('selectedIndex', 0);
+                    $('#NewEventName').val('');
+                    $('#NewEventLocation').val('');
+                    $('#NewEventDescription').val('');
+                },
+                error: function (error) {
+                    console.log(error);
+                    let banner = $('<div>', { text: "An error occurred" });
+                    banner.addClass("alert alert-warning");
+                    banner.appendTo("#eventCreationResponse");
+                    setTimeout(function () {
+                        banner.hide(1000);
+                        setTimeout(function () {
+                            banner.remove()
+                        }, 1000);
+                    }, 3000);
+                    $("createNewEventButton").prop("disabled", false);
+                }
+            });
+            $("createNewEventButton").on('click', function () {
+                $(this).prop("disabled", true);
+            });
+        }
+
+        // function responseHelper(inviteid, response) {
+        //     updateBanner(response);
+        //     getResults(inviteid);
+        // }
+
+        // function setAvailability(inviteid, timeid, action) {
+        //     let url = action + "_invitation_response_time/";
+        //     url += inviteid + "/" + timeid;
+
+        //     request = $.ajax(
+        //         {
+        //             type: 'POST',
+        //             url: url,
+        //             success: (response) => responseHelper(inviteid, response)
+        //         }
+        //     );
+        // }
+
+        function setRenderRangeText() {
+            let start = cal.getDateRangeStart().toDate();
+            let end = cal.getDateRangeEnd().toDate();
+            let startString = (start.getMonth() + 1) + "/" + start.getDate() + "/" + start.getFullYear();
+            let endString = (end.getMonth() + 1) + "/" + end.getDate() + "/" + end.getFullYear();
+            let newRange = $('<span>', {text: startString + " ~ " + endString });
+            $('#renderRange').empty();
+            $("#renderRange").append(newRange);
+        }
+
+        function changeCalendarRange(direction) {
+            if (!cal) {
+                return;
+            }
+            if (direction < 0) {
+                cal.prev();
+            } else if (direction > 0) {
+                cal.next();
+            }
+            setRenderRangeText();
         }
 
         function setup() {
-            $('#createNewGroup').on('click', createNewGroup);
+            console.log("Setting up page");
+            $('#createNewEventButton').on('click', createNewEvent);
+            $('#calendarMenuPrev').on('click', function () {
+                changeCalendarRange(-1);
+            });
+            $('#calendarMenuNext').on('click', function () {
+                changeCalendarRange(1);
+            });
         }
 
         $('document').ready(setup);
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -602,6 +649,8 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+
+    <script src="{{ url_for('static', filename='scripts/event-calendar.js') }}"></script>
 
 </body>
 
