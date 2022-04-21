@@ -112,7 +112,7 @@
         }
       );
     }
-
+    // TODO: Lu Make this not add owner to options
     function addMemberToSelection(memberid, membernetid) {
       if (!$("#NewGroupOwner option[value='" + memberid + "']").length) {
         $('#NewGroupOwner').append($('<option>').val(memberid).text(membernetid));
