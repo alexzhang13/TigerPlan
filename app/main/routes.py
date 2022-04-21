@@ -77,14 +77,17 @@ def groups():
         users = get_users()
         groupId = request.args.get("groupId")
         if (groupId):
-            group = get_group(groupId)
-            if group.owner_id != user.id:
+            try:
+                group = get_group(groupId)
+                if group.owner_id != user.id:
+                    raise Exception("User is not group owner")
+                members = get_members(groupId)
+                events = get_group_events(groupId)
+                admins = get_group_admin(groupId)
+            except:
                 return render_template("mygroups.html", 
                     title='TigerPlan Manage Groups',
                     user=session['username'], groups=groups)
-            members = get_members(groupId)
-            events = get_group_events(groupId)
-            admins = get_group_admin(groupId)
             return render_template("mygroups.html", 
                 title='TigerPlan Manage Groups', 
                 user=session['username'],
