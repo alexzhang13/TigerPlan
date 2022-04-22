@@ -160,7 +160,7 @@
 
   let removeMemberRequest = null;
   function removeMember(memberId) {
-    uriMemberId = encodeURIComponent(memberId);
+    let uriMemberId = encodeURIComponent(memberId);
     let url = '/remove_member?groupId=' + groupId;
     url += '&memberId=' + uriMemberId;
 
