@@ -1,8 +1,8 @@
 <p class="card-text"><strong>View Events</strong><br>
   View details for your group's events all in one place! Click on an event to view details.
 </p>
-<div class="btn-group-vertical d-flex justify-content-center">
-  {% if events is defined and events|length != 0 %}
+<div id="eventContainer" class="btn-group-vertical d-flex justify-content-center">
+  <!-- {% if events is defined and events|length != 0 %}
   {% for event in events %}
   <a href="/view_event_details/{{event.id}}" target = "_blank">
     <div class="card">
@@ -20,6 +20,6 @@
   <p class="card-text">
     This group has no scheduled events.
   </p>
-  {% endif %}
+  {% endif %} -->
 </div>
 

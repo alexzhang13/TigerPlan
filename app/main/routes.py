@@ -114,6 +114,25 @@ def encodeUser(userObj):
         return output
     return result
 
+def encodeEvent(eventObj):
+    result = []
+    if isinstance(eventObj, list):
+        for event in eventObj:
+            output = {}
+            output['id'] = event.id
+            output['name'] = event.name
+            output['location'] = event.location
+            output['description'] = event.description
+            result.append(output)
+    elif isinstance(eventObj, models.Event):
+        output = {}
+        output['id'] = event.id
+        output['name'] = event.name
+        output['location'] = event.location
+        output['description'] = event.description
+        return output
+    return result
+
 # -------------------------- MANAGE GROUPS -------------------------- #
 @bp.route("/mygroupinfo", methods=['GET'])
 def groupinfo():
@@ -130,10 +149,10 @@ def groupinfo():
             if (groupId):
                 try:
                     members = encodeUser(get_members(groupId))
-                    # events = get_group_events(groupId)
+                    events = encodeEvent(get_group_events(groupId))
                     # admins = get_group_admin(groupId)
                     response_json = json.dumps({"success": True,
-                        "users": users, "members": members})
+                        "users": users, "members": members, "events": events})
                     response = make_response(response_json)
                     response.headers['Content-Type'] = 'application/json'
                     return response

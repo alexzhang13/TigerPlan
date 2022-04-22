@@ -378,7 +378,38 @@
             console.log("Loaded member data.")
         }
 
-        function loadEventsInfo() {}
+        function loadEventsInfo(events) {
+            $('#eventContainer div').remove()
+            console.log("Cleared event data.")
+            let index = 0;
+            while (index < events.length) {
+                let event = events[index]
+                let eventCard = $('<div>');
+                
+                eventCard.attr('class', "card");
+                let cardHeader = $('<div>', { text: event.name });
+                cardHeader.attr('class', "card-header p-2 text-center");
+                cardHeader.attr('style', " color: white !important; background-color: #850b68 !important;");
+                let cardBody = $('<div>');
+                cardBody.attr('class', "card-body");
+                let location = $('<div>', { text: "Location:" + event.location });
+                location.attr('class', "card-text font-weight-light");
+                let description = $('<div>', { text: event.description });
+                description.attr('class', "card-text");
+
+                // Construct card
+                cardBody.append(location);
+                cardBody.append(description);
+                cardBody.append($('<br>'));
+                eventCard.append(cardHeader);
+                eventCard.append(cardBody);
+                $('#eventContainer').append(eventCard);
+                index += 1;
+            }
+            console.log("Loaded event data.")
+        }
+
+
         function loadAdminInfo() {}
 
         let groupTabRequest = null;
@@ -396,7 +427,9 @@
                     url: url,
                     success: function (response) {
                         if (!response.success) return;
+                        console.log(response)
                         loadMemberInfo(response.members, response.users);
+                        loadEventsInfo(response.events);
                         $('#groupInfoToggle').attr('style', "display:block;")
                     },
                     error: function (error) {
