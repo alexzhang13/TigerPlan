@@ -142,6 +142,7 @@ def get_invitation_response_times(id: int) -> dict:
     event = get_event(id)
     time_counts = {}
     num_responses = 0
+
     for invite in event.invitations:
         if not invite.finalized:
             continue
@@ -152,4 +153,20 @@ def get_invitation_response_times(id: int) -> dict:
                 time_counts[timeblock] += 1
             else: 
                 time_counts[timeblock] = 1
-    return time_counts, num_responses
+
+    response_times = []
+    for time in event.times:
+        availability = 0
+        if time in time_counts:
+            availability = time_counts[time]
+        block = {
+            "id": time.id,
+            "start": time.start.strftime('%Y-%m-%dT%H:%M:%S'),
+            "end": time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+            "availability": availability
+        }
+
+        response_times.append(block)
+    print("Response times!:", response_times)
+
+    return response_times, num_responses

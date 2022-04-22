@@ -410,7 +410,8 @@
                         });
                         banner.addClass("alert alert-warning");
                         banner.appendTo("#eventCreationResponse");
-
+                        
+                        $("createNewEventButton").prop("disabled", false);
                         setTimeout(function () {
                             banner.hide(1000);
                             setTimeout(function () {
@@ -441,6 +442,7 @@
                     $("createNewEventButton").prop("disabled", false);
                 }
             });
+            $("#createNewEventButton").prop("disabled", true);
         }
 
         function setRenderRangeText() {
@@ -473,8 +475,7 @@
             $('#calendarMenuNext').on('click', function () {
                 changeCalendarRange(1);
             });
-            $("#createNewEventButton").on('click', function () {
-                $("#createNewEventButton").prop("disabled", true);                
+            $("#createNewEventButton").on('click', function () {          
                 createNewEvent();
             });
         }

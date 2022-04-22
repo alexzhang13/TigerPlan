@@ -1,4 +1,4 @@
-/* Script for handling Events Calendar */
+/* Script for handling Invitation Calendar */
 var calendarList = [];
 
 /* List of scheduleIds */
