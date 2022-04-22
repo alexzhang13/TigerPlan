@@ -96,6 +96,58 @@ def groups():
     return render_template("login.html",
         title='Login to TigerResearch')
 
+# ------------- JSON USER ENCODER ----------------------------------- #
+def encodeUser(userObj):
+    result = []
+    if isinstance(userObj, list):
+        for user in userObj:
+            output = {}
+            output['id'] = user.id
+            output['netid'] = user.netid
+            output['name'] = user.name
+            result.append(output)
+    elif isinstance(userObj, models.User):
+        output = {}
+        output['id'] = user.id
+        output['netid'] = user.netid
+        output['name'] = user.name
+        return output
+    return result
+
+# -------------------------- MANAGE GROUPS -------------------------- #
+@bp.route("/mygroupinfo", methods=['GET'])
+def groupinfo():
+    if check_user_validity():
+        try:
+            user = get_user_from_netid(session['username'])
+            groupId = request.args.get('groupId')
+            group = get_group(groupId)
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            # groups = get_user_groups(user.id)
+            # admin_groups = get_admin_groups(user.id)
+            users = encodeUser(get_users())
+            if (groupId):
+                try:
+                    members = encodeUser(get_members(groupId))
+                    # events = get_group_events(groupId)
+                    # admins = get_group_admin(groupId)
+                    response_json = json.dumps({"success": True,
+                        "users": users, "members": members})
+                    response = make_response(response_json)
+                    response.headers['Content-Type'] = 'application/json'
+                    return response
+                except Exception as ex:
+                    raise ex
+        except Exception as ex:
+            print("An exception occured at '/mygroupinfo':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html",
+        title='Login to TigerResearch')
+
 # ---------------------------- SCHEDULER ---------------------------- #
 @bp.route("/scheduler", methods=['GET'])
 def scheduler():

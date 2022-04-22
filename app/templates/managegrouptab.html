@@ -10,18 +10,45 @@
         <div class="tab-pane active" id="members">
             <div class="card-body">
                 <div id = "members-content" class="container">
-                    {% if this_group is defined %}
-                        {% include 'groupmembers.html' %}
-                    {% endif %}
+                    <p class="card-text"><strong>Group Members</strong><br>
+                        View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.
+                      </p>
+                      
+                      <div class="container border rounded pt-2">
+                      <table class="table" id="membersTable">
+                        <thead class="thead-dark">
+                          <tr>
+                            <th>Name</th>
+                            <th>Netid</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <!-- {% if members is defined and members|length != 0 %}
+                        {% for member in members %}
+                        <tr id="memberRow{{member.id}}">
+                          <td>{{ member.name }}</td>
+                          <td>{{ member.netid }}</td>
+                          <td>
+                            <a class="btn btn-outline-default btn-sm mb-0" onclick="removeMember('{{member.id}}')">Remove Member</a>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %} -->
+                      </table>
+                      </div>
+                      
+                      {% if this_group is defined and this_group != 0 %}
+                      {% include 'groupmembers.html' %}
+                      {% endif %}
                 </div>
             </div>
         </div>
         <div class="tab-pane" id="events">
             <div class="card-body">
                 <div class="container">
-                    {% if this_group is defined and this_group != 0 %}
+                    <!-- {% if this_group is defined and this_group != 0 %} -->
                         {% include 'groupevent.html' %}
-                    {% endif %}
+                    <!-- {% endif %} -->
                 </div>
             </div>
         </div>
