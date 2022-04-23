@@ -83,10 +83,10 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     return event
 
 def event_finalize(eventid: int, timeid: int) -> Invitation:
-    """Changes the event's finalization state. Returns the updated event."""
+    """Changes the event's finalization state. Returns the updated event. If the event is already finalized, throws an exception."""
     event = get_event(eventid)
     if event.finalized:
-        return event
+        raise Exception("Event is already finalized")
     
     # TODO: Should make sure timeblock exists/exists in event (although
     # could just add back if not in event)

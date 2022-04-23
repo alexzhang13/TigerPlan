@@ -5,11 +5,14 @@ let selectedTimeblockId = null;
 const detailCalendarId = "2";
 let detailCal = null;
 
-function renderDetailCalendar(calendarDivId) {
+function renderDetailCalendar(isFinalized, calendarDivId) {
     if (detailCal != null) {
         destroyDetailCalendar();
     }
 
+    if (isFinalized === null) {
+        isFinalized = false;
+    }
     if (!calendarDivId) {
         calendarDivId = "#calendar";
     }
@@ -18,93 +21,12 @@ function renderDetailCalendar(calendarDivId) {
         defaultView: 'week',
         taskView: false,
         isReadOnly: true,
-        scheduleView: ['time'],
-        template: templates
+        scheduleView: ['time']
     });
-
-    // register templates
-    var templates = {
-        popupStateFree: function () {
-            return 'Free';
-        },
-        popupStateBusy: function () {
-            return 'Busy';
-        },
-        titlePlaceholder: function () {
-            return 'Subject';
-        },
-        locationPlaceholder: function () {
-            return 'Location';
-        },
-        startDatePlaceholder: function () {
-            return 'Start date';
-        },
-        endDatePlaceholder: function () {
-            return 'End date';
-        },
-        popupSave: function () {
-            return 'Save';
-        },
-        popupUpdate: function () {
-            return 'Update';
-        },
-        popupDetailDate: function (isAllDay, start, end) {
-            var isSameDate = moment(start).isSame(end);
-            var endFormat = (isSameDate ? '' : 'YYYY.MM.DD ') + 'hh:mm a';
-
-            if (isAllDay) {
-                return moment(start).format('YYYY.MM.DD') + (isSameDate ? '' : ' - ' + moment(end).format('YYYY.MM.DD'));
-            }
-
-            return (moment(start).format('YYYY.MM.DD hh:mm a') + ' - ' + moment(end).format(endFormat));
-        },
-        popupDetailUser: function (schedule) {
-            return 'User : ' + (schedule.attendees || []).join(', ');
-        },
-        popupDetailState: function (schedule) {
-            return 'State : ' + schedule.state || 'Busy';
-        },
-        popupDetailRepeat: function (schedule) {
-            return 'Repeat : ' + schedule.recurrenceRule;
-        },
-        popupDetailBody: function (schedule) {
-            return 'Body : ' + schedule.body;
-        },
-        popupEdit: function () {
-            return 'Edit';
-        },
-        popupDelete: function () {
-            return 'Delete';
-        }
-
-    };
 
     detailCal.on({
         'clickMore': function (e) {
             console.log('clickMore', e);
-        },
-        'clickSchedule': function (event) {
-            console.log("clicked " + event.schedule.id);
-
-            if (event.schedule.id == selectedTimeblockId) {
-                selectedTimeblockId = null;
-                detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
-                    isFocused: false
-                });
-            } else if (selectedTimeblockId == null) {
-                selectedTimeblockId = event.schedule.id;
-                detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
-                    isFocused: true
-                });
-            } else {
-                detailCal.updateSchedule(selectedTimeblockId, detailCalendarId, {
-                    isFocused: false
-                });
-                detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
-                    isFocused: true
-                });
-                selectedTimeblockId = event.schedule.id;
-            }
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
@@ -120,7 +42,7 @@ function renderDetailCalendar(calendarDivId) {
             console.log('beforeDeleteSchedule', e);
         },
         'afterRenderSchedule': function (e) {
-            console.log('afterRenderSchedule', e);
+            // console.log('afterRenderSchedule', e);
         },
         'clickTimezonesCollapseBtn': function (timezonesCollapsed) {
             console.log('timezonesCollapsed', timezonesCollapsed);
@@ -139,37 +61,82 @@ function renderDetailCalendar(calendarDivId) {
 
             return true;
         }
-
     });
-}
 
-// const conflictColor = "#dddddd";
-// const eventColorSelected = "#f7349e";
-// const eventColorUnselected = "#ffe7ff";
+    if (!isFinalized) {
+        detailCal.on({
+            'clickSchedule': function (event) {
+
+                if (event.schedule.id == selectedTimeblockId) {
+                    selectedTimeblockId = null;
+                    detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
+                        isFocused: false
+                    });
+                } else if (selectedTimeblockId == null) {
+                    selectedTimeblockId = event.schedule.id;
+                    detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
+                        isFocused: true
+                    });
+                } else {
+                    detailCal.updateSchedule(selectedTimeblockId, detailCalendarId, {
+                        isFocused: false
+                    });
+                    detailCal.updateSchedule(event.schedule.id, detailCalendarId, {
+                        isFocused: true
+                    });
+                    selectedTimeblockId = event.schedule.id;
+                }
+            }
+        });
+    }
+}
 
 function colorToHex(color) {
     var hexadecimal = color.toString(16);
     return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
 }
 
-function convertRGBtoHex(red, green, blue) {
-    return "#" + colorToHex(red) + colorToHex(green) + colorToHex(blue);
-}
 const blue = [68, 74, 198];
-const red = [237, 66, 780];
+const red = [233, 109, 112];
 
 function getHexColor(availability, numResponses) {
-    console.log(numResponses)
     if (numResponses === 0) {
         return "#f7349e";
     }
-    let ratio = availability/numResponses;
-    let str = convertRGBtoHex(blue[0] + ratio * (red[0] - blue[0]), red[0] + ratio * (blue[0] - red[0]), blue[0] + ratio * (red[0] - blue[0]));
+    let ratio = availability / numResponses;
+    let redComp = blue[0] + ratio * (red[0] - blue[0]);
+    let greenComp = blue[1] + ratio * (red[1] - blue[1]);
+    let blueComp = blue[2] + ratio * (red[2] - blue[2]);
+    console.log(redComp, greenComp, blueComp)
+    let str = "#" + colorToHex(redComp) + colorToHex(greenComp) + colorToHex(blueComp);
     console.log(str);
     return str;
 }
 
+function renderChosenTime(response) {
+    if (detailCal === null) {
+        return;
+    }
+    console.log(response);
+    let chosenTime = response.chosenTime;
+    var schedule = {
+        id: chosenTime.id,
+        title: response.eventName,
+        calendarId: detailCalendarId,
+        category: 'time',
+        dueDateClass: '',
+        start: chosenTime.start + 'Z',
+        end: chosenTime.end + 'Z',
+        bgColor: "#f7349e",
+        color: "#000000"
+    }
+    detailCal.createSchedules([schedule]);
+}
+
 function renderDetailTimeBlocks(response) {
+    if (detailCal === null) {
+        return;
+    }
     console.log(response);
     let eventTimes = response.responseTimes;
     let numResponses = response.numResponses;

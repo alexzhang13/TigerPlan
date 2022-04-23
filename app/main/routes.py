@@ -154,6 +154,7 @@ def view_event_details(id):
                 response_times, num = get_invitation_response_times(event.id)
                 response_json = json.dumps({
                     "success":True,
+                    "finalized":False,
                     "responseTimes": response_times,
                     "numResponses": num
                 })
@@ -163,9 +164,16 @@ def view_event_details(id):
             chosen_time = event.times[0]
             chosen_time_json = { 
                 "start": chosen_time.start.strftime('%Y-%m-%dT%H:%M:%S'),
-                "end": chosen_time.end.strftime('%Y-%m-%dT%H:%M:%S')
+                "end": chosen_time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+                "id": chosen_time.id
             }
-            response_json = json.dumps({"success":True, "chosenTime":chosen_time_json})
+            response_json = json.dumps({
+                "success":True,
+                "finalized":True,
+                "chosenTime":chosen_time_json,
+                "eventName": event.name,
+                "eventId": event.id
+                })
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
@@ -176,23 +184,23 @@ def view_event_details(id):
             response.headers['Content-Type'] = 'application/json'
             return response
         # TODO: Make an error html file for these cases
-        try:
-            event = get_event(id)
-        except:
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        if event.owner_id != user.id:
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        if not event.finalized:
-            responses, num = get_invitation_response_times(event.id)
-            return render_template("eventdetails.html", 
-                finalized=False, event=event, responses=responses,
-                num=num)
-        else:
-            # TODO: Ensure that there is a time
-            return render_template("eventdetails.html", finalized=True,
-            event=event, time=event.times[0])
+        # try:
+        #     event = get_event(id)
+        # except:
+        #     html = "<strong>Error fetching event<strong>"
+        #     return make_response(html)
+        # if event.owner_id != user.id:
+        #     html = "<strong>Error fetching event<strong>"
+        #     return make_response(html)
+        # if not event.finalized:
+        #     responses, num = get_invitation_response_times(event.id)
+        #     return render_template("eventdetails.html", 
+        #         finalized=False, event=event, responses=responses,
+        #         num=num)
+        # else:
+        #     # TODO: Ensure that there is a time
+        #     return render_template("eventdetails.html", finalized=True,
+        #     event=event, time=event.times[0])
     return render_template("login.html", 
         title='Login to TigerResearch') 
 

@@ -258,7 +258,7 @@
                                             {% for event in events %}
                                             <div class="card my-3" id="eventCard{{event.id}}">
                                                 <div class="card-header p-2 text-center"
-                                                    style=" color: white !important; background-color: #850b68 !important;">
+                                                    style="color: white !important; background-color:{% if event.finalized %}#1d0b85{% else %}#850b68{% endif %} !important;">
                                                     {{ event.name }} ({{ event.group.name }})</div>
                                                 <div class="card-body">
                                                     <div class="card-text font-weight-light">Location: {{ event.location
@@ -283,8 +283,13 @@
                                                     {% else %}
                                                     <a class="btn btn-outline-default btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
-                                                        onclick="eventViewDetails('{{event.id}}')">View Invitee
-                                                        Responses</a>
+                                                        onclick="eventViewDetails('{{event.id}}')">
+                                                        {% if event.finalized %}
+                                                        View Finalized Time
+                                                        {% else %}
+                                                        View Invitee Responses/Finalize Time
+                                                        {% endif %}
+                                                    </a>
                                                     {% endif %}
                                                     <a class="btn btn-outline-danger btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
@@ -393,24 +398,36 @@
 
         function eventViewDetails(eventId) {
             if (currentlyViewedEventId) {
-
+                destroyDetailCalendar();
             }
             currentlyViewedEventId = eventId;
-            $('#finalizeEventButton').show();
-            $("#calendarMenu").show();
-            renderDetailCalendar();
-            setRenderRangeText();
             eventId = encodeURIComponent(eventId);
             let timesUrl = '/view_event_details/' + eventId;
 
 
-            // get user conflicts
+            // get event times
             $.ajax({
                 type: "GET",
                 url: timesUrl,
-                success: renderDetailTimeBlocks,
+                success: function (response) {
+                    if (!response.success) {
+                        addBanner("finalizeEventResponse", "an error occurred", false);
+                    }
+                    if (!response.finalized) {
+                        $('#finalizeEventButton').show();
+                        renderDetailCalendar();
+                        renderDetailTimeBlocks(response);
+                    } else {
+                        $('#finalizeEventButton').hide();
+                        renderDetailCalendar(true);
+                        renderChosenTime(response);
+                    }
+                    $("#calendarMenu").show();
+                    setRenderRangeText();
+                },
                 error: function (response) {
                     console.log(response);
+                    addBanner("finalizeEventResponse", "an error occurred", false);
                 }
             });
         }
@@ -418,6 +435,11 @@
         function finalize() {
             let selectedId = getSelectedTimeblockId();
             if (selectedId === null || currentlyViewedEventId === null) {
+                if (selectedId === null) {
+                    addBanner("#finalizeEventReponse", "Must select a time (click on one of the timeblocks in the calendar)", false);
+                } else {
+                    addBanner("#finalizeEventReponse", "error processing request", false);
+                }
                 return;
             }
             $('#finalizeEventButton').prop('disabled', true);
