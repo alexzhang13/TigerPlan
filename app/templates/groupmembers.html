@@ -1,8 +1,4 @@
-<br>
 
-<p class="card-text"><strong>Add Group Members</strong><br>
-  To add a member to your group, select their netid from the dropdown and click Add Member.
-</p>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
@@ -30,13 +26,22 @@
 }
 </style>
 
+<p class="card-text"><strong>Group Members</strong><br>View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.</p>
+<div class="container border rounded pt-2">
+    <table class="table" id="membersTable">
+    <thead class="thead-dark">
+        <tr>
+        <th>Name</th>
+        <th>Netid</th>
+        <th></th>
+        </tr>
+    </thead>
+    </table>
+</div>
+<br>
+<p class="card-text"><strong>Add Group Members</strong><br>To add a member to your group, select their netid from the dropdown and click Add Member.</p>
 <div class="container">
-  <select id="NewGroupMember" class="form-select select2 form-select-md">
-    {% if users is defined and users != '' %}
-    {% for user in users %}
-    <option value="{{ user.id }}">{{ user.netid }}</option>
-    {% endfor %}
-    {% endif %}
+  <select id="selectNewGroupMember" class="form-select select2 form-select-md">
   </select>
   <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
 </div>
@@ -50,7 +55,6 @@
 <script>
 
   'use strict';
-  let groupId = encodeURIComponent("{{ this_group.id }}");
 
   function makeNewMemberTableRow(memberName, memberNetid, memberId, groupId) {
     let tableRow = $('<tr>');
@@ -88,6 +92,7 @@
   function addNewMember() {
     let memberId = $('#NewGroupMember :selected').val();
     memberId = encodeURIComponent(memberId);
+    let groupId = $('#thisGroupHeader').attr('value');
 
     let url = '/add_new_member?group=' + groupId;
     url += '&member=' + memberId
@@ -122,6 +127,7 @@
   let removeMemberRequest = null;
   function removeMember(memberId) {
     let uriMemberId = encodeURIComponent(memberId);
+    let groupId = $('#thisGroupHeader').attr('value');
     let url = '/remove_member?groupId=' + groupId;
     url += '&memberId=' + uriMemberId;
 

@@ -376,6 +376,8 @@
                 index += 1;
             }
             console.log("Loaded member data.")
+            $('#selectNewGroupMember option').remove()
+            console.log("Cleared new member select data.")
             index = 0;
             while (index < users.length) {
                 let user = users[index]
@@ -418,7 +420,42 @@
         }
 
 
-        function loadAdminInfo() {}
+        function loadAdminInfo(members, admins) {
+            $('#adminTable tbody tr').remove()
+            console.log("Cleared admin data.")
+            let index = 0;
+            while (index < admins.length) {
+                let admin = admins[index]
+                let tableRow = $('<tr>');
+                if (admin.name === null) {
+                    admin.name = "None";
+                }
+                tableRow.append($('<td>', { text: admin.name }));
+                tableRow.append($('<td>', { text: admin.netid }));
+                tableRow.attr('id', "adminRow" + admin.id);
+                let deleteAdminTd = $('<td>');
+                let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
+                deleteAdminButton.attr('onclick', "removeAdmin(" + admin.id + ")");
+                deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+                deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+                deleteAdminTd.append(deleteAdminButton);
+                tableRow.append(deleteAdminTd);
+                $('#adminTable').append(tableRow);
+                index += 1;
+            }
+            $('#selectNewGroupAdmin option').remove();
+            $('#selectNewGroupOwner option').remove();
+            console.log("Cleared new admin select data.")
+            index = 0;
+            while (index < members.length) {
+                let member = members[index]
+                $('#selectNewGroupAdmin').append(new Option(member.netid, member.id));
+                $('#selectNewGroupOwner').append(new Option(member.netid, member.id));
+                index += 1;
+                console.log("Loaded a potential admin / new oner.")
+            }
+            console.log("Loaded admin data.")
+        }
 
         let groupTabRequest = null;
         function showGroupInfo(groupId) {
@@ -436,9 +473,12 @@
                     success: function (response) {
                         if (!response.success) return;
                         console.log(response)
+                        let groupTitle = $('<h3>', { id: "thisGroupHeader", text: response.name, value: groupId });
+                        $('#thisGroup').append(groupTitle);
                         loadMemberInfo(response.members, response.users);
                         loadEventsInfo(response.events);
-                        $('#groupInfoToggle').attr('style', "display:block;")
+                        loadAdminInfo(response.members, response.admins);
+                        $('#groupInfoToggle').attr('style', "display:block;");
                     },
                     error: function (error) {
                         console.log(error);

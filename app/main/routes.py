@@ -150,9 +150,10 @@ def groupinfo():
                 try:
                     members = encodeUser(get_members(groupId))
                     events = encodeEvent(get_group_events(groupId))
-                    # admins = get_group_admin(groupId)
+                    admins = encodeUser(get_group_admin(groupId))
                     response_json = json.dumps({"success": True,
-                        "users": users, "members": members, "events": events})
+                        "users": users, "members": members, 
+                        "events": events, "admins": admins})
                     response = make_response(response_json)
                     response.headers['Content-Type'] = 'application/json'
                     return response
