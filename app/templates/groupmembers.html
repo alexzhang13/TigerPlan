@@ -44,8 +44,8 @@
   <select id="selectNewGroupMember" class="form-select select2 form-select-md">
   </select>
   <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
+  <span id = "groupMembersResponse"></span>
 </div>
-<div id = "groupMembersResponse"></div>
 
 <script>
     $('.select2').select2();
@@ -56,7 +56,7 @@
 
   'use strict';
 
-  function makeNewMemberTableRow(memberName, memberNetid, memberId, groupId) {
+  function makeNewMemberTableRow(memberName, memberNetid, memberId) {
     let tableRow = $('<tr>');
     if (memberName === null) {
       // default name
@@ -76,21 +76,23 @@
     console.log("Table row")
   }
 
-  function addBanner(message, success) {
+  function addMemberBanner(message, success) {
     let banner = $('<div>', { text: message });
     banner.addClass("alert alert-" + (successs ? "success" : "warning"));
     banner.appendTo("#groupMembersResponse");
+    console.log('group members banner should appear');
     setTimeout(function () {
       banner.hide(1000);
       setTimeout(function () {
         banner.remove()
       }, 1000);
     }, 3000);
+    return;
   }
 
   let addNewMemberRequest = null;
   function addNewMember() {
-    let memberId = $('#NewGroupMember :selected').val();
+    let memberId = $('#selectNewGroupMember :selected').val();
     memberId = encodeURIComponent(memberId);
     let groupId = $('#thisGroupHeader').attr('value');
 
@@ -107,18 +109,18 @@
         success: function (response) {
           let banner;
           if (response.success) {
-            addBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
+            addMemberBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
             if (!response.redundant) {
-              makeNewMemberTableRow(response.memberName, response.memberNetid, memberId, groupId);
+              makeNewMemberTableRow(response.memberName, response.memberNetid, memberId);
               addMemberToSelection(memberId, response.memberNetid);
             }
           } else {
-            addBanner("Error fetching group", false);
+            addMemberBanner("Error fetching group", false);
           }
         },
         error: function (error) {
           console.log(error);
-          addBanner("An error occurred", false);
+          addMemberBanner("An error occurred", false);
         }
       }
     );
@@ -141,17 +143,17 @@
         success: function (response) {
           let banner;
           if (!response.success) {
-            addBanner("Error deleting", false);
+            addMemberBanner("Error deleting", false);
             return;
           }
 
           $('#memberRow' + uriMemberId).remove();
           removeMemberFromSelection(memberId);
-          addBanner("Success!", true);
+          addMemberBanner("Success!", true);
         },
         error: function (error) {
           console.log(error);
-          addBanner("An error occurred", false);
+          addMemberBanner("An error occurred", false);
         }
       }
     );

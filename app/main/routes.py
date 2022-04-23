@@ -108,9 +108,9 @@ def encodeUser(userObj):
             result.append(output)
     elif isinstance(userObj, models.User):
         output = {}
-        output['id'] = user.id
-        output['netid'] = user.netid
-        output['name'] = user.name
+        output['id'] = userObj.id
+        output['netid'] = userObj.netid
+        output['name'] = userObj.name
         return output
     return result
 
@@ -294,7 +294,8 @@ def remove_member():
             group = get_group(group_id)
             if (user.id != group.owner_id):
                 raise Exception("User is not group owner.")
-            delete_member(group_id, member_id)
+            success = delete_member(group_id, member_id)
+            response = make_response(json.dumps({"success":success}))
         except Exception as ex:
             print("An exception occured at '/remove_member':", ex)
             response_json = json.dumps({"success":False})
@@ -363,7 +364,7 @@ def change_ownership():
         title='Login to TigerResearch')
 
 # ----------------------- ADD GROUP OFFICER ------------------------- #
-@bp.route("/add_group_admin", methods=['POST'])
+@bp.route("/add_group_admin", methods=['GET'])
 def add_group_admin():
     if check_user_validity():
         try:
@@ -373,8 +374,12 @@ def add_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            add_admin(groupid=groupId, newAdminId=member)
-            return redirect("/mygroups?groupId=" + groupId)
+            success = add_admin(groupid=groupId, newAdminId=member)
+            new_admin = get_user_from_id(member)
+            response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/add_group_admin':", ex)
             response_json = json.dumps({"success":False})

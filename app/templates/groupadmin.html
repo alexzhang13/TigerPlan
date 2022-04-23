@@ -25,6 +25,7 @@
   <select id="selectNewGroupAdmin" class="form-select form-select-md">
   </select> 
   <a id="addAdmin" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Admin</a>
+  <span id="addAdminResponse"></span>
 </div>
 <br>
 <br>
@@ -67,7 +68,7 @@
       }
       let member = $('#selectNewGroupOwner :selected').val();
       member = encodeURIComponent(member);
-      thisGroup = $('#thisGroupHeader').attr('value');
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
       let url = '/change_ownership?group=' + thisGroup
       url += '&member=' + member
@@ -101,11 +102,42 @@
       }
     }
 
+    function addAdminTableRow(adminName, adminNetid, adminId) {
+      let tableRow = $('<tr>');
+      if (adminName === null) {
+          adminName = "None";
+      }
+      tableRow.append($('<td>', { text: adminName }));
+      tableRow.append($('<td>', { text: adminNetid }));
+      tableRow.attr('id', "adminRow" + adminId);
+      let deleteAdminTd = $('<td>');
+      let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
+      deleteAdminButton.attr('onclick', "removeAdmin(" + adminId + ")");
+      deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+      deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+      deleteAdminTd.append(deleteAdminButton);
+      tableRow.append(deleteAdminTd);
+      $('#adminTable').append(tableRow);
+    }
+
+    function addAdminBanner(message, success) {
+      let banner = $('<div>', { text: message });
+      banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+      banner.appendTo("#addAdminResponse");
+      setTimeout(function () {
+        banner.hide(1000);
+        setTimeout(function () {
+          banner.remove()
+        }, 1000);
+      }, 3000);
+      return;
+    }
+
     let addAdminRequest = null;
     function addGroupAdmin() {
       let member = $('#selectNewGroupAdmin :selected').val();
       member = encodeURIComponent(member);
-      thisGroup = $('#thisGroupHeader').attr('value');
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
       let url = '/add_group_admin?group=' + thisGroup
       url += '&member=' + member
@@ -116,8 +148,17 @@
       // TODO: Ajax to update the admin table without refresh, banners
       addAdminRequest = $.ajax(
         {
-          type: 'POST',
+          type: 'GET',
           url: url,
+          success: function(response) {
+            if (!response.success) {
+              addAdminBanner("An error occurred.", false);
+            }
+            console.log(response)
+            if (response.admin.name === null) { response.admin.name = "None"; }
+            addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);
+            addAdminBanner("Success!", true);
+          }
         }
       );
     }
