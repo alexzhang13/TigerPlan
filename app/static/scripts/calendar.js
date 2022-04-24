@@ -92,15 +92,13 @@ cal.on({
 
         console.log('beforeUpdateSchedule', e);
 
-        cal.updateSchedule(schedule.id, schedule.calendarId, changes);
-
         var data = {
             id: schedule.id,
             title: schedule.title,
             start: e.changes.start.toUTCString(),
             end: e.changes.end.toUTCString(),
         }
-        
+
         var url = '/update_conflict'
 
         console.log(data)
@@ -110,7 +108,8 @@ cal.on({
             data: JSON.stringify(data),
             dataType: "json",
             success: function (response) {
-                console.log(response)
+                console.log(response);
+                cal.updateSchedule(schedule.id, schedule.calendarId, changes);
             },
             error: function (error) {
                 console.log(error);
@@ -123,12 +122,27 @@ cal.on({
     },
     'beforeDeleteSchedule': function (e) {
         console.log('beforeDeleteSchedule', e);
-        cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
-        // UPDATE ON DB ON FLASK
+
+        if (!e.schedule.id) return;
+
+        var url = '/del_conflict/' + e.schedule.id;
+        $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+
+                cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
 
     },
     'afterRenderSchedule': function (e) {
-        var schedule = e.schedule;
+        // var schedule = e.schedule;
         // var element = cal.getElement(schedule.id, schedule.calendarId);
         // console.log('afterRenderSchedule', element);
     },
@@ -149,11 +163,11 @@ cal.on({
 
         return true;
     }
-    
+
 });
 
 function deleteSchedule(scheduleData) {
-    
+
 }
 
 function saveNewSchedule(scheduleData) {
@@ -184,7 +198,7 @@ function saveNewSchedule(scheduleData) {
     $.ajax({
         type: "POST",
         url: url,
-        data: JSON.stringify( schedule ),
+        data: JSON.stringify(schedule),
         dataType: "json",
         success: function (response) {
             console.log(response)
@@ -238,7 +252,7 @@ $(document).ready(function () {
                     end: response[i].end + 'Z',
                     bgColor: "#9bd912",
                     dragBgColor: "#9bd912",
-                    }
+                }
                 toCreate.push(d);
                 console.log(toCreate)
             }

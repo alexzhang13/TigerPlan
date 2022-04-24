@@ -130,6 +130,8 @@ class Member_Group(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
+    is_admin = db.Column(db.Boolean, default=False)
+
 #---------------------------------------------------------------------#
 # Associative table to facilitate n-to-n relationship between invitations, timeblocks
 class Invitation_Timeblock(db.Model):
@@ -144,21 +146,6 @@ class Invitation_Timeblock(db.Model):
 
     def __repr__(self):
         return '<Initation_Timeblock {}>'.format(self.id)
-
-#---------------------------------------------------------------------#
-# class MutableList(db.ext.mutable.Mutable, list):
-#     def append(self, value):
-#         list.append(self, value)
-#         self.changed()
-
-#     @classmethod
-#     def coerce(cls, key, value):
-#         if not isinstance(value, db.ext.mutable.MutableList):
-#             if isinstance(value, list):
-#                 return MutableList(value)
-#             return db.ext.mutable.Mutable.coerce(key, value)
-#         else:
-#             return value
 
 #---------------------------------------------------------------------#
 @login.user_loader

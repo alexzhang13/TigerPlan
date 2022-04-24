@@ -143,6 +143,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
         }
 
     });
+    scheduleIds = [];
 }
 
 function deleteSchedule(e) {
@@ -155,7 +156,12 @@ function deleteSchedule(e) {
 }
 
 function destroyTimeSelectionCalendar() {
-    cal.destroy();
+    if (cal) {
+        cal.destroy();
+        cal = null;
+    }
+    scheduleIds = [];
+    nextId = 0;
 }
 
 function getAllSchedules() {
@@ -188,19 +194,4 @@ function saveNewSchedule(scheduleData) {
 
     cal.createSchedules([schedule]);
     scheduleIds.push(strId);
-}
-
-function refreshScheduleVisibility() {
-    var calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
-
-    calendarList.forEach(function (calendar) {
-        cal.toggleSchedules(calendar.id, !calendar.checked, false);
-    });
-
-    cal.render(true);
-
-    calendarElements.forEach(function (input) {
-        var span = input.nextElementSibling;
-        span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
-    });
 }

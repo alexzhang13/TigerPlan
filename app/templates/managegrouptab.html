@@ -1,16 +1,14 @@
 <div class="card">
     <div class="card-header" style=" color: white !important; background-color: #cb0c9f !important;">
-    <ul class="nav nav-tabs card-header-tabs" id="groupTab">
-        <li class="active p-3"><a  data-target="#members" data-toggle="tab">Members</a></li>
-        <li class="p-3"><a  data-target="#events" data-toggle="tab">Events</a></li>
-        <li class="p-3"><a  data-target="#settings" data-toggle="tab">Admin</a></li>
+    <ul class="nav nav-tabs card-header-tabs m-0" id="groupTab">
+        <li class="nav-item active px-3"><a data-target="#members" data-toggle="tab">Manage Members</a></li>
+        <li class="nav-item px-3"><a data-target="#events" data-toggle="tab">View Events</a></li>
+        <li class="nav-item px-3"><a data-target="#settings" data-toggle="tab">Admin</a></li>
     </ul>
     </div>
     <div class = "tab-content">
         <div class="tab-pane active" id="members">
             <div class="card-body">
-                <h5 class="card-title">Manage Group Members</h5>
-                <p class="card-text">Add new members to your group or remove existing members.</p>
                 <div id = "members-content" class="container">
                     {% if this_group is defined %}
                         {% include 'groupmembers.html' %}
@@ -20,19 +18,15 @@
         </div>
         <div class="tab-pane" id="events">
             <div class="card-body">
-                <h5 class="card-title">Group Events</h5>
-                {% if events is defined and events|length != 0 %}
-                    <p class="card-text">Here's what your group has scheduled!</p>
-                    {% include 'groupevent.html' %}
-                {% else %}
-                    <p class="card-text">This group does not have any events planned.</p>
-                {% endif %}
+                <div class="container">
+                    {% if this_group is defined and this_group != 0 %}
+                        {% include 'groupevent.html' %}
+                    {% endif %}
+                </div>
             </div>
         </div>
         <div class="tab-pane" id="settings">
             <div class="card-body">
-                <h5 class="card-title">Settings</h5>
-                <p class="card-text">Transfer ownership of your group or give event privileges to existing members.</p>
                 <div class="container">
                     {% if this_group is defined %}
                         {% include 'groupadmin.html' %}

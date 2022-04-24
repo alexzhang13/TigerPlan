@@ -30,6 +30,11 @@ def get_user_events(userid: int) -> Event:
     events = db.session.query(Event).filter(Event.owner_id == userid).all()
     return events
 
+def get_admin_groups(userid: int) -> Group:
+    '''GEt the user(admin)'s groups. Returns a list of groups.'''
+    groups = db.session.query(Group).filter(Group.id == Member_Group.group_id, Member_Group.member_id == userid, Member_Group.is_admin == True).all()
+    return groups
+
 # TODO: TEST
 def get_member_groups(memberid: int) -> Group:
     """Get the user(member)'s groups. Returns a list of groups."""
