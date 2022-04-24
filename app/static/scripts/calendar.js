@@ -241,15 +241,15 @@ $(document).ready(function () {
         success: function (response) {
             console.log(response)
             for (let i = 0; i < response.length; i++) {
-                var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                console.log((new Date(response[i].start + 'Z')).toUTCString());
                 var d = {
                     id: response[i].id,
                     calendarId: '1',
                     title: response[i].name,
                     category: 'time',
                     dueDateClass: '',
-                    start: response[i].start + 'Z',
-                    end: response[i].end + 'Z',
+                    start: new Date(response[i].start + 'Z'),
+                    end: new Date(response[i].end + 'Z'),
                     bgColor: "#9bd912",
                     dragBgColor: "#9bd912",
                 }

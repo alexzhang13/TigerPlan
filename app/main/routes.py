@@ -142,25 +142,65 @@ def about():
 @bp.route("/view_event_details/<id>", methods=['GET', 'POST'])
 def view_event_details(id):
     if check_user_validity():
-        user = get_user_from_netid(session['username'])
-        # TODO: Make an error html file for these cases
         try:
+            user = get_user_from_netid(session['username'])
             event = get_event(id)
-        except:
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        if event.owner_id != user.id:
-            html = "<strong>Error fetching event<strong>"
-            return make_response(html)
-        if not event.finalized:
-            responses, num = get_invitation_response_times(event.id)
-            return render_template("eventdetails.html", 
-                finalized=False, event=event, responses=responses,
-                num=num)
-        else:
-            # TODO: Ensure that there is a time
-            return render_template("eventdetails.html", finalized=True,
-            event=event, time=event.times[0])
+            # TODO: Lu Make sure user is an owner or an admin?
+
+            if (event.owner_id != user.id):
+                raise Exception("User is not event owner") 
+
+            if not event.finalized:
+                response_times, num = get_invitation_response_times(event.id)
+                response_json = json.dumps({
+                    "success":True,
+                    "finalized":False,
+                    "responseTimes": response_times,
+                    "numResponses": num
+                })
+                response = make_response(response_json)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+            chosen_time = event.times[0]
+            chosen_time_json = { 
+                "start": chosen_time.start.strftime('%Y-%m-%dT%H:%M:%S'),
+                "end": chosen_time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+                "id": chosen_time.id
+            }
+            response_json = json.dumps({
+                "success":True,
+                "finalized":True,
+                "chosenTime":chosen_time_json,
+                "eventName": event.name,
+                "eventId": event.id
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An error occurred in view_event_details:", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        # TODO: Make an error html file for these cases
+        # try:
+        #     event = get_event(id)
+        # except:
+        #     html = "<strong>Error fetching event<strong>"
+        #     return make_response(html)
+        # if event.owner_id != user.id:
+        #     html = "<strong>Error fetching event<strong>"
+        #     return make_response(html)
+        # if not event.finalized:
+        #     responses, num = get_invitation_response_times(event.id)
+        #     return render_template("eventdetails.html", 
+        #         finalized=False, event=event, responses=responses,
+        #         num=num)
+        # else:
+        #     # TODO: Ensure that there is a time
+        #     return render_template("eventdetails.html", finalized=True,
+        #     event=event, time=event.times[0])
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
@@ -363,7 +403,7 @@ def change_group_name():
 #                         EVENT MUTATIONS                             #
 # ------------------------------------------------------------------- #
 
-# --------------------- CREATE CUSTOM EVENT ------------------------- # TODO: Review Authorization
+# --------------------- CREATE CUSTOM EVENT ------------------------- # TODO: Lu Review Authorization - admins?
 @bp.route("/add_event", methods=['POST'])
 def add_event():
     if check_user_validity():
@@ -412,19 +452,24 @@ def add_event():
         title='Login to TigerPlan')
 
 # ------------------------- FINALIZE EVENT -------------------------- # TODO: FIX THIS PLEASE!!!!!!!!
-@bp.route("/finalize_event_time/<eventid>/<timeid>", methods=['GET', 'POST'])
-def finalize_event(eventid, timeid):
+@bp.route("/finalize_event_time", methods=['POST'])
+def finalize_event():
     if check_user_validity():
+        eventid = request.args.get('eventid')
+        timeid = request.args.get('timeid')
         try:
             user = get_user_from_netid(session['username'])
             event = get_event(eventid)
             if user.id != event.owner_id:
                 raise Exception("User is not event owner.")
             event_finalize(eventid, timeid)
-            return redirect("/scheduler")
+            response_json = json.dumps({"success": True})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/finalize_event':", ex)
-            response_json = json.dumps({"success":False})
+            response_json = json.dumps({"success": False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
@@ -630,7 +675,7 @@ def saveNewSchedule():
         title='Login to TigerResearch') 
 
 # ------------------------------------------------------------------- #
-@bp.route("/update_conflict/", methods=["GET", "POST"])
+@bp.route("/update_conflict/", methods=["GET", "POST"]) #TODO: Authorization
 def update_conflict():
     if check_user_validity():
         user = get_user_from_netid(session['username'])

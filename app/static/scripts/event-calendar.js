@@ -21,9 +21,9 @@ function renderTimeSelectionCalendar(calendarDivId) {
         defaultView: 'week',
         taskView: false,
         scheduleView: ['time'],
-        useCreationPopup: true,
-        useDetailPopup: true,
-        template: templates
+        useCreationPopup: false,
+        useDetailPopup: false,
+        // template: templates
     });
 
     // register templates
@@ -89,6 +89,9 @@ function renderTimeSelectionCalendar(calendarDivId) {
         },
         'clickSchedule': function (e) {
             console.log(e);
+            if (e.event.ctrlKey) {
+                deleteSchedule(e);
+            }
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
@@ -117,6 +120,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
         'beforeDeleteSchedule': function (e) {
             // UPDATE ON DB ON FLASK
             deleteSchedule(e);
+            console.log("deleting!");
 
         },
         'afterRenderSchedule': function (e) {
