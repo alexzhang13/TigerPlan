@@ -134,7 +134,7 @@ function renderChosenTime(response) {
 }
 
 function renderDetailTimeBlocks(response) {
-    if (detailCal === null) {
+    if (!detailCal) {
         return;
     }
     console.log(response);
@@ -160,8 +160,10 @@ function renderDetailTimeBlocks(response) {
 }
 
 function destroyDetailCalendar() {
-    detailCal.destroy();
-    detailCal = null;
+    if (detailCal) {
+        detailCal.destroy();
+        detailCal = null;
+    }
     selectedTimeblockId = null;
 }
 

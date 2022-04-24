@@ -153,32 +153,117 @@ const conflictColor = "#dddddd";
 const eventColorSelected = "#f7349e";
 const eventColorUnselected = "#ffe7ff";
 
-function renderUserConflicts(response) {
-    var userConflictsList = [];
-    for (let i = 0; i < response.length; i++) {
+let reccuringUserConflicts = [];
+let renderedRange = [0, 0];
+let currentWeekOffset = 0;
 
+// updates range, returns true if rendering is needed
+function checkAndUpdateRange(newOffset) {
+    if (newOffset < renderedRange[0]) {
+        renderedRange[0] = newOffset;
+        
+        return true;
+    } else if (newOffset > renderedRange[1]) {
+        renderedRange[1] = newOffset;
+        return true;
+    }
+    return false;
+}
+
+function calendarPrev() {
+    if (!cal) {
+        return;
+    }
+    currentWeekOffset -= 1;
+    let render = checkAndUpdateRange(currentWeekOffset);
+    if (render) {
+        renderNewOffsets(currentWeekOffset);
+    }
+    cal.prev();
+}
+
+function calendarNext() {
+    if (!cal) {
+        return;
+    }
+    currentWeekOffset += 1;
+    let render = checkAndUpdateRange(currentWeekOffset);
+    if (render) {
+        renderNewOffsets(currentWeekOffset);
+    }
+    cal.next();
+}
+
+function renderNewOffsets(offset) {
+    if (!cal) {
+        return;
+    }
+
+    let toCreate = [];
+
+    for (let i = 0; i < reccuringUserConflicts.length; i++) {
+        let origschedule = reccuringUserConflicts[i];
+        let newStartTime = new Date(origschedule.start.getTime());
+        let newEndTime = new Date(origschedule.end.getTime());
+        newStartTime.setDate(newStartTime.getDate() + offset * 7);
+        newEndTime.setDate(newEndTime.getDate() + offset * 7);
+        let newSchedule = {
+            title: origschedule.title,
+            category: 'time',
+            dueDateClass: '',
+            start: newStartTime,
+            end: newEndTime,
+            bgColor: conflictColor,
+            dragBgColor: conflictColor,
+            raw: "UserConflict"
+        }
+        toCreate.push(newSchedule);
+    }
+    cal.createSchedules(toCreate);
+}
+
+function renderUserConflicts(response) {
+    if (!cal) {
+        return;
+    }
+    let allRenderedUserConflicts = [];
+    let calStart = cal.getDateRangeStart().toDate();
+    let calEnd = cal.getDateRangeEnd().toDate();
+    calEnd.setDate(calEnd.getDate() + 1);
+    console.log("Cal start", calStart);
+    console.log("Cal end", calEnd);
+    for (let i = 0; i < response.length; i++) {
+        let startTime = new Date(response[i].start + 'Z');
+        let endTime = new Date(response[i].end + 'Z');
+        startTime = getInRange(startTime, calStart, calEnd);
+        endTime = getInRange(endTime, calStart, calEnd);
         var d = {
             id: response[i].id,
             calendarId: '1',
             title: response[i].name,
             category: 'time',
             dueDateClass: '',
-            start: response[i].start + 'Z',
-            end: response[i].end + 'Z',
+            start: startTime,
+            end: endTime,
             bgColor: conflictColor,
             dragBgColor: conflictColor,
             raw: "UserConflict"
         }
-        userConflictsList.push(d);
+        allRenderedUserConflicts.push(d);
+        if (/* TODO: should just check recurrence flag */response[i].name == "yay") {
+            reccuringUserConflicts.push(d);
+        }
     }
-    console.log(userConflictsList);
-    cal.createSchedules(userConflictsList);
+    console.log(allRenderedUserConflicts);
+    cal.createSchedules(allRenderedUserConflicts);
 }
 
 function renderEventTimeBlocks(eventTimes) {
+    if (!cal) {
+        return;
+    }
     var eventTimesList = [];
     timeblockAvailabilities = {};
-    console.log(eventTimes);
     for (let i = 0; i < eventTimes.length; i++) {
 
         var d = {
@@ -205,12 +290,39 @@ function errorWhileFetchingTimeBlocks(error) {
 }
 
 function destroyInvitationCalendar() {
-    cal.destroy();
-    cal = null;
+    if (cal) {
+        cal.destroy();
+        cal = null;
+        timeblockAvailabilities = {};
+    }
 }
 
 function getAllSelections() {
     return timeblockAvailabilities;
 }
 
+/********** HELPER FUNCTIONS: SHOULD BE MOVED TO UTILITIES **********/
+function getInRange(dt, start, end) {
+    if (dt < start) {
+        let diff = daysBetween(dt, start);
+        diff = Math.ceil(diff / 7) * 7;
+        dt.setDate(dt.getDate() + diff);
+    } else if (dt > end) {
+        let diff = daysBetween(end, dt);
+        diff = Math.ceil(diff / 7) * 7;
+        dt.setDate(dt.getDate() - diff);
+    }
+    return dt;
+}
+
+function treatAsUTC(date) {
+    let copy = new Date(date);
+    copy.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date;
+}
+
+function daysBetween(startDate, endDate) {
+    var millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
+}
 
