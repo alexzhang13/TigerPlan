@@ -544,12 +544,17 @@ def respond_to_invitation(id):
 
             for timeblock in invitation.event.times:
                 event_times.append(timeblock.to_json())
+
+            conflicts = get_user_conflicts(user.id)
+            conflicts = [conflict.to_json() for conflict in conflicts]
+
             response_json = json.dumps({"success":True, 
                 "eventTimes": event_times,
                 "eventName": invitation.event.name,
                 "eventId": invitation.event_id,
                 "eventDescription": invitation.event.description,
-                "eventLocation": invitation.event.location
+                "eventLocation": invitation.event.location,
+                "userConflicts": conflicts
                 })
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
@@ -790,7 +795,7 @@ def logout_callback():
     session.pop('username', None)
     return redirect(url_for('main.index'))
 
-# ------------------------ LOAD CONFLICTS --------------------------- #
+# ------------------------ LOAD CONFLICTS --------------------------- # TODO: Authorization
 @bp.route("/load_conflicts", methods=['GET', 'POST'])
 def load_conflicts():
     user = get_user_from_netid(session['username'])

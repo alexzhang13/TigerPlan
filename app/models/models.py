@@ -81,6 +81,7 @@ class TimeBlock(db.Model): #DONE
     start = db.Column(db.DateTime())
     end = db.Column(db.DateTime())
     is_conflict = db.Column(db.Boolean)
+    is_recurring = db.Column(db.Boolean)
 
     # n-to-1 relation fields
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -98,7 +99,8 @@ class TimeBlock(db.Model): #DONE
             "name": self.name,
             "start": self.start.strftime('%Y-%m-%dT%H:%M:%S'),
             "end": self.end.strftime('%Y-%m-%dT%H:%M:%S'),
-            "is_conflict": self.is_conflict
+            "is_conflict": self.is_conflict,
+            "is_recurring": self.is_recurring
         }
 
 #---------------------------------------------------------------------#

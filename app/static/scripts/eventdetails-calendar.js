@@ -131,6 +131,7 @@ function renderChosenTime(response) {
         color: "#000000"
     }
     detailCal.createSchedules([schedule]);
+    detailCal.setDate(new Date(chosenTime.start + 'Z'));
 }
 
 function renderDetailTimeBlocks(response) {

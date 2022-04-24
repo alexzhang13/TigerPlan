@@ -250,7 +250,7 @@ function renderUserConflicts(response) {
             raw: "UserConflict"
         }
         allRenderedUserConflicts.push(d);
-        if (/* TODO: should just check recurrence flag */response[i].name == "yay") {
+        if (response[i].is_recurring) {
             reccuringUserConflicts.push(d);
         }
     }
@@ -283,6 +283,9 @@ function renderEventTimeBlocks(eventTimes) {
     }
     console.log(eventTimesList);
     cal.createSchedules(eventTimesList);
+    if (eventTimesList[0] && eventTimesList[0].start) {
+        cal.setDate(new Date(eventTimesList[0].start));
+    }
 }
 
 function errorWhileFetchingTimeBlocks(error) {

@@ -439,14 +439,6 @@
                 let conflictsUrl = '/load_conflicts'
                 addCalendar(cal);
 
-                // get user conflicts
-                $.ajax({
-                    type: "GET",
-                    url: conflictsUrl,
-                    success: renderUserConflicts,
-                    error: errorWhileFetchingTimeBlocks
-                });
-
                 let respondToInvitationUrl = "respond_to_invitation/" + invitationId;
                 $.ajax({
                     type: "GET",
@@ -454,12 +446,23 @@
                     success: function (response) {
                         let eventTimes = response.eventTimes;
                         renderEventTimeBlocks(eventTimes);
+                        renderUserConflicts(response.userConflicts);
+                        setRenderRangeText();
                         showInvitationEventDetails(response.eventName, response.eventDescription, response.eventLocation);
                     },
                     error: function () {
                         errorWhileFetchingTimeBlocks("Error while fetching time blocks");
                     }
                 });
+
+                // get user conflicts: MUST COME AFTER EVENTS ARE LOADED!
+                // $.ajax({
+                //     type: "GET",
+                //     url: conflictsUrl,
+                //     success: renderUserConflicts,
+                //     error: errorWhileFetchingTimeBlocks
+                // });
+
             }
 
             function setRenderRangeText() {
