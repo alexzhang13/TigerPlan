@@ -39,7 +39,7 @@ function renderEditConflictsCalendars() {
         'beforeCreateSchedule': function (e) {
 
             // $("#create").fadeIn();
-            saveNewSchedule(e, recurringCal);
+            saveNewSchedule(e, true);
         },
         'beforeUpdateSchedule': function (e) {
             var schedule = e.schedule;
@@ -132,7 +132,7 @@ function renderEditConflictsCalendars() {
         'beforeCreateSchedule': function (e) {
 
             // $("#create").fadeIn();
-            saveNewSchedule(e, onetimeCal);
+            saveNewSchedule(e, false);
         },
         'beforeUpdateSchedule': function (e) {
             var schedule = e.schedule;
@@ -215,7 +215,7 @@ function renderEditConflictsCalendars() {
     });
 }
 
-function saveNewSchedule(scheduleData, calendar) {
+function saveNewSchedule(scheduleData, recurring) {
     var randomId = Math.floor(Math.random() * 22345679).toString(16);
 
     // figure out better ID genereation
@@ -224,16 +224,13 @@ function saveNewSchedule(scheduleData, calendar) {
         title: scheduleData.title,
         start: scheduleData.start,
         end: scheduleData.end,
-        bgColor: "#9bd912",
-        dragBgColor: "#9bd912",
+        bgColor: recurring ? recurringColor : onetimeColor,
+        dragBgColor: recurring ? recurringColor : onetimeColor,
         category: 'time',
         // category: scheduleData.isAllDay ? 'allday' : 'time',
         // dueDateClass: '',
         location: scheduleData.location,
-        // raw: {
-        //     class: scheduleData.raw['class']
-        // },
-        // state: scheduleData.state
+        isRecurring: recurring
     };
 
     // call ajax to save calendar
@@ -248,7 +245,11 @@ function saveNewSchedule(scheduleData, calendar) {
             console.log(response)
             schedule['id'] = response.id
             console.log(schedule)
-            calendar.createSchedules([schedule]);
+            if (recurring) {
+                recurringCal.createSchedules([schedule]);
+            } else {
+                onetimeCal.createSchedules([schedule]);
+            }
         },
         error: function (error) {
             console.log(error);
@@ -359,6 +360,17 @@ function loadUserConflicts() {
     });
 }
 
+function setRenderRangeText() {
+    if (!onetimeCal) return;
+    let start = onetimeCal.getDateRangeStart().toDate();
+    let end = onetimeCal.getDateRangeEnd().toDate();
+    let startString = (start.getMonth() + 1) + "/" + start.getDate() + "/" + start.getFullYear();
+    let endString = (end.getMonth() + 1) + "/" + end.getDate() + "/" + end.getFullYear();
+    let newRange = $('<span>', { text: startString + " ~ " + endString });
+    $('#renderRange').empty();
+    $("#renderRange").append(newRange);
+}
+
 $(document).ready(function () {
     // call ajax to load calendar
     let url = '/load_conflicts'
@@ -377,6 +389,21 @@ $(document).ready(function () {
         setRenderRangeText();
     });
     setRenderRangeText();
+    
+    $("#recurButton").on('click', function() {
+        $("#recurButton").prop('disabled', true);
+        $("#onetimeButton").prop('disabled', false);
+        $("#onetimeSpan").hide();
+        $("#recurSpan").show();
+        recurringCal.render();
+    })
+    $("#onetimeButton").on('click', function() {
+        $("#recurButton").prop('disabled', false);
+        $("#onetimeButton").prop('disabled', true);
+        $("#recurSpan").hide();
+        $("#onetimeSpan").show();
+        onetimeCal.render();
+    })
 });
 
 /********** HELPER FUNCTIONS: SHOULD BE MOVED TO UTILITIES **********/

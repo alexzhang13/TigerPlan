@@ -618,9 +618,10 @@ def saveNewSchedule():
         schedule = json.loads(request.get_data())
         start = datetime.fromisoformat(schedule['start']['_date'][:-1])
         end = datetime.fromisoformat(schedule['end']['_date'][:-1])
+        is_recurring = schedule['isRecurring']
 
         tb = create_timeblock(name=schedule['title'], user=user, start=start, 
-            end=end, isconflict=True)
+            end=end, isconflict=True, is_recurring=is_recurring)
         return make_response(jsonify(success=True, id=tb.id))
     return render_template("login.html", 
         title='Login to TigerResearch') 

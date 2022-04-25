@@ -81,7 +81,7 @@ class TimeBlock(db.Model): #DONE
     start = db.Column(db.DateTime())
     end = db.Column(db.DateTime())
     is_conflict = db.Column(db.Boolean)
-    is_recurring = db.Column(db.Boolean)
+    is_recurring = db.Column(db.Boolean, default=False)
 
     # n-to-1 relation fields
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
