@@ -59,7 +59,7 @@ function setUpHomeCalendar() {
         }
 
     });
-    
+
     addCalendar(cal);
 }
 
@@ -67,6 +67,7 @@ const conflictColor = "#9bd912";
 const eventColor = "#f7349e";
 
 let reccuringUserConflicts = [];
+let recurringUserEvents = [];
 let renderedRange = [0, 0];
 let currentWeekOffset = 0;
 
@@ -85,7 +86,7 @@ function setRenderRangeText() {
 function checkAndUpdateRange(newOffset) {
     if (newOffset < renderedRange[0]) {
         renderedRange[0] = newOffset;
-        
+
         return true;
     } else if (newOffset > renderedRange[1]) {
         renderedRange[1] = newOffset;
@@ -126,7 +127,10 @@ function renderNewOffsets(offset) {
     }
 
     let toCreate = [];
-
+    let newCalStart = new Date(calStart.getTime());
+    let newCalEnd = new Date(calEnd.getTime());
+    newCalStart.setDate(newCalStart.getDate() + offset * 7);
+    newCalEnd.setDate(newCalEnd.getDate() + offset * 7);
     for (let i = 0; i < reccuringUserConflicts.length; i++) {
         let origschedule = reccuringUserConflicts[i];
         let newStartTime = new Date(origschedule.start.getTime());
@@ -145,16 +149,44 @@ function renderNewOffsets(offset) {
         }
         toCreate.push(newSchedule);
     }
+
+    for (let i = 0; i < recurringUserEvents.length; i++) {
+        let origschedule = recurringUserEvents[i];
+        console.log(origschedule.start);
+        console.log(newCalEnd);
+        if (origschedule.start < newCalEnd) {
+            let newStartTime = new Date(origschedule.start.getTime());
+            let newEndTime = new Date(origschedule.end.getTime());
+            newStartTime = getInRange(newStartTime, newCalStart, newCalEnd);
+            newEndTime = getInRange(newEndTime, newCalStart, newCalEnd);
+            console.log(newStartTime);
+            console.log(newEndTime);
+            let newSchedule = {
+                title: origschedule.title,
+                category: 'time',
+                dueDateClass: '',
+                start: newStartTime,
+                end: newEndTime,
+                bgColor: origschedule.bgColor,
+                dragBgColor: origschedule.dragBgColor,
+                raw: "UserConflict"
+            }
+            toCreate.push(newSchedule);
+        }
+
+    }
+
     cal.createSchedules(toCreate);
 }
-
+let calStart;
+let calEnd;
 function renderUserConflicts(conflicts) {
     if (!cal) {
         return;
     }
     let allRenderedUserConflicts = [];
-    let calStart = cal.getDateRangeStart().toDate();
-    let calEnd = cal.getDateRangeEnd().toDate();
+    calStart = cal.getDateRangeStart().toDate();
+    calEnd = cal.getDateRangeEnd().toDate();
     calEnd.setDate(calEnd.getDate() + 1);
     console.log("Cal start", calStart);
     console.log("Cal end", calEnd);
@@ -182,7 +214,6 @@ function renderUserConflicts(conflicts) {
             reccuringUserConflicts.push(d);
         }
     }
-    console.log(allRenderedUserConflicts);
     cal.createSchedules(allRenderedUserConflicts);
 }
 
@@ -202,7 +233,9 @@ function renderEventTimes(events) {
             dragBgColor: eventColor,
         }
         toCreate.push(d);
-        console.log(toCreate)
+        if (events[i].is_recurring) {
+            recurringUserEvents.push(d);
+        }
     }
     cal.createSchedules(toCreate);
 }
@@ -226,7 +259,7 @@ function loadUserConflicts() {
     });
 }
 
-$(document).ready(function () {    
+$(document).ready(function () {
     setUpHomeCalendar();
     // call ajax to load calendar
     loadUserConflicts();
