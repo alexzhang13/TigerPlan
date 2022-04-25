@@ -235,8 +235,10 @@ function renderUserConflicts(response) {
     for (let i = 0; i < response.length; i++) {
         let startTime = new Date(response[i].start + 'Z');
         let endTime = new Date(response[i].end + 'Z');
-        startTime = getInRange(startTime, calStart, calEnd);
-        endTime = getInRange(endTime, calStart, calEnd);
+        if (response[i].is_recurring) {
+            startTime = getInRange(startTime, calStart, calEnd);
+            endTime = getInRange(endTime, calStart, calEnd);
+        }
         var d = {
             id: response[i].id,
             calendarId: '1',

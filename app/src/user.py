@@ -21,6 +21,20 @@ def get_user_conflicts(userid: int) -> TimeBlock:
     """Get the user's conflicts. Returns a list of time blocks."""
     return db.session.query(TimeBlock).filter(TimeBlock.user_id == userid).all()
 
+def get_user_recurring_conflicts(userid: int) -> TimeBlock:
+    """Get the user's recurring conflicts. Returns a list of time blocks."""
+    return db.session.query(TimeBlock).filter(
+        TimeBlock.user_id == userid,
+        TimeBlock.is_recurring == True
+    ).all()
+
+def get_user_onetime_conflicts(userid: int) -> TimeBlock:
+    """Get the user's onetime (non-recurring) conflicts. Returns a list of time blocks."""
+    return db.session.query(TimeBlock).filter(
+        TimeBlock.user_id == userid,
+        TimeBlock.is_recurring == False
+    ).all()
+
 def get_user_groups(userid: int) -> Group:
     """Get the user(owner)'s groups. Returns a list of groups."""
     groups = db.session.query(Group).filter(Group.owner_id == userid).all()

@@ -1,6 +1,6 @@
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
-from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_users
+from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_user_onetime_conflicts, get_user_recurring_conflicts, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -59,6 +59,19 @@ def dashboard():
         return render_template("dashboard.html",
             title='TigerPlan User Dashboard', user=session['username'], 
             conflicts=conflicts, invitations=invitations)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# -------------------------- EDIT CONFLICTS ------------------------- #
+@bp.route("/editconflicts", methods=['GET'])
+def editconflicts():
+    if check_user_validity():
+        user = get_user_from_netid(session['username'])
+        groups = get_user_groups(user.id)
+        events = get_user_events(user.id)
+        return render_template("editconflicts.html",
+            title='TigerPlan Conflicts', user=session['username'],
+            groups=groups, events=events)
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -618,9 +631,13 @@ def update_conflict():
     if check_user_validity():
         user = get_user_from_netid(session['username'])
         schedule = json.loads(request.get_data())
-
-        start = datetime.strptime(schedule['start'][5:], '%d %b %Y %H:%M:%S GMT')
-        end = datetime.strptime(schedule['end'][5:], '%d %b %Y %H:%M:%S GMT')
+        start = None
+        end = None
+        
+        if schedule['start'] is not None:
+            start = datetime.strptime(schedule['start'][5:], '%d %b %Y %H:%M:%S GMT')
+        if schedule['end'] is not None:
+            end = datetime.strptime(schedule['end'][5:], '%d %b %Y %H:%M:%S GMT')
 
          # retrieve database datetime
         update_timeblock(schedule['id'], schedule['title'], start, end)
@@ -761,8 +778,29 @@ def load_conflicts():
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
-    user = get_user_from_netid(session['username'])
-    conflicts = get_user_conflicts(user.id)
-    conflicts = [conflict.to_json() for conflict in conflicts]
+@bp.route("/load_edit_conflicts", methods=['GET', 'POST'])
+def load_edit_conflicts():
 
-    return jsonify(conflicts)
+    if check_user_validity():
+        try:
+            user = get_user_from_netid(session['username'])
+            recurring_conflicts = get_user_recurring_conflicts(user.id)
+            recurring_conflicts = [conflict.to_json() for conflict in recurring_conflicts]
+            onetime_conflicts = get_user_onetime_conflicts(user.id)
+            onetime_conflicts = [conflict.to_json() for conflict in onetime_conflicts]
+            response_json = json.dumps({
+                "success": True,
+                "recurringConflicts": recurring_conflicts,
+                "onetimeConflicts": onetime_conflicts,
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An error occurred at /load_conflicts:", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerResearch') 

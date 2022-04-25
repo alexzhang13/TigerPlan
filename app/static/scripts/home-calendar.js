@@ -5,6 +5,7 @@ function addCalendar(calendar) {
     calendarList.push(calendar);
 }
 
+let cal;
 function setUpHomeCalendar() {
     cal = new tui.Calendar('#calendar', {
         id: "1",
@@ -107,7 +108,6 @@ function calendarPrev() {
 }
 
 function calendarNext() {
-    console.log("next");
     if (!cal) {
         return;
     }
@@ -161,8 +161,10 @@ function renderUserConflicts(conflicts) {
     for (let i = 0; i < conflicts.length; i++) {
         let startTime = new Date(conflicts[i].start + 'Z');
         let endTime = new Date(conflicts[i].end + 'Z');
-        startTime = getInRange(startTime, calStart, calEnd);
-        endTime = getInRange(endTime, calStart, calEnd);
+        if (conflicts[i].is_recurring) {
+            startTime = getInRange(startTime, calStart, calEnd);
+            endTime = getInRange(endTime, calStart, calEnd);
+        }
         var d = {
             id: conflicts[i].id,
             calendarId: '1',
@@ -208,8 +210,7 @@ function renderEventTimes(events) {
 function loadUserConflicts() {
     let url = '/load_conflicts'
 
-    var toCreate = []
-    schedules = $.ajax({
+    $.ajax({
         type: "GET",
         url: url,
         success: function (response) {

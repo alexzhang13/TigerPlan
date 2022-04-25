@@ -35,8 +35,10 @@ def update_timeblock(id: int, name: str, start: TimeBlock, end: TimeBlock) -> Ti
     updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
     if name is not None:
         updated_tb.name = name
-    updated_tb.start = start
-    updated_tb.end = end
+    if start is not None:
+        updated_tb.start = start
+    if end is not None:
+        updated_tb.end = end
     
     db.session.add(updated_tb)
     db.session.commit()
