@@ -3,13 +3,14 @@ from app.models.models import TimeBlock, User, Event
 from app import db
 
 #---------------------------- CRUD Functions -------------------------#
-def create_timeblock(name: str, user: User, start: DateTime, end: DateTime, isconflict: bool) -> TimeBlock:
+def create_timeblock(name: str, user: User, start: DateTime, end: DateTime, isconflict: bool, is_recurring: bool = False) -> TimeBlock:
     """Create a time block. Returns created time block."""
     new_tb = TimeBlock(name=name,
                       user_id=user.id,
                       start=start,
                       end=end,
-                      is_conflict=isconflict)
+                      is_conflict=isconflict,
+                      is_recurring=is_recurring)
     db.session.add(new_tb)
     db.session.commit()
     return new_tb
@@ -35,8 +36,10 @@ def update_timeblock(id: int, name: str, start: TimeBlock, end: TimeBlock) -> Ti
     updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
     if name is not None:
         updated_tb.name = name
-    updated_tb.start = start
-    updated_tb.end = end
+    if start is not None:
+        updated_tb.start = start
+    if end is not None:
+        updated_tb.end = end
     
     db.session.add(updated_tb)
     db.session.commit()

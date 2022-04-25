@@ -1,120 +1,32 @@
-/* Script for handling Invitation Calendar */
+/* Script for handling Events Calendar */
 var calendarList = [];
-
-/* List of scheduleIds */
-var timeblockAvailabilities;
 
 function addCalendar(calendar) {
     calendarList.push(calendar);
 }
 
-const calendarId = "1";
-let cal = null;
-
-function renderTimeSelectionCalendar(calendarDivId) {
-    if (cal != null) {
-        destroyInvitationCalendar();
-    }
-
-    if (!calendarDivId) {
-        calendarDivId = "#calendar";
-    }
-    cal = new tui.Calendar(calendarDivId, {
-        id: calendarId,
+let cal;
+function setUpHomeCalendar() {
+    cal = new tui.Calendar('#calendar', {
+        id: "1",
         defaultView: 'week',
         taskView: false,
-        isReadOnly: true,
         scheduleView: ['time'],
+        isReadOnly: true,
         useCreationPopup: true,
-        useDetailPopup: true,
-        template: templates
+        useDetailPopup: true
     });
-
-    // register templates
-    var templates = {
-        popupStateFree: function () {
-            return 'Free';
-        },
-        popupStateBusy: function () {
-            return 'Busy';
-        },
-        titlePlaceholder: function () {
-            return 'Subject';
-        },
-        locationPlaceholder: function () {
-            return 'Location';
-        },
-        startDatePlaceholder: function () {
-            return 'Start date';
-        },
-        endDatePlaceholder: function () {
-            return 'End date';
-        },
-        popupSave: function () {
-            return 'Save';
-        },
-        popupUpdate: function () {
-            return 'Update';
-        },
-        popupDetailDate: function (isAllDay, start, end) {
-            var isSameDate = moment(start).isSame(end);
-            var endFormat = (isSameDate ? '' : 'YYYY.MM.DD ') + 'hh:mm a';
-
-            if (isAllDay) {
-                return moment(start).format('YYYY.MM.DD') + (isSameDate ? '' : ' - ' + moment(end).format('YYYY.MM.DD'));
-            }
-
-            return (moment(start).format('YYYY.MM.DD hh:mm a') + ' - ' + moment(end).format(endFormat));
-        },
-        popupDetailUser: function (schedule) {
-            return 'User : ' + (schedule.attendees || []).join(', ');
-        },
-        popupDetailState: function (schedule) {
-            return 'State : ' + schedule.state || 'Busy';
-        },
-        popupDetailRepeat: function (schedule) {
-            return 'Repeat : ' + schedule.recurrenceRule;
-        },
-        popupDetailBody: function (schedule) {
-            return 'Body : ' + schedule.body;
-        },
-        popupEdit: function () {
-            return 'Edit';
-        },
-        popupDelete: function () {
-            return 'Delete';
-        }
-
-    };
 
     cal.on({
         'clickMore': function (e) {
             console.log('clickMore', e);
         },
         'clickSchedule': function (e) {
-            if (e.schedule.raw != "EventTimeBlock") {
-                return;
-            }
-
-            if (timeblockAvailabilities[e.schedule.id]) {
-                cal.updateSchedule(e.schedule.id, calendarId, {
-                    bgColor: eventColorUnselected,
-                    color: "#999999"
-                });
-                timeblockAvailabilities[e.schedule.id] = false;
-            } else {
-                cal.updateSchedule(e.schedule.id, calendarId, {
-                    bgColor: eventColorSelected,
-                    color: "#000000"
-                });
-                timeblockAvailabilities[e.schedule.id] = true;
-            }
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
         },
         'beforeCreateSchedule': function (e) {
-            console.log('This should not be possible. Calendar is readonly.');
             console.log('beforeCreateSchedule', e);
         },
         'beforeUpdateSchedule': function (e) {
@@ -124,7 +36,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
             console.log('beforeDeleteSchedule', e);
         },
         'afterRenderSchedule': function (e) {
-            var schedule = e.schedule;
+            // var schedule = e.schedule;
             // var element = cal.getElement(schedule.id, schedule.calendarId);
             // console.log('afterRenderSchedule', element);
         },
@@ -147,21 +59,34 @@ function renderTimeSelectionCalendar(calendarDivId) {
         }
 
     });
+
+    addCalendar(cal);
 }
 
-const conflictColor = "#dddddd";
-const eventColorSelected = "#f7349e";
-const eventColorUnselected = "#ffe7ff";
+const conflictColor = "#9bd912";
+const eventColor = "#f7349e";
 
 let reccuringUserConflicts = [];
+let recurringUserEvents = [];
 let renderedRange = [0, 0];
 let currentWeekOffset = 0;
+
+function setRenderRangeText() {
+    if (!cal) return;
+    let start = cal.getDateRangeStart().toDate();
+    let end = cal.getDateRangeEnd().toDate();
+    let startString = (start.getMonth() + 1) + "/" + start.getDate() + "/" + start.getFullYear();
+    let endString = (end.getMonth() + 1) + "/" + end.getDate() + "/" + end.getFullYear();
+    let newRange = $('<span>', { text: startString + " ~ " + endString });
+    $('#renderRange').empty();
+    $("#renderRange").append(newRange);
+}
 
 // updates range, returns true if rendering is needed
 function checkAndUpdateRange(newOffset) {
     if (newOffset < renderedRange[0]) {
         renderedRange[0] = newOffset;
-        
+
         return true;
     } else if (newOffset > renderedRange[1]) {
         renderedRange[1] = newOffset;
@@ -180,6 +105,7 @@ function calendarPrev() {
         renderNewOffsets(currentWeekOffset);
     }
     cal.prev();
+    setRenderRangeText();
 }
 
 function calendarNext() {
@@ -192,6 +118,7 @@ function calendarNext() {
         renderNewOffsets(currentWeekOffset);
     }
     cal.next();
+    setRenderRangeText();
 }
 
 function renderNewOffsets(offset) {
@@ -200,7 +127,10 @@ function renderNewOffsets(offset) {
     }
 
     let toCreate = [];
-
+    let newCalStart = new Date(calStart.getTime());
+    let newCalEnd = new Date(calEnd.getTime());
+    newCalStart.setDate(newCalStart.getDate() + offset * 7);
+    newCalEnd.setDate(newCalEnd.getDate() + offset * 7);
     for (let i = 0; i < reccuringUserConflicts.length; i++) {
         let origschedule = reccuringUserConflicts[i];
         let newStartTime = new Date(origschedule.start.getTime());
@@ -219,30 +149,58 @@ function renderNewOffsets(offset) {
         }
         toCreate.push(newSchedule);
     }
+
+    for (let i = 0; i < recurringUserEvents.length; i++) {
+        let origschedule = recurringUserEvents[i];
+        console.log(origschedule.start);
+        console.log(newCalEnd);
+        if (origschedule.start < newCalEnd) {
+            let newStartTime = new Date(origschedule.start.getTime());
+            let newEndTime = new Date(origschedule.end.getTime());
+            newStartTime = getInRange(newStartTime, newCalStart, newCalEnd);
+            newEndTime = getInRange(newEndTime, newCalStart, newCalEnd);
+            console.log(newStartTime);
+            console.log(newEndTime);
+            let newSchedule = {
+                title: origschedule.title,
+                category: 'time',
+                dueDateClass: '',
+                start: newStartTime,
+                end: newEndTime,
+                bgColor: origschedule.bgColor,
+                dragBgColor: origschedule.dragBgColor,
+                raw: "UserConflict"
+            }
+            toCreate.push(newSchedule);
+        }
+
+    }
+
     cal.createSchedules(toCreate);
 }
-
-function renderUserConflicts(response) {
+let calStart;
+let calEnd;
+function renderUserConflicts(conflicts) {
     if (!cal) {
         return;
     }
     let allRenderedUserConflicts = [];
-    let calStart = cal.getDateRangeStart().toDate();
-    let calEnd = cal.getDateRangeEnd().toDate();
+    calStart = cal.getDateRangeStart().toDate();
+    calEnd = cal.getDateRangeEnd().toDate();
     calEnd.setDate(calEnd.getDate() + 1);
     console.log("Cal start", calStart);
     console.log("Cal end", calEnd);
-    for (let i = 0; i < response.length; i++) {
-        let startTime = new Date(response[i].start + 'Z');
-        let endTime = new Date(response[i].end + 'Z');
-        if (response[i].is_recurring) {
+    for (let i = 0; i < conflicts.length; i++) {
+        let startTime = new Date(conflicts[i].start + 'Z');
+        let endTime = new Date(conflicts[i].end + 'Z');
+        if (conflicts[i].is_recurring) {
             startTime = getInRange(startTime, calStart, calEnd);
             endTime = getInRange(endTime, calStart, calEnd);
         }
         var d = {
-            id: response[i].id,
+            id: conflicts[i].id,
             calendarId: '1',
-            title: response[i].name,
+            title: conflicts[i].name,
             category: 'time',
             dueDateClass: '',
             start: startTime,
@@ -252,59 +210,63 @@ function renderUserConflicts(response) {
             raw: "UserConflict"
         }
         allRenderedUserConflicts.push(d);
-        if (response[i].is_recurring) {
+        if (conflicts[i].is_recurring) {
             reccuringUserConflicts.push(d);
         }
     }
-    console.log(allRenderedUserConflicts);
     cal.createSchedules(allRenderedUserConflicts);
 }
 
-function renderEventTimeBlocks(eventTimes) {
-    if (!cal) {
-        return;
-    }
-    var eventTimesList = [];
-    timeblockAvailabilities = {};
-    for (let i = 0; i < eventTimes.length; i++) {
-
+function renderEventTimes(events) {
+    console.log(events);
+    var toCreate = [];
+    for (let i = 0; i < events.length; i++) {
         var d = {
-            id: eventTimes[i].id,
+            id: events[i].id,
             calendarId: '1',
-            title: eventTimes[i].name,
+            title: events[i].name,
             category: 'time',
             dueDateClass: '',
-            start: eventTimes[i].start + 'Z',
-            end: eventTimes[i].end + 'Z',
-            bgColor: eventColorUnselected,
-            color: "#999999",
-            raw: "EventTimeBlock"
+            start: new Date(events[i].start + 'Z'),
+            end: new Date(events[i].end + 'Z'),
+            bgColor: eventColor,
+            dragBgColor: eventColor,
         }
-        eventTimesList.push(d);
-        timeblockAvailabilities[eventTimes[i].id] = false;
+        toCreate.push(d);
+        if (events[i].is_recurring) {
+            recurringUserEvents.push(d);
+        }
     }
-    console.log(eventTimesList);
-    cal.createSchedules(eventTimesList);
-    if (eventTimesList[0] && eventTimesList[0].start) {
-        cal.setDate(new Date(eventTimesList[0].start));
-    }
+    cal.createSchedules(toCreate);
 }
 
-function errorWhileFetchingTimeBlocks(error) {
-    console.log(error);
+function loadUserConflicts() {
+    let url = '/load_conflicts'
+
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function (response) {
+            if (!response.success) {
+                console.log("An error occured");
+            }
+            renderUserConflicts(response.conflicts);
+            renderEventTimes(response.finalizedEvents);
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
 }
 
-function destroyInvitationCalendar() {
-    if (cal) {
-        cal.destroy();
-        cal = null;
-        timeblockAvailabilities = {};
-    }
-}
-
-function getAllSelections() {
-    return timeblockAvailabilities;
-}
+$(document).ready(function () {
+    setUpHomeCalendar();
+    // call ajax to load calendar
+    loadUserConflicts();
+    $("#calendarMenuPrev").on('click', calendarPrev);
+    $("#calendarMenuNext").on('click', calendarNext);
+    setRenderRangeText();
+});
 
 /********** HELPER FUNCTIONS: SHOULD BE MOVED TO UTILITIES **********/
 function getInRange(dt, start, end) {

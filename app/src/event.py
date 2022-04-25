@@ -83,10 +83,10 @@ def set_proposed_times(id: int, datetimes: DateTime) -> Event:
     return event
 
 def event_finalize(eventid: int, timeid: int) -> Invitation:
-    """Changes the event's finalization state. Returns the updated event."""
+    """Changes the event's finalization state. Returns the updated event. If the event is already finalized, throws an exception."""
     event = get_event(eventid)
     if event.finalized:
-        return event
+        raise Exception("Event is already finalized")
     
     # TODO: Should make sure timeblock exists/exists in event (although
     # could just add back if not in event)
@@ -142,6 +142,7 @@ def get_invitation_response_times(id: int) -> dict:
     event = get_event(id)
     time_counts = {}
     num_responses = 0
+
     for invite in event.invitations:
         if not invite.finalized:
             continue
@@ -152,4 +153,20 @@ def get_invitation_response_times(id: int) -> dict:
                 time_counts[timeblock] += 1
             else: 
                 time_counts[timeblock] = 1
-    return time_counts, num_responses
+
+    response_times = []
+    for time in event.times:
+        availability = 0
+        if time in time_counts:
+            availability = time_counts[time]
+        block = {
+            "id": time.id,
+            "start": time.start.strftime('%Y-%m-%dT%H:%M:%S'),
+            "end": time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+            "availability": availability
+        }
+
+        response_times.append(block)
+    print("Response times!:", response_times)
+
+    return response_times, num_responses
