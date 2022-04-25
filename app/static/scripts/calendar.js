@@ -12,7 +12,7 @@ var cal = new tui.Calendar('#calendar', {
     scheduleView: ['time'],
     useCreationPopup: true,
     useDetailPopup: true,
-    template: templates
+    //template: templates
 });
 
 // register templates

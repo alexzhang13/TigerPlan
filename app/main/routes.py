@@ -1,6 +1,6 @@
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
-from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
+from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -183,24 +183,6 @@ def view_event_details(id):
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
-        # TODO: Make an error html file for these cases
-        # try:
-        #     event = get_event(id)
-        # except:
-        #     html = "<strong>Error fetching event<strong>"
-        #     return make_response(html)
-        # if event.owner_id != user.id:
-        #     html = "<strong>Error fetching event<strong>"
-        #     return make_response(html)
-        # if not event.finalized:
-        #     responses, num = get_invitation_response_times(event.id)
-        #     return render_template("eventdetails.html", 
-        #         finalized=False, event=event, responses=responses,
-        #         num=num)
-        # else:
-        #     # TODO: Ensure that there is a time
-        #     return render_template("eventdetails.html", finalized=True,
-        #     event=event, time=event.times[0])
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
@@ -569,7 +551,7 @@ def respond_to_invitation(id):
         title='Login to TigerPlan')
 
 
-# ------------------- CREATE EVENT INVITATIONS ---------------------- #
+# ------------------- CREATE EVENT INVITATIONS ---------------------- # # TODO: fix this please
 @bp.route("/cr_event_invitations/<id>", methods=['POST'])
 def add_invitations(id):
     if check_user_validity():
@@ -583,55 +565,6 @@ def add_invitations(id):
         return redirect("/scheduler")
     return render_template("login.html", 
         title='Login to TigerPlan') 
-
-# # ------------------- EDIT INVITATION RESPONSE ---------------------- #
-# @bp.route("/add_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-# def add_invitation_response_time(invitationid, timeid):
-#     if check_user_validity():
-#         user = get_user_from_netid(session['username'])
-#         invitation = get_invitation(invitationid)
-#         if invitation.user_id != user.id:
-#             html = "<strong>Error fetching invitation<strong>"
-#             # TODO: Make JSON
-#             print("Invitation is not owned by user")
-#             return make_response(html, 400)
-#         else:
-#             try:
-#                 invitation_add_response_time(invitationid, timeid)
-#             except ValueError as ex:
-#                 html = "<strong>%s<strong>" % str(ex)
-#                 # TODO: Make JSON
-#                 print("value error", str(ex))
-#                 return make_response(html, 400)
-#             # TODO: Make JSON
-#             return "Success!"
-#     # TODO: Make JSON
-#     return render_template("login.html", 
-#         title='Login to TigerPlan')
-
-# @bp.route("/del_invitation_response_time/<invitationid>/<timeid>", methods=['POST'])
-# def del_invitation_response_time(invitationid, timeid):
-#     if check_user_validity():
-#         user = get_user_from_netid(session['username'])
-#         invitation = get_invitation(invitationid)
-#         if (invitation.user_id != user.id):
-#             # TODO: Make JSON
-#             html = "<strong>Error fetching invitation<strong>"
-#             print("Invitation is not owned by user")
-#             return make_response(html, 400)
-#         else:
-#             try:
-#                 invitation_del_response_time(invitationid, timeid)
-#             except ValueError as ex:
-#                 # TODO: Make JSON
-#                 html = "<strong>%s<strong>" % str(ex)
-#                 print("value error", str(ex))
-#                 return make_response(html, 400)
-#             # TODO: Make JSON
-#             return "Success!"
-#     return render_template("login.html", 
-#         title='Login to TigerPlan')
-
 # ---------------------- FINALIZE INVITATION ------------------------ #
 @bp.route("/finalize_invitation/<invitationid>", methods=['POST'])
 def finalize_invitation(invitationid):
@@ -725,7 +658,7 @@ def del_conflict(id):
             response.headers['Content-Type'] = 'application/json'
             return response
         except Exception as ex:
-            print("An error occurred at del_conflict:", ex)
+            print("An error occurred at /del_conflict:", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
@@ -798,6 +731,36 @@ def logout_callback():
 # ------------------------ LOAD CONFLICTS --------------------------- # TODO: Authorization
 @bp.route("/load_conflicts", methods=['GET', 'POST'])
 def load_conflicts():
+
+    if check_user_validity():
+        try:
+            user = get_user_from_netid(session['username'])
+            conflicts = get_user_conflicts(user.id)
+            conflicts = [conflict.to_json() for conflict in conflicts]
+            event_times = get_user_member_finalized_event_times(user.id)
+            event_times_json = []
+            for event_time in event_times:
+                event = get_event(event_time.event_id)
+                event_json = event_time.to_json()
+                event_json['name'] = event.name
+                event_times_json.append(event_json)
+            response_json = json.dumps({
+                "success":True,
+                "conflicts":conflicts,
+                "finalizedEvents":event_times_json
+                })
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An error occurred at /load_conflicts:", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html", 
+        title='Login to TigerResearch') 
+
     user = get_user_from_netid(session['username'])
     conflicts = get_user_conflicts(user.id)
     conflicts = [conflict.to_json() for conflict in conflicts]
