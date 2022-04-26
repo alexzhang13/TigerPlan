@@ -425,11 +425,12 @@ def add_event():
             timeblocks = schedule['timeblocks']
             if (len(timeblocks) == 0):
                 raise Exception("No timeblocks included")
-            
+            is_recurring = schedule['isRecurring']
             new_event = create_event(groupid=group_id, name=name,
                                     owner=user, location=location, 
                                     description=description,
-                                    timeblocks=timeblocks)
+                                    timeblocks=timeblocks,
+                                    is_recurring=is_recurring)
             response_json = json.dumps({"success":True, 
                 "newEventId":new_event.id,
                 "groupName":new_event.group.name
@@ -549,7 +550,8 @@ def respond_to_invitation(id):
                 "eventId": invitation.event_id,
                 "eventDescription": invitation.event.description,
                 "eventLocation": invitation.event.location,
-                "userConflicts": conflicts
+                "userConflicts": conflicts,
+                "eventIsRecurring": invitation.event.is_recurring
                 })
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'

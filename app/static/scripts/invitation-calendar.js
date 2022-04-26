@@ -299,6 +299,9 @@ function destroyInvitationCalendar() {
         cal.destroy();
         cal = null;
         timeblockAvailabilities = {};
+        reccuringUserConflicts = [];
+        renderedRange = [0, 0];
+        currentWeekOffset = 0;
     }
 }
 
