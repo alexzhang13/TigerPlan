@@ -6,3 +6,5 @@
 # Keep local database copies out of version control
 *.db
 config.py
+# Keep .DS_Store out
+.DS_Store
