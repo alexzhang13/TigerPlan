@@ -113,7 +113,9 @@
             console.log("response.redundant: ", response.redundant)
             if (!response.redundant) {
               makeNewMemberTableRow(response.memberName, response.memberNetid, memberId);
-              addMemberToSelection(memberId, response.memberNetid);
+              if (memberId != response.exclude_id) {
+                addMemberToSelection(memberId, response.memberNetid);
+              }
             }
           } else {
             addMemberBanner("Error fetching group", false);
@@ -147,10 +149,15 @@
             addMemberBanner("Error deleting", false);
             return;
           }
-
+          let netid = $('#memberRow')
           $('#memberRow' + uriMemberId).remove();
-          removeMemberFromSelection(memberId);
+          removeMemberFromSelection(memberId, false);
           addMemberBanner("Success!", true);
+
+          if ($('adminRow' + memberId) != undefined) {
+            $('#adminRow' + memberId).remove();
+            addMemberToSelection(memberId, response.old_member.netid)
+          }
         },
         error: function (error) {
           console.log(error);
