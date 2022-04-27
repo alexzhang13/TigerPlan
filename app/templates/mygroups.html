@@ -276,11 +276,11 @@
                                         {% if groups is defined and groups != '' %}
                                         {% for group in groups %}
                                             {% if this_group is defined and this_group == group %}
-                                            <a class="btn active btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
+                                            <a id="groupInfoButton{{group.id}}" class="btn active btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
                                                 onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
                                                 }}) </a>
                                             {% else %}
-                                            <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
+                                            <a id="groupInfoButton{{group.id}}" class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
                                                 onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
                                                 }}) </a>
                                             {% endif %}
@@ -409,7 +409,7 @@
         }
 
 
-        function loadAdminInfo(members, admins) {
+        function loadAdminInfo(members, admins, owner) {
             $('#adminTable tbody tr').remove()
             console.log("Cleared admin data.")
             let index = 0;
@@ -438,8 +438,13 @@
             index = 0;
             while (index < members.length) {
                 let member = members[index]
-                $('#selectNewGroupAdmin').append(new Option(member.netid, member.id));
-                $('#selectNewGroupOwner').append(new Option(member.netid, member.id));
+                if (member.id != owner) {
+                    // If the member is not an admin, add them to the add group admin select
+                    if (!$("#adminTable tr[id=adminRow" + member.id + "]").length) {
+                        $('#selectNewGroupAdmin').append(new Option(member.netid, member.id));
+                    }
+                    $('#selectNewGroupOwner').append(new Option(member.netid, member.id));
+                }
                 index += 1;
                 console.log("Loaded a potential admin / new oner.")
             }
@@ -462,11 +467,12 @@
                     success: function (response) {
                         if (!response.success) return;
                         console.log(response)
-                        let groupTitle = $('<h3>', { id: "thisGroupHeader", text: response.name, value: groupId });
+                        $('#thisGroupHeader').remove();
+                        let groupTitle = $('<h3>', { id: "thisGroupHeader", text: response.name, value: groupId, class: "px-4 py-2" });
                         $('#thisGroup').append(groupTitle);
                         loadMemberInfo(response.members, response.users);
                         loadEventsInfo(response.events);
-                        loadAdminInfo(response.members, response.admins);
+                        loadAdminInfo(response.members, response.admins, response.exclude_id);
                         $('#groupInfoToggle').attr('style', "display:block;");
                     },
                     error: function (error) {

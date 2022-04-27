@@ -166,7 +166,8 @@ def groupinfo():
                     admins = encodeUser(get_group_admin(groupId))
                     response_json = json.dumps({"success": True,
                         "users": users, "members": members, 
-                        "events": events, "admins": admins})
+                        "events": events, "admins": admins,
+                        "exclude_id": user.id, "name": group.name})
                     response = make_response(response_json)
                     response.headers['Content-Type'] = 'application/json'
                     return response
@@ -332,8 +333,10 @@ def remove_member():
             group = get_group(group_id)
             if (user.id != group.owner_id):
                 raise Exception("User is not group owner.")
+            old_member = get_user_from_id(member_id)
             success = delete_member(group_id, member_id)
-            response = make_response(json.dumps({"success":success}))
+            response = make_response(json.dumps({"success":success, 
+                "old_member": encodeUser(old_member)}))
         except Exception as ex:
             print("An exception occured at '/remove_member':", ex)
             response_json = json.dumps({"success":False})
@@ -364,7 +367,8 @@ def add_new_member():
             member = get_user_from_id(member_id)
             response_json = json.dumps({"success": True,
                 "redundant": redudant, "memberName": member.name, 
-                "memberNetid": member.netid})
+                "memberNetid": member.netid, 
+                "exclude_id": member.id == group.owner_id})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
@@ -402,7 +406,7 @@ def change_ownership():
         title='Login to TigerResearch')
 
 # ----------------------- ADD GROUP OFFICER ------------------------- #
-@bp.route("/add_group_admin", methods=['GET'])
+@bp.route("/add_group_admin", methods=['POST'])
 def add_group_admin():
     if check_user_validity():
         try:
@@ -412,15 +416,16 @@ def add_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            success = add_admin(groupid=groupId, newAdminId=member)
-            new_admin = get_user_from_id(member)
-            response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
+            else:
+                success = add_admin(groupid=groupId, newAdminId=member)
+                new_admin = get_user_from_id(member)
+                response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
         except Exception as ex:
             print("An exception occured at '/add_group_admin':", ex)
-            response_json = json.dumps({"success":False})
+            response_json = json.dumps({"success":False, "isOwner": False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
@@ -436,11 +441,12 @@ def remove_group_admin():
             user = get_user_from_netid(session['username'])
             groupId = request.args.get('group')
             group = get_group(groupId)
-            member = request.args.get('member')
+            memberId = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            success = delete_admin(groupid=groupId, newAdminId=member)
-            response_json = json.dumps({"success":success})
+            old_admin = get_user_from_id(memberId)
+            success = delete_admin(groupid=groupId, newAdminId=memberId)
+            response_json = json.dumps({"success":success, "old_admin": encodeUser(old_admin)})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response

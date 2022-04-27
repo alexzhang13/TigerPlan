@@ -96,8 +96,8 @@
       }
     }
 
-    function removeMemberFromSelection(memberid) {
-      if ($("#selectNewGroupOwner option[value=" + memberid + "]").length) {
+    function removeMemberFromSelection(memberid, is_new_admin) {
+      if (!is_new_admin && $("#selectNewGroupOwner option[value=" + memberid + "]").length) {
         $("#selectNewGroupOwner option[value=" + memberid + "]").remove();
       }
       if ($("#selectNewGroupAdmin option[value=" + memberid + "]").length) {
@@ -125,12 +125,12 @@
 
     function addAdminBanner(message, success) {
       let banner = $('<div>', { text: message });
-      banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+      banner.addClass("alert alert-" + (success ? "success" : "warning"));
       banner.appendTo("#addAdminResponse");
       setTimeout(function () {
         banner.hide(1000);
         setTimeout(function () {
-          banner.remove()
+          banner.remove();
         }, 1000);
       }, 3000);
       return;
@@ -147,19 +147,25 @@
   
       if (addAdminRequest != null)
         addAdminRequest.abort();
-  
+      
       // TODO: Ajax to update the admin table without refresh, banners
       addAdminRequest = $.ajax(
         {
-          type: 'GET',
+          type: 'POST',
           url: url,
           success: function(response) {
+            console.log(response)
             if (!response.success) {
-              addAdminBanner("An error occurred.", false);
+              addAdminBanner(response.isOwner ? "Group owner can not be a group admin." : "An error occurred.", false);
+              return;
             }
-            if (response.admin.name === null) { response.admin.name = "None"; }
+            if (response.admin.name === undefined) { response.admin.name = "None"; }
             addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);
+            removeMemberFromSelection(response.admin.id, true);
             addAdminBanner("Success!", true);
+          },
+          error: function(response) {
+            addAdminBanner("An error occurred.", false);
           }
         }
       );
@@ -184,8 +190,10 @@
           success: function(response) {
             if (!response.success) {
               addAdminBanner("An error occurred.", false);
+              return;
             }
             $('#adminRow' + adminId).remove();
+            addMemberToSelection(adminId, response.old_admin.netid);
             addAdminBanner("Success! Admin was removed.", true);
           }
         }
