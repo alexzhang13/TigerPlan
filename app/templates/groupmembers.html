@@ -157,11 +157,7 @@
             console.log("added member to select")
           }
           addMemberBanner("Success!", true);
-
-          if ($('adminRow' + memberId) != undefined) {
-            $('#adminRow' + memberId).remove();
-            addMemberToSelection(memberId, response.old_member.netid)
-          }
+          $('#adminRow' + memberId).remove();
         },
         error: function (error) {
           console.log(error);
