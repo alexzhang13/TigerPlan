@@ -1,11 +1,22 @@
 <div class="card">
     <div id="thisGroup"></div>
-    <div class="card-header" style=" color: white !important; background-color: #cb0c9f !important;">
-    <ul class="nav nav-tabs card-header-tabs m-0" id="groupTab">
-        <li class="nav-item active px-3"><a data-target="#members" data-toggle="tab">Manage Members</a></li>
-        <li class="nav-item px-3"><a data-target="#events" data-toggle="tab">View Events</a></li>
-        <li class="nav-item px-3"><a data-target="#settings" data-toggle="tab">Admin</a></li>
-    </ul>
+    <div class="nav-wrapper position-relative end-0">
+        <ul class="nav nav-pills nav-fill p-1" style="background: #f7f7f7" id="groupTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1 active show" data-target="#members" href="#" data-toggle="tab" aria-expanded="true">
+                    <strong style="color:black">Manage Members</strong></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1" data-target="#events" href="#" data-toggle="tab">
+                    <strong style="color:black">View Events</strong>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link mb-0 px-0 py-1" data-target="#settings" href="#" data-toggle="tab">
+                    <strong style="color:black">Admin</strong>
+                </a>
+            </li>
+        </ul>
     </div>
     <div class = "tab-content">
         <div class="tab-pane active" id="members">
@@ -18,7 +29,7 @@
         <div class="tab-pane" id="events">
             <div class="card-body">
                 <div class="container">
-                    <p class="card-text"><strong>View Events</strong><br>View details for your group's events all in one place! Click on an event to view details.</p>
+                    <p class="card-text"><strong style="color:black">View Events</strong><br>View details for your group's events all in one place! Click on an event to view details.</p>
                     <div id="eventContainer" class="btn-group-vertical d-flex justify-content-center"></div>
                 </div>
             </div>

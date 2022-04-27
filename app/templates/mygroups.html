@@ -41,6 +41,7 @@
     <link href="{{ url_for('static', filename='css/nucleo-svg.css ') }}" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ url_for('static', filename='css/soft-ui-dashboard.css') }}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
@@ -54,7 +55,7 @@
             </a>
         </div>
         <hr class="horizontal dark mt-0">
-        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+        <div class="collapse navbar-collapse  w-auto " style="height: 100%" id="sidenav-collapse-main">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="{{ url_for('main.index') }}">
@@ -83,9 +84,35 @@
                         <span class="nav-link-text ms-1">Home</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
-                    <a class="nav-link  " href="{{ url_for('main.dashboard') }}"">
+                    <!-- TODO: UI Please change this icon :,) -->
+                    <a class="nav-link" href="{{ url_for('main.editconflicts') }}">
+                        <div class=" icon icon-shape icon-sm shadow border-radius-md bg-white
+                                        text-center me-2 d-flex align-items-center justify-content-center">
+                            <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink">
+                                <title>office</title>
+                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g transform="translate(-1869.000000, -293.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                                        <g transform="translate(1716.000000, 291.000000)">
+                                            <g id="office" transform="translate(153.000000, 2.000000)">
+                                                <path class="color-background opacity-6"
+                                                    d="M12.25,17.5 L8.75,17.5 L8.75,1.75 C8.75,0.78225 9.53225,0 10.5,0 L31.5,0 C32.46775,0 33.25,0.78225 33.25,1.75 L33.25,12.25 L29.75,12.25 L29.75,3.5 L12.25,3.5 L12.25,17.5 Z">
+                                                </path>
+                                                <path class="color-background"
+                                                    d="M40.25,14 L24.5,14 C23.53225,14 22.75,14.78225 22.75,15.75 L22.75,38.5 L19.25,38.5 L19.25,22.75 C19.25,21.78225 18.46775,21 17.5,21 L1.75,21 C0.78225,21 0,21.78225 0,22.75 L0,40.25 C0,41.21775 0.78225,42 1.75,42 L40.25,42 C41.21775,42 42,41.21775 42,40.25 L42,15.75 C42,14.78225 41.21775,14 40.25,14 Z M12.25,36.75 L7,36.75 L7,33.25 L12.25,33.25 L12.25,36.75 Z M12.25,29.75 L7,29.75 L7,26.25 L12.25,26.25 L12.25,29.75 Z M35,36.75 L29.75,36.75 L29.75,33.25 L35,33.25 L35,36.75 Z M35,29.75 L29.75,29.75 L29.75,26.25 L35,26.25 L35,29.75 Z M35,22.75 L29.75,22.75 L29.75,19.25 L35,19.25 L35,22.75 Z">
+                                                </path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+                        <span class="nav-link-text ms-1">Edit Conflicts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link  " href="{{ url_for('main.dashboard') }}">
                         <div
                             class=" icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex
                         align-items-center justify-content-center">
@@ -275,36 +302,44 @@
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">My Owned Groups</p>
                                         {% if groups is defined and groups != '' %}
                                         {% for group in groups %}
-                                            {% if this_group is defined and this_group == group %}
-                                            <a id="groupInfoButton{{group.id}}" class="btn active btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                                onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
-                                                }}) </a>
-                                            {% else %}
-                                            <a id="groupInfoButton{{group.id}}" class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                                onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
-                                                }}) </a>
-                                            {% endif %}
+                                        {% if this_group is defined and this_group == group %}
+                                        <a id="groupInfoButton{{group.id}}"
+                                            class="btn active btn-outline-primary btn-sm w-100 mb-0"
+                                            style="margin: 9px 0 5px;" onclick="showGroupInfo('{{group.id}}')"> {{
+                                            group.name }}</a>
+                                        {% else %}
+                                        <a id="groupInfoButton{{group.id}}"
+                                            class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
+                                            onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} </a>
+                                        {% endif %}
                                         {% endfor %}
                                         {% else %}
-                                            <p class="text-sm mb-0">You do not have any owned groups.</p>
+                                        <p class="text-sm mb-0">You do not have any owned groups.</p>
                                         {% endif %}
                                         <br>
-                                        <p class="text-sm mb-0 pt-3 text-capitalize font-weight-bold">My Shared Groups</p>
+                                        <p class="text-sm mb-0 pt-3 text-capitalize font-weight-bold">My Shared Groups
+                                        </p>
                                         {% if admin_groups is defined and admin_groups|length != 0 %}
-                                            {% for admin_group in admin_groups %}
-                                                <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) <br> (* Event privileges only *)</a>
-                                            {% endfor %}
+                                        {% for admin_group in admin_groups %}
+                                        <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;">
+                                            {{ admin_group.name }} <br> (* Event privileges
+                                            only *)</a>
+                                        {% endfor %}
                                         {% else %}
-                                            <p class="text-sm mb-0">You do not have any shared groups.</p>
+                                        <p class="text-sm mb-0">You do not have any shared groups.</p>
                                         {% endif %}
                                     </div>
                                     <br>
                                     <div class="card mt-3 mb-3 p-3 border" style="border-color: #cb0c9f !important;">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Create New Group</p>
-                                        <p class="text-secondary font-weight-bold text-sm mt-2 mb-3">Please specify a name for your new group.</p>
+                                        <p class="text-secondary font-weight-bold text-sm mt-2 mb-3">Please specify a
+                                            name for your new group.</p>
                                         <div>
-                                            <input type="text" name="newGroupName" id="NewGroupName" class="form-control" placeholder="Group Name" autofocus>
-                                            <button id="createNewGroup" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Create Group</button>
+                                            <input type="text" name="newGroupName" id="NewGroupName"
+                                                class="form-control" placeholder="Group Name" autofocus>
+                                            <button id="createNewGroup"
+                                                class="btn btn-outline-default btn-sm w-100 mb-0"
+                                                style="margin: 9px 0 5px;">Create Group</button>
                                         </div>
                                         <span id="groupCreationResponse"></span>
 
@@ -322,13 +357,13 @@
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
                     <div class="row">
-                            <div id="groupInfoToggle" style="display:none;">
-                                <h3 id="groupNameHeader"></h3>
-                                {% include 'managegrouptab.html' %}
-                            </div>
-                            <div id="selectGroupToggle" style="display:none;">
-                                <h5>Please select a group.</h5>
-                            </div>
+                        <div id="groupInfoToggle" style="display:none;">
+                            <h3 id="groupNameHeader"></h3>
+                            {% include 'managegrouptab.html' %}
+                        </div>
+                        <div id="selectGroupToggle" style="display:none;">
+                            <h5>Please select a group.</h5>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -348,17 +383,16 @@
                 let member = members[index]
                 let tableRow = $('<tr>');
                 if (member.name === null) {
-                // default name
-                member.name = "None";
+                    // default name
+                    member.name = "None";
                 }
-                tableRow.append($('<td>', { text: member.name }));
-                tableRow.append($('<td>', { text: member.netid }));
+                tableRow.append($('<td>', { text: "   " + member.netid }));
                 tableRow.attr('id', "memberRow" + member.id);
                 let deleteUserTd = $('<td>');
-                let deleteUserButton = $('<a>', { text: "Remove member"});
+                let deleteUserButton = $('<a>', { text: "Remove member" });
                 deleteUserButton.attr('onclick', "removeMember(" + member.id + ")");
-                deleteUserButton.attr('class', "btn btn-outline-default btn-sm mb-0")
-                deleteUserButton.attr('style', "margin: 9px 0 5px;")
+                deleteUserButton.attr('class', "btn btn-outline-danger btn-sm mb-0")
+                deleteUserButton.attr('style', "margin: 0px 0 0px;")
                 deleteUserTd.append(deleteUserButton);
                 tableRow.append(deleteUserTd);
                 $('#membersTable').append(tableRow);
@@ -386,24 +420,25 @@
             while (index < events.length) {
                 let event = events[index]
                 let eventCard = $('<div>');
-                
+
                 eventCard.attr('class', "card");
+                eventCard.css('width','100%');
                 let cardHeader = $('<div>', { text: event.name });
                 cardHeader.attr('class', "card-header p-2 text-center");
-                cardHeader.attr('style', " color: white !important; background-color: #850b68 !important;");
+                cardHeader.attr('style', " color: black !important; background-color: #ADD8E6 !important;");
                 let cardBody = $('<div>');
                 cardBody.attr('class', "card-body");
-                let location = $('<div>', { text: "Location:" + event.location });
-                location.attr('class', "card-text font-weight-light");
-                let description = $('<div>', { text: event.description });
+                let location = $('<div>', { text: "Location: " + event.location });
+                location.attr('class', "card-text");
+                let description = $('<div>', { text: "Description: " + event.description });
                 description.attr('class', "card-text");
 
                 // Construct card
                 cardBody.append(location);
                 cardBody.append(description);
-                cardBody.append($('<br>'));
                 eventCard.append(cardHeader);
                 eventCard.append(cardBody);
+                eventCard.css('margin-bottom', '10px');
                 $('#eventContainer').append(eventCard);
                 index += 1;
             }
@@ -418,17 +453,13 @@
             while (index < admins.length) {
                 let admin = admins[index]
                 let tableRow = $('<tr>');
-                if (admin.name === null) {
-                    admin.name = "None";
-                }
-                tableRow.append($('<td>', { text: admin.name }));
                 tableRow.append($('<td>', { text: admin.netid }));
                 tableRow.attr('id', "adminRow" + admin.id);
                 let deleteAdminTd = $('<td>');
-                let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
+                let deleteAdminButton = $('<a>', { text: "Remove admin privileges" });
                 deleteAdminButton.attr('onclick', "removeAdmin(" + admin.id + ")");
-                deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
-                deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+                deleteAdminButton.attr('class', "btn btn-outline-info btn-sm mb-0")
+                deleteAdminButton.attr('style', "margin: 0px 0 0px;")
                 deleteAdminTd.append(deleteAdminButton);
                 tableRow.append(deleteAdminTd);
                 $('#adminTable').append(tableRow);
@@ -458,7 +489,7 @@
             let url = '/mygroupinfo?groupId=' + groupId
 
             if (groupTabRequest != null)
-            groupTabRequest.abort();
+                groupTabRequest.abort();
 
             console.log("group Tab Request")
 
@@ -485,190 +516,7 @@
         }
 
     </script>
-
-
-    </div>
-    <!-- TODO: UI what is this??? -->
-    <script>
-        var ctx = document.getElementById("chart-bars").getContext("2d");
-
-        new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Sales",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    borderSkipped: false,
-                    backgroundColor: "#fff",
-                    data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
-                    maxBarThickness: 6
-                },],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                        },
-                        ticks: {
-                            suggestedMin: 0,
-                            suggestedMax: 500,
-                            beginAtZero: true,
-                            padding: 15,
-                            font: {
-                                size: 14,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                            color: "#fff"
-                        },
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false
-                        },
-                        ticks: {
-                            display: false
-                        },
-                    },
-                },
-            },
-        });
-
-
-        var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-        var gradientStroke1 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke1.addColorStop(1, 'rgba(203,12,159,0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(203,12,159,0)'); //purple colors
-
-        var gradientStroke2 = ctx2.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
-        gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
-        gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
-
-        new Chart(ctx2, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#cb0c9f",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke1,
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                },
-                {
-                    label: "Websites",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#3A416F",
-                    borderWidth: 3,
-                    backgroundColor: gradientStroke2,
-                    fill: true,
-                    data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
-                    maxBarThickness: 6
-                },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#b2b9bf',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#b2b9bf',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                },
-            },
-        });
-    </script>
-    <script>
-        var win = navigator.platform.indexOf('Win') > -1;
-        if (win && document.querySelector('#sidenav-scrollbar')) {
-            var options = {
-                damping: '0.5'
-            }
-            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
-        }
-    </script>
-
+    
     <!-- Script to create a new group -->
     <script>
 
@@ -712,7 +560,7 @@
                         if (response.success) {
                             document.location.reload();
                         } else {
-                            addBanner("An error occured", false);                            
+                            addBanner("An error occured", false);
                         }
                     },
                     error: function (response) {
@@ -735,23 +583,8 @@
     <!--   Core JS Files   -->
     <script src="{{ url_for('static', filename='scripts/core/popper.min.js') }}"></script>
 
-    <!-- Plugin for the charts, full documentation here: https://www.chartjs.org/ -->
-    <script src="{{ url_for('static', filename='scripts/plugins/chartjs.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/plugins/Chart.extension.js') }}"></script>
-
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="{{ url_for('static', filename='scripts/soft-ui-dashboard.min.js') }}"></script>
-
-    <footer class="site-footer">
-        <div class="container fixed-bottom">
-            <hr>
-            <div class="row flex-shrink-0">
-                <div class="col-md-12">
-                    <h5 style="font-size: 15px;">TigerPlan 2022</h5>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
 

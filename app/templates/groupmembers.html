@@ -26,24 +26,22 @@
 }
 </style>
 
-<p class="card-text"><strong>Group Members</strong><br>View existing members by name and netid. To remove a member, click the remove icon to the right of their netid.</p>
+<p class="card-text"><strong style="color:black">Group Members</strong><br>View existing members by netid. To remove a member, click the remove icon to the right of their netid.</p>
 <div class="container border rounded pt-2">
     <table class="table" id="membersTable">
     <thead class="thead-dark">
         <tr>
-        <th>Name</th>
         <th>Netid</th>
-        <th></th>
         </tr>
     </thead>
     </table>
 </div>
 <br>
-<p class="card-text"><strong>Add Group Members</strong><br>To add a member to your group, select their netid from the dropdown and click Add Member.</p>
+<p class="card-text"><strong style="color:black">Add Group Members</strong><br>To add a member to your group, select their netid from the dropdown and click Add Member.</p>
 <div class="container">
-  <select id="selectNewGroupMember" class="form-select select2 form-select-md">
+  <select id="selectNewGroupMember" class="form-select select2 form-select-md" style="width: 100%">
   </select>
-  <a id="addNewMember" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
+  <a id="addNewMember" class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Member</a>
   <span id = "groupMembersResponse"></span>
 </div>
 
@@ -56,20 +54,15 @@
 
   'use strict';
 
-  function makeNewMemberTableRow(memberName, memberNetid, memberId) {
+  function makeNewMemberTableRow(memberNetid, memberId) {
     let tableRow = $('<tr>');
-    if (memberName === null) {
-      // default name
-      memberName = "None";
-    }
-    tableRow.append($('<td>', { text: memberName }));
-    tableRow.append($('<td>', { text: memberNetid }));
+    tableRow.append($('<td>', { text: "   " + memberNetid }));
     tableRow.attr('id', "memberRow" + memberId);
     let deleteUserTd = $('<td>');
     let deleteUserButton = $('<a>', { text: "Remove member"});
     deleteUserButton.attr('onclick', "removeMember(" + memberId + ")");
-    deleteUserButton.attr('class', "btn btn-outline-default btn-sm mb-0")
-    deleteUserButton.attr('style', "margin: 9px 0 5px;")
+    deleteUserButton.attr('class', "btn btn-outline-danger btn-sm mb-0")
+    deleteUserButton.attr('style', "margin: 0px 0 0px;")
     deleteUserTd.append(deleteUserButton);
     tableRow.append(deleteUserTd);
     $('#membersTable').append(tableRow);
@@ -109,7 +102,7 @@
           if (response.success) {
             addMemberBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
             if (!response.redundant) {
-              makeNewMemberTableRow(response.memberName, response.memberNetid, memberId);
+              makeNewMemberTableRow(response.memberNetid, memberId);
               $('#selectNewGroupMember option[value=' + memberId + ']').remove();
               console.log("removed member from select")
               if (memberId != response.exclude_id) {

@@ -1,4 +1,4 @@
-<p class="card-text"><strong>Manage Group Administrators</strong><br>
+<p class="card-text"><strong style="color:black">Manage Group Administrators</strong><br>
   Add group administrators from the list of existing members to give them event scheduling privileges. 
   Administrators can create, update, and delete group events bur cannot access or change group members.
 </p>
@@ -7,7 +7,6 @@
 <table class="table" id="adminTable">
   <thead class="thead-dark">
     <tr>
-      <th>Name</th>
       <th>Netid</th>
     </tr>
   </thead>
@@ -16,7 +15,7 @@
 <br>
 <br>
 
-<p class="card-text"><strong>Add Group Admin</strong><br>
+<p class="card-text"><strong style="color:black">Add Group Admin</strong><br>
   Specifying a user as a group administrator allows them to create and manage events for your group. Events 
   that you create will still only be editable by you. Group administrators do not have access to view the list 
   of members or change administrator privileges. 
@@ -24,38 +23,38 @@
 <div>
   <select id="selectNewGroupAdmin" class="form-select form-select-md">
   </select> 
-  <a id="addAdmin" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Admin</a>
+  <a id="addAdmin" class="btn btn-outline-info btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Admin</a>
   <span id="addAdminResponse"></span>
 </div>
 <br>
 <br>
 
-<p class="card-text"><strong>Transfer Ownership</strong><br>
+<p class="card-text"><strong style="color:black">Transfer Ownership</strong><br>
   To transfer ownership of this group, select the new owner from the dropdown menu. Transferring
   owership will transfer all admin privileges. Ownership of existing events will not be transferred.
 </p>
 <div>
   <select id="selectNewGroupOwner" class="form-select form-select-md">
   </select> 
-  <a id="changeOwner" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Transfer Ownership</a>
+  <a id="changeOwner" class="btn btn-outline-danger btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Transfer Ownership</a>
 </div>
 <br>
 <br>
 
-<p class="card-text"><strong>Rename Group</strong></p>
+<p class="card-text"><strong style="color:black">Rename Group</strong></p>
 <form action="" method="get">
     <div>
         <input type="text" id="UpdateGroupName" class="form-control" placeholder="Enter New Group Name" autofocus>
-        <a id="changeGroupName" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Rename Group</a>
+        <a id="changeGroupName" class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Rename Group</a>
     </div>
 </form>
 <br>
 <br>
 
-<p class="card-text"><strong>Delete Group</strong><br>
+<p class="card-text"><strong style="color:black">Delete Group</strong><br>
   Deleting this group will also permanently delete all its related events, invitation responses, and any pending invitations.
 </p>
-<a id="deleteGroupButton" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Delete Group</a>
+<a id="deleteGroupButton" class="btn btn-danger btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Delete Group</a>
 
 
 <script>
@@ -105,19 +104,15 @@
       }
     }
 
-    function addAdminTableRow(adminName, adminNetid, adminId) {
+    function addAdminTableRow(adminNetid, adminId) {
       let tableRow = $('<tr>');
-      if (adminName === null) {
-          adminName = "None";
-      }
-      tableRow.append($('<td>', { text: adminName }));
       tableRow.append($('<td>', { text: adminNetid }));
       tableRow.attr('id', "adminRow" + adminId);
       let deleteAdminTd = $('<td>');
       let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
       deleteAdminButton.attr('onclick', "removeAdmin(" + adminId + ")");
-      deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
-      deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+      deleteAdminButton.attr('class', "btn btn-outline-info btn-sm mb-0")
+      deleteAdminButton.attr('style', "margin: 0px 0 0px;")
       deleteAdminTd.append(deleteAdminButton);
       tableRow.append(deleteAdminTd);
       $('#adminTable').append(tableRow);
@@ -159,8 +154,7 @@
               addAdminBanner(response.isOwner ? "Group owner can not be a group admin." : "An error occurred.", false);
               return;
             }
-            if (response.admin.name === undefined) { response.admin.name = "None"; }
-            addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);
+            addAdminTableRow(response.admin.netid, response.admin.id);
             removeMemberFromSelection(response.admin.id, true);
             addAdminBanner("Success!", true);
           },

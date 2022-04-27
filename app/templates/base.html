@@ -3,7 +3,7 @@
 
 <head>
     <!-- <meta charset="utf-8"> -->
-    
+
     <!-- Original -->
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
 
@@ -88,11 +88,12 @@
     <link href="{{ url_for('static', filename='css/nucleo-svg.css ') }}" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ url_for('static', filename='css/soft-ui-dashboard.css') }}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
 <body class="g-sidenav-show  bg-gray-100">
-  
-<!-- <body style="background-color:rgb(255,255,255);"> -->
+
+    <!-- <body style="background-color:rgb(255,255,255);"> -->
     {% block content %} {% endblock %}
     <footer class="site-footer">
         <div class="container fixed-bottom">
@@ -104,7 +105,7 @@
             </div>
         </div>
     </footer>
-        
+
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/calendar.css') }}" rel="stylesheet">
