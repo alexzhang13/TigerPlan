@@ -264,16 +264,19 @@ def add_custom_group():
         title='Login to TigerResearch')
 
 # -------------------------- DELETE GROUP --------------------------- # TODO: change to POST
-@bp.route("/del_group/<id>", methods=['POST', 'GET'])
-def del_group(id):
+@bp.route("/del_group", methods=['POST'])
+def del_group():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            group = get_group(id)
+            group_id = request.args.get('group')
+            group = get_group(group_id)
             if user.id != group.owner_id:
                 raise Exception("User is not group owner.")
-            delete_group(id) 
-            return redirect("/mygroups")
+            success = delete_group(group_id) 
+            response = make_response(json.dumps({"success":success}))
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/del_group':", ex)
             response_json = json.dumps({"success":False})
@@ -401,8 +404,11 @@ def remove_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            delete_admin(groupid=groupId, newAdminId=member)
-            return redirect("/mygroups?groupId=" + groupId)
+            success = delete_admin(groupid=groupId, newAdminId=member)
+            response_json = json.dumps({"success":success})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/remove_group_admin':", ex)
             response_json = json.dumps({"success":False})

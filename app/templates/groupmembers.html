@@ -78,7 +78,7 @@
 
   function addMemberBanner(message, success) {
     let banner = $('<div>', { text: message });
-    banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+    banner.addClass("alert alert-" + (success ? "success" : "warning"));
     banner.appendTo("#groupMembersResponse");
     console.log('group members banner should appear');
     setTimeout(function () {
@@ -110,6 +110,7 @@
           let banner;
           if (response.success) {
             addMemberBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
+            console.log("response.redundant: ", response.redundant)
             if (!response.redundant) {
               makeNewMemberTableRow(response.memberName, response.memberNetid, memberId);
               addMemberToSelection(memberId, response.memberNetid);

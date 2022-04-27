@@ -55,7 +55,7 @@
 <p class="card-text"><strong>Delete Group</strong><br>
   Deleting this group will also permanently delete all its related events, invitation responses, and any pending invitations.
 </p>
-<a class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;" href="">Delete Group</a>
+<a id="deleteGroupButton" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Delete Group</a>
 
 
 <script>
@@ -80,6 +80,9 @@
         {
           type: 'POST',
           url: url,
+          success: function(success) {
+            document.location.reload();
+          }
         }
       );
     }
@@ -154,10 +157,36 @@
             if (!response.success) {
               addAdminBanner("An error occurred.", false);
             }
-            console.log(response)
             if (response.admin.name === null) { response.admin.name = "None"; }
             addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);
             addAdminBanner("Success!", true);
+          }
+        }
+      );
+    }
+
+    let removeAdminRequest = null;
+    function removeAdmin(adminId) {
+      let thisGroup = $('#thisGroupHeader').attr('value');
+      adminId = encodeURIComponent(adminId);
+  
+      let url = '/remove_group_admin?group=' + thisGroup
+      url += '&member=' + adminId
+  
+      if (removeAdminRequest != null)
+        removeAdminRequest.abort();
+  
+      // TODO: Ajax to update the admin table without refresh, banners
+      removeAdminRequest = $.ajax(
+        {
+          type: 'POST',
+          url: url,
+          success: function(response) {
+            if (!response.success) {
+              addAdminBanner("An error occurred.", false);
+            }
+            $('#adminRow' + adminId).remove();
+            addAdminBanner("Success! Admin was removed.", true);
           }
         }
       );
@@ -167,7 +196,7 @@
     function changeName() {
       let name = $('#UpdateGroupName').val();
       name = encodeURIComponent(name);
-      thisGroup = $('#thisGroupHeader').attr('value');
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
       let url = '/change_group_name?group=' + thisGroup
       url += '&name=' + name
@@ -179,14 +208,37 @@
         {
           type: 'POST',
           url: url,
+          success: function(response) {
+            document.location.reload();
+          }
         }
       );
+    }
+
+    let removeGroupRequest = null;
+    function removeGroup() {
+      let thisGroup = $('#thisGroupHeader').attr('value');
+      let url = '/del_group?group=' + thisGroup
+
+      if (removeGroupRequest != null)
+        removeGroupRequest.abort();
+
+      removeGroupRequest = $.ajax(
+        {
+          type: 'POST',
+          url: url,
+          success: function(response) {
+            document.location.reload()
+          }
+        }
+      )
     }
   
     function setup() {
       $('#changeOwner').on('click', changeOwner);
       $('#changeGroupName').on('click', changeName);
       $('#addAdmin').on('click', addGroupAdmin)
+      $('#deleteGroupButton').on('click', removeGroup);
     }
   
     $('document').ready(setup);
