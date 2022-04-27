@@ -370,7 +370,9 @@
             index = 0;
             while (index < users.length) {
                 let user = users[index]
-                $('#selectNewGroupMember').append(new Option(user.netid, user.id));
+                if (!$("#membersTable tr[id=memberRow" + user.id + "]").length) {
+                    $('#selectNewGroupMember').append(new Option(user.netid, user.id));
+                }
                 index += 1;
                 console.log("Loaded a user.")
             }

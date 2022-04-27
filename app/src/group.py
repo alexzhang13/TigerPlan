@@ -63,10 +63,10 @@ def add_member(id: int, memberId: int) -> bool:
 def delete_member(id: int, memberId: int) -> bool:
     del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).first()
     if (del_mem_group is None):
-        return
+        return True
     db.session.delete(del_mem_group)
     db.session.commit()
-    return del_mem_group.id == None
+    return db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).first() == None
     
 def get_members(groupid: int) -> User:
     '''Get the group's members. Returns a list of users.'''

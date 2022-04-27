@@ -73,14 +73,12 @@
     deleteUserTd.append(deleteUserButton);
     tableRow.append(deleteUserTd);
     $('#membersTable').append(tableRow);
-    console.log("Table row")
   }
 
   function addMemberBanner(message, success) {
     let banner = $('<div>', { text: message });
     banner.addClass("alert alert-" + (success ? "success" : "warning"));
     banner.appendTo("#groupMembersResponse");
-    console.log('group members banner should appear');
     setTimeout(function () {
       banner.hide(1000);
       setTimeout(function () {
@@ -110,9 +108,10 @@
           let banner;
           if (response.success) {
             addMemberBanner(response.redundant ? response.memberNetid + " is already in group!" : "Success!", !response.redundant);
-            console.log("response.redundant: ", response.redundant)
             if (!response.redundant) {
               makeNewMemberTableRow(response.memberName, response.memberNetid, memberId);
+              $('#selectNewGroupMember option[value=' + memberId + ']').remove();
+              console.log("removed member from select")
               if (memberId != response.exclude_id) {
                 addMemberToSelection(memberId, response.memberNetid);
               }
@@ -144,14 +143,19 @@
         type: 'POST',
         url: url,
         success: function (response) {
+          console.log(response)
           let banner;
           if (!response.success) {
             addMemberBanner("Error deleting", false);
             return;
           }
-          let netid = $('#memberRow')
           $('#memberRow' + uriMemberId).remove();
           removeMemberFromSelection(memberId, false);
+          if (!$('#selectNewGroupMember option[value=' + memberId + ']').length) {
+            console.log("member does not exist in select")
+            $('#selectNewGroupMember').append(new Option(response.old_member.netid, memberId));
+            console.log("added member to select")
+          }
           addMemberBanner("Success!", true);
 
           if ($('adminRow' + memberId) != undefined) {
