@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
 from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_users
@@ -299,20 +300,18 @@ def remove_member():
             if (user.id != group.owner_id):
                 raise Exception("User is not group owner.")
             old_member = get_user_from_id(member_id)
+            if old_member is None:
+                raise Exception("User was not found.")
             success = delete_member(group_id, member_id)
-            response = make_response(json.dumps({"success":success, 
-                "old_member": encodeUser(old_member)}))
+            response = make_response(json.dumps({"success":success, "old_member": encodeUser(old_member)}))
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/remove_member':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
-
-        response_json = json.dumps({"success":True})
-        response = make_response(response_json)
-        response.headers['Content-Type'] = 'application/json'
-        return response
 
     return render_template("login.html", 
         title='Login to TigerPlan')
