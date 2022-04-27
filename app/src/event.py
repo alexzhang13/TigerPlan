@@ -10,13 +10,14 @@ from app import db, login
 
 #---------------------------- CRUD Functions -------------------------#
 
-def create_event(name: str, owner: User, location: str, description: str, groupid: int, timeblocks) -> Event:
+def create_event(name: str, owner: User, location: str, description: str, groupid: int, timeblocks, is_recurring: bool = False) -> Event:
     """Create an event. Returns created event."""
     new_event = Event(group_id=groupid, 
                       name=name,
                       owner_id=owner.id,
                       location=location,
-                      description=description)
+                      description=description,
+                      is_recurring=is_recurring)
     db.session.add(new_event)
     
     # make sure id is accessable
@@ -26,7 +27,9 @@ def create_event(name: str, owner: User, location: str, description: str, groupi
         start = datetime.fromisoformat(timeblock['start']['_date'][:-1])
         end = datetime.fromisoformat(timeblock['end']['_date'][:-1])
         name = timeblock['name']
-        _ = create_event_timeblock(eventId=new_event.id, start=start, end=end, name=name, isconflict=False, commit=False)
+        _ = create_event_timeblock(eventId=new_event.id, start=start, 
+            end=end, name=name, isconflict=False, 
+            is_recurring=is_recurring, commit=False)
 
     db.session.commit()
     return new_event

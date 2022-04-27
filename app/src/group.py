@@ -49,13 +49,11 @@ def delete_group(id: int) -> bool:
 def add_member(id: int, memberId: int) -> bool:
     '''Makes a user a member of a group. If the user is already a
     member, do nothing and return false. Otherwise, return true.'''
-    group = get_group(id)
-    user = get_user_from_id(memberId)
 
-    for mem_group in user.groups:
-        if group.id == mem_group.group_id:
-            print("User", memberId, "is already a part of group", id)
-            return False
+    redundant = db.session.query(Member_Group).filter(Member_Group.group_id==id, Member_Group.member_id==memberId).first()
+    if redundant is not None:
+        print("User", memberId, "is already a part of group", id)
+        return False
 
     new_mem_group = Member_Group(member_id=memberId, group_id=id)
     db.session.add(new_mem_group)
@@ -65,10 +63,10 @@ def add_member(id: int, memberId: int) -> bool:
 def delete_member(id: int, memberId: int) -> bool:
     del_mem_group = db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).first()
     if (del_mem_group is None):
-        return
+        return True
     db.session.delete(del_mem_group)
     db.session.commit()
-    return del_mem_group.id == None
+    return db.session.query(Member_Group).filter(Member_Group.group_id == id, Member_Group.member_id==memberId).first() == None
     
 def get_members(groupid: int) -> User:
     '''Get the group's members. Returns a list of users.'''

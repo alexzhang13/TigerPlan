@@ -275,27 +275,31 @@
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">My Owned Groups</p>
                                         {% if groups is defined and groups != '' %}
                                         {% for group in groups %}
-                                        {% if this_group is defined and this_group == group %}
-                                        <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                            href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id
-                                            }}) </a>
-                                        {% else %}
-                                        <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
-                                            href="mygroups?groupId={{ group.id }}"> {{ group.name }} (ID# {{ group.id
-                                            }}) </a>
-                                        {% endif %}
+                                            {% if this_group is defined and this_group == group %}
+                                            <a id="groupInfoButton{{group.id}}" class="btn active btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
+                                                onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
+                                                }}) </a>
+                                            {% else %}
+                                            <a id="groupInfoButton{{group.id}}" class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"
+                                                onclick="showGroupInfo('{{group.id}}')"> {{ group.name }} (ID# {{ group.id
+                                                }}) </a>
+                                            {% endif %}
                                         {% endfor %}
+                                        {% else %}
+                                            <p class="text-sm mb-0">You do not have any owned groups.</p>
                                         {% endif %}
                                         <br>
                                         <p class="text-sm mb-0 pt-3 text-capitalize font-weight-bold">My Shared Groups</p>
-                                        {% if admin_groups is defined and admin_groups != '' %}
+                                        {% if admin_groups is defined and admin_groups|length != 0 %}
                                             {% for admin_group in admin_groups %}
                                                 <a class="btn btn-outline-primary btn-sm w-100 mb-0" style="margin: 9px 0 5px;"> {{ admin_group.name }} (ID# {{ admin_group.id }}) <br> (* Event privileges only *)</a>
-                                        {% endfor %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-sm mb-0">You do not have any shared groups.</p>
                                         {% endif %}
                                     </div>
                                     <br>
-                                    <div class="card mt-3 mb-3 p-3">
+                                    <div class="card mt-3 mb-3 p-3 border" style="border-color: #cb0c9f !important;">
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">Create New Group</p>
                                         <p class="text-secondary font-weight-bold text-sm mt-2 mb-3">Please specify a name for your new group.</p>
                                         <div>
@@ -317,23 +321,171 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-sm-6 mb-xl-8 mb-8">
-                    
-                        <div class="row">
-                                <div class="numbers">
-                                    <!-- Right Column -->
-                                    {% if this_group is defined %}
-                                        <h3>{{ this_group.name }}</h3>
-                                        {% include 'managegrouptab.html' %}
-                                    {% else %}
-                                        <h5>Please select a group.</h5>
-                                    {% endif %}
-                                </div>
-                        </div>
+                    <div class="row">
+                            <div id="groupInfoToggle" style="display:none;">
+                                <h3 id="groupNameHeader"></h3>
+                                {% include 'managegrouptab.html' %}
+                            </div>
+                            <div id="selectGroupToggle" style="display:none;">
+                                <h5>Please select a group.</h5>
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+
+    <!-- Script to programatically fill/load the manage groups tab -->
+    <script>
+        'use strict';
+
+        function loadMemberInfo(members, users) {
+            $('#membersTable tbody tr').remove()
+            console.log("Cleared member data.")
+            let index = 0;
+            while (index < members.length) {
+                let member = members[index]
+                let tableRow = $('<tr>');
+                if (member.name === null) {
+                // default name
+                member.name = "None";
+                }
+                tableRow.append($('<td>', { text: member.name }));
+                tableRow.append($('<td>', { text: member.netid }));
+                tableRow.attr('id', "memberRow" + member.id);
+                let deleteUserTd = $('<td>');
+                let deleteUserButton = $('<a>', { text: "Remove member"});
+                deleteUserButton.attr('onclick', "removeMember(" + member.id + ")");
+                deleteUserButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+                deleteUserButton.attr('style', "margin: 9px 0 5px;")
+                deleteUserTd.append(deleteUserButton);
+                tableRow.append(deleteUserTd);
+                $('#membersTable').append(tableRow);
+                index += 1;
+            }
+            console.log("Loaded member data.")
+            $('#selectNewGroupMember option').remove()
+            console.log("Cleared new member select data.")
+            index = 0;
+            while (index < users.length) {
+                let user = users[index]
+                if (!$("#membersTable tr[id=memberRow" + user.id + "]").length) {
+                    $('#selectNewGroupMember').append(new Option(user.netid, user.id));
+                }
+                index += 1;
+                console.log("Loaded a user.")
+            }
+            console.log("Loaded user data.")
+        }
+
+        function loadEventsInfo(events) {
+            $('#eventContainer div').remove()
+            console.log("Cleared event data.")
+            let index = 0;
+            while (index < events.length) {
+                let event = events[index]
+                let eventCard = $('<div>');
+                
+                eventCard.attr('class', "card");
+                let cardHeader = $('<div>', { text: event.name });
+                cardHeader.attr('class', "card-header p-2 text-center");
+                cardHeader.attr('style', " color: white !important; background-color: #850b68 !important;");
+                let cardBody = $('<div>');
+                cardBody.attr('class', "card-body");
+                let location = $('<div>', { text: "Location:" + event.location });
+                location.attr('class', "card-text font-weight-light");
+                let description = $('<div>', { text: event.description });
+                description.attr('class', "card-text");
+
+                // Construct card
+                cardBody.append(location);
+                cardBody.append(description);
+                cardBody.append($('<br>'));
+                eventCard.append(cardHeader);
+                eventCard.append(cardBody);
+                $('#eventContainer').append(eventCard);
+                index += 1;
+            }
+            console.log("Loaded event data.")
+        }
+
+
+        function loadAdminInfo(members, admins, owner) {
+            $('#adminTable tbody tr').remove()
+            console.log("Cleared admin data.")
+            let index = 0;
+            while (index < admins.length) {
+                let admin = admins[index]
+                let tableRow = $('<tr>');
+                if (admin.name === null) {
+                    admin.name = "None";
+                }
+                tableRow.append($('<td>', { text: admin.name }));
+                tableRow.append($('<td>', { text: admin.netid }));
+                tableRow.attr('id', "adminRow" + admin.id);
+                let deleteAdminTd = $('<td>');
+                let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
+                deleteAdminButton.attr('onclick', "removeAdmin(" + admin.id + ")");
+                deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+                deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+                deleteAdminTd.append(deleteAdminButton);
+                tableRow.append(deleteAdminTd);
+                $('#adminTable').append(tableRow);
+                index += 1;
+            }
+            $('#selectNewGroupAdmin option').remove();
+            $('#selectNewGroupOwner option').remove();
+            console.log("Cleared new admin select data.")
+            index = 0;
+            while (index < members.length) {
+                let member = members[index]
+                if (member.id != owner) {
+                    // If the member is not an admin, add them to the add group admin select
+                    if (!$("#adminTable tr[id=adminRow" + member.id + "]").length) {
+                        $('#selectNewGroupAdmin').append(new Option(member.netid, member.id));
+                    }
+                    $('#selectNewGroupOwner').append(new Option(member.netid, member.id));
+                }
+                index += 1;
+                console.log("Loaded a potential admin / new oner.")
+            }
+            console.log("Loaded admin data.")
+        }
+
+        let groupTabRequest = null;
+        function showGroupInfo(groupId) {
+            let url = '/mygroupinfo?groupId=' + groupId
+
+            if (groupTabRequest != null)
+            groupTabRequest.abort();
+
+            console.log("group Tab Request")
+
+            groupTabRequest = $.ajax(
+                {
+                    type: 'GET',
+                    url: url,
+                    success: function (response) {
+                        if (!response.success) return;
+                        console.log(response)
+                        $('#thisGroupHeader').remove();
+                        let groupTitle = $('<h3>', { id: "thisGroupHeader", text: response.name, value: groupId, class: "px-4 py-2" });
+                        $('#thisGroup').append(groupTitle);
+                        loadMemberInfo(response.members, response.users);
+                        loadEventsInfo(response.events);
+                        loadAdminInfo(response.members, response.admins, response.exclude_id);
+                        $('#groupInfoToggle').attr('style', "display:block;");
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                }
+            );
+        }
+
+    </script>
+
 
     </div>
     <!-- TODO: UI what is this??? -->

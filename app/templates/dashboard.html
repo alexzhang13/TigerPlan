@@ -410,11 +410,17 @@
                 );
             }
 
-            function showInvitationEventDetails(eventName, eventDescription, eventLocation) {
+            function showInvitationEventDetails(eventName, eventDescription, eventLocation, eventIsRecurring) {
                 if (eventName) {
                     let eventNameHeader = $('<h3>');
                     eventNameHeader.append($('<strong>', { text: "Responding to event \"" + eventName + "\"" }));
                     $('#invitationDetailsTitle').append(eventNameHeader);
+                }
+                if (eventIsRecurring) {
+                    let recurText = $('<div>', { text: "This event recurs weekly!" });
+                    recurText.addClass("card-text font-weight-bolder");
+                    $('#invitationDetailsBody').append(recurText);
+                    $('#invitationDetailsBody').append($('<br>'));
                 }
                 if (eventDescription) {
                     $('#invitationDetailsBody').append($('<strong>', { text: "Event description: " }));
@@ -448,7 +454,7 @@
                         renderEventTimeBlocks(eventTimes);
                         renderUserConflicts(response.userConflicts);
                         setRenderRangeText();
-                        showInvitationEventDetails(response.eventName, response.eventDescription, response.eventLocation);
+                        showInvitationEventDetails(response.eventName, response.eventDescription, response.eventLocation, response.eventIsRecurring);
                     },
                     error: function () {
                         errorWhileFetchingTimeBlocks("Error while fetching time blocks");

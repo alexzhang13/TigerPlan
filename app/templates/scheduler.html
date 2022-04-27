@@ -253,11 +253,12 @@
                             <div class="row">
                                 <div>
                                     <div class="card-body" id="showCreateEventCardButton" style="display: none;">
-                                        Your event has been successfully created, but invitations have not yet been sent out!
+                                        Your event has been successfully created, but invitations have not yet been sent
+                                        out!
                                         <br>
-                                        <a href="manage_events">Go to the manage events tab</a> 
+                                        <a href="manage_events">Go to the manage events tab</a>
                                         <br>
-                                        to send out invitations, or 
+                                        to send out invitations, or
                                         <br>
                                         <button onclick="showCreateEventCard(true)">
                                             click here to create another event!
@@ -295,7 +296,9 @@
                                                 </small>
                                                 <br>
                                             </form>
-                                            <!-- <button onclick="showCreateEventCard(false)">Cancel</button> -->
+                                            <input type="checkbox" id="isRecurringCheckbox">
+                                            <label for="isRecurringCheckbox">Make event recur weekly</label>
+                                            <br>
                                             <button id="createNewEventButton">Create Event</button>
                                         </div>
                                     </div>
@@ -365,6 +368,8 @@
             let description = $('#NewEventDescription').val();
             let schedules = getAllSchedules();
 
+            let isRecurring = $("#isRecurringCheckbox").prop('checked');
+
             let validity = checkNewEventValidity(id, name, schedules);
 
             if (validity != "") {
@@ -403,6 +408,7 @@
             newEventData.location = location;
             newEventData.description = description;
             newEventData.timeblocks = timeblocks;
+            newEventData.isRecurring = isRecurring;
 
             console.log(newEventData);
             let url = '/add_event'
@@ -437,6 +443,7 @@
                     $('#NewEventName').val('');
                     $('#NewEventLocation').val('');
                     $('#NewEventDescription').val('');
+                    $('#isRecurringCheckbox').prop('checked', false);
 
                     let banner = $('<div>', {
                         text: "Event successfully created!"

@@ -259,12 +259,13 @@
                                             <div class="card my-3" id="eventCard{{event.id}}">
                                                 <div class="card-header p-2 text-center"
                                                     style="color: white !important; background-color:{% if event.finalized %}#1d0b85{% else %}#850b68{% endif %} !important;">
-                                                    {{ event.name }} ({{ event.group.name }})</div>
+                                                    {{ event.name }} ({{ event.group.name }}) {% if event.finalized %} - Finalized {% endif %}</div>
                                                 <div class="card-body">
-                                                    <div class="card-text font-weight-light">Location: {{ event.location
-                                                        }}</div>
-                                                    <div class="card-text font-weight-light">Finalized: {{
-                                                        event.finalized }}</div>
+                                                    
+                                                    {% if event.is_recurring %}
+                                                    <div class="card-text font-weight-bolder">This event recurs weekly!</div>
+                                                    {% endif %}
+                                                    <div class="card-text font-weight-light">Location: {{ event.location}}</div>
                                                     <br>
                                                     <div class="card-text font-weight-light">Description: {{
                                                         event.description }}</div>

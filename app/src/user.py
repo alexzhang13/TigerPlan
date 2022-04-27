@@ -4,7 +4,7 @@ from app.models.models import Invitation, Member_Group, TimeBlock, User, Group, 
 from app import db
 
 #---------------------------- Spec Functions -------------------------#
-def get_user_from_id(id: int) -> Event:
+def get_user_from_id(id: int) -> User:
     """Get the user from the user's id"""
     return db.session.query(User).filter(User.id == id).one()
 

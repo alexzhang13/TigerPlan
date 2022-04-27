@@ -178,6 +178,7 @@ function renderNewOffsets(offset) {
 
     cal.createSchedules(toCreate);
 }
+
 let calStart;
 let calEnd;
 function renderUserConflicts(conflicts) {
