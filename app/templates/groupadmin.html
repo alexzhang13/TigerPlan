@@ -125,12 +125,12 @@
 
     function addAdminBanner(message, success) {
       let banner = $('<div>', { text: message });
-      banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+      banner.addClass("alert alert-" + (success ? "success" : "warning"));
       banner.appendTo("#addAdminResponse");
       setTimeout(function () {
         banner.hide(1000);
         setTimeout(function () {
-          banner.remove()
+          banner.remove();
         }, 1000);
       }, 3000);
       return;
@@ -155,7 +155,7 @@
           url: url,
           success: function(response) {
             if (!response.success) {
-              addAdminBanner("An error occurred.", false);
+              addAdminBanner(response.isOwner ? "Group owner can not be a group admin." : "An error occurred.", false);
             }
             if (response.admin.name === null) { response.admin.name = "None"; }
             addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);

@@ -377,15 +377,18 @@ def add_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            success = add_admin(groupid=groupId, newAdminId=member)
-            new_admin = get_user_from_id(member)
-            response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
+            if (member != group.owner_id):
+                response_json = json.dumps({"success": False, "isOwner": True})
+            else:
+                success = add_admin(groupid=groupId, newAdminId=member)
+                new_admin = get_user_from_id(member)
+                response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
         except Exception as ex:
             print("An exception occured at '/add_group_admin':", ex)
-            response_json = json.dumps({"success":False})
+            response_json = json.dumps({"success":False, "isOwner": False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
