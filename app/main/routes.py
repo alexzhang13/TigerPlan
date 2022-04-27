@@ -109,6 +109,78 @@ def groups():
     return render_template("login.html",
         title='Login to TigerResearch')
 
+# ------------- JSON USER ENCODER ----------------------------------- #
+def encodeUser(userObj):
+    result = []
+    if isinstance(userObj, list):
+        for user in userObj:
+            output = {}
+            output['id'] = user.id
+            output['netid'] = user.netid
+            output['name'] = user.name
+            result.append(output)
+    elif isinstance(userObj, models.User):
+        output = {}
+        output['id'] = userObj.id
+        output['netid'] = userObj.netid
+        output['name'] = userObj.name
+        return output
+    return result
+
+def encodeEvent(eventObj):
+    result = []
+    if isinstance(eventObj, list):
+        for event in eventObj:
+            output = {}
+            output['id'] = event.id
+            output['name'] = event.name
+            output['location'] = event.location
+            output['description'] = event.description
+            result.append(output)
+    elif isinstance(eventObj, models.Event):
+        output = {}
+        output['id'] = event.id
+        output['name'] = event.name
+        output['location'] = event.location
+        output['description'] = event.description
+        return output
+    return result
+
+# -------------------------- MANAGE GROUPS -------------------------- #
+@bp.route("/mygroupinfo", methods=['GET'])
+def groupinfo():
+    if check_user_validity():
+        try:
+            user = get_user_from_netid(session['username'])
+            groupId = request.args.get('groupId')
+            group = get_group(groupId)
+            if (group.owner_id != user.id):
+                raise Exception("User is not group owner")
+            # groups = get_user_groups(user.id)
+            # admin_groups = get_admin_groups(user.id)
+            users = encodeUser(get_users())
+            if (groupId):
+                try:
+                    members = encodeUser(get_members(groupId))
+                    events = encodeEvent(get_group_events(groupId))
+                    admins = encodeUser(get_group_admin(groupId))
+                    response_json = json.dumps({"success": True,
+                        "users": users, "members": members, 
+                        "events": events, "admins": admins})
+                    response = make_response(response_json)
+                    response.headers['Content-Type'] = 'application/json'
+                    return response
+                except Exception as ex:
+                    raise ex
+        except Exception as ex:
+            print("An exception occured at '/mygroupinfo':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    return render_template("login.html",
+        title='Login to TigerResearch')
+
 # ---------------------------- SCHEDULER ---------------------------- #
 @bp.route("/scheduler", methods=['GET'])
 def scheduler():
@@ -227,16 +299,19 @@ def add_custom_group():
         title='Login to TigerResearch')
 
 # -------------------------- DELETE GROUP --------------------------- # TODO: change to POST
-@bp.route("/del_group/<id>", methods=['POST', 'GET'])
-def del_group(id):
+@bp.route("/del_group", methods=['POST'])
+def del_group():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            group = get_group(id)
+            group_id = request.args.get('group')
+            group = get_group(group_id)
             if user.id != group.owner_id:
                 raise Exception("User is not group owner.")
-            delete_group(id) 
-            return redirect("/mygroups")
+            success = delete_group(group_id) 
+            response = make_response(json.dumps({"success":success}))
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/del_group':", ex)
             response_json = json.dumps({"success":False})
@@ -257,7 +332,8 @@ def remove_member():
             group = get_group(group_id)
             if (user.id != group.owner_id):
                 raise Exception("User is not group owner.")
-            delete_member(group_id, member_id)
+            success = delete_member(group_id, member_id)
+            response = make_response(json.dumps({"success":success}))
         except Exception as ex:
             print("An exception occured at '/remove_member':", ex)
             response_json = json.dumps({"success":False})
@@ -326,7 +402,7 @@ def change_ownership():
         title='Login to TigerResearch')
 
 # ----------------------- ADD GROUP OFFICER ------------------------- #
-@bp.route("/add_group_admin", methods=['POST'])
+@bp.route("/add_group_admin", methods=['GET'])
 def add_group_admin():
     if check_user_validity():
         try:
@@ -336,8 +412,12 @@ def add_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            add_admin(groupid=groupId, newAdminId=member)
-            return redirect("/mygroups?groupId=" + groupId)
+            success = add_admin(groupid=groupId, newAdminId=member)
+            new_admin = get_user_from_id(member)
+            response_json = json.dumps({"success":success, "admin": encodeUser(new_admin)})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/add_group_admin':", ex)
             response_json = json.dumps({"success":False})
@@ -359,8 +439,11 @@ def remove_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            delete_admin(groupid=groupId, newAdminId=member)
-            return redirect("/mygroups?groupId=" + groupId)
+            success = delete_admin(groupid=groupId, newAdminId=member)
+            response_json = json.dumps({"success":success})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/remove_group_admin':", ex)
             response_json = json.dumps({"success":False})

@@ -1,36 +1,18 @@
-{% if members is defined %}
-
 <p class="card-text"><strong>Manage Group Administrators</strong><br>
   Add group administrators from the list of existing members to give them event scheduling privileges. 
   Administrators can create, update, and delete group events bur cannot access or change group members.
 </p>
 
-{% if admins is defined and admins|length != 0 %}
 <div class="container border rounded pt-2">
-<table class="table" id="membersTable">
+<table class="table" id="adminTable">
   <thead class="thead-dark">
     <tr>
       <th>Name</th>
       <th>Netid</th>
     </tr>
   </thead>
-  {% for admin in admins %}
-  <tr id="adminRow{{admin.id}}">
-    <td>{{ admin.name }}</td>
-    <td>{{ admin.netid }}</td>
-    <td>
-      <!-- TODO: Implement Remove Admin javascript -->
-      <button onclick="removeAdmin('{{admin.id}}')"> 
-        Remove Admin Privileges
-      </button>
-    </td>
-  </tr>
-  {% endfor %}
 </table>
 </div>
-{% else %}
-<div><br>No admins yet!</div>
-{% endif %}
 <br>
 <br>
 
@@ -40,15 +22,10 @@
   of members or change administrator privileges. 
 </p>
 <div>
-  <select id="NewGroupAdmin" class="form-select form-select-md">
-      {% if members != '' %}
-      <option>Select New Admin</option>
-      {% for user in members %}
-      <option value="{{ user.id }}">{{ user.netid }}</option>
-      {% endfor %}
-      {% endif %}
+  <select id="selectNewGroupAdmin" class="form-select form-select-md">
   </select> 
   <a id="addAdmin" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Add Admin</a>
+  <span id="addAdminResponse"></span>
 </div>
 <br>
 <br>
@@ -58,13 +35,7 @@
   owership will transfer all admin privileges. Ownership of existing events will not be transferred.
 </p>
 <div>
-  <select id="NewGroupOwner" class="form-select form-select-md">
-      {% if members != '' %}
-      <option>Select New Owner</option>
-      {% for user in members %}
-      <option value="{{ user.id }}">{{ user.netid }}</option>
-      {% endfor %}
-      {% endif %}
+  <select id="selectNewGroupOwner" class="form-select form-select-md">
   </select> 
   <a id="changeOwner" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Transfer Ownership</a>
 </div>
@@ -84,22 +55,22 @@
 <p class="card-text"><strong>Delete Group</strong><br>
   Deleting this group will also permanently delete all its related events, invitation responses, and any pending invitations.
 </p>
-<a class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;" href="/del_group/{{ this_group.id }}">Delete Group</a>
+<a id="deleteGroupButton" class="btn btn-outline-default btn-sm w-100 mb-0" style="margin: 9px 0 5px;">Delete Group</a>
 
-{% endif %}
 
 <script>
     'use strict';
     let changeOwnershipRequest = null;
     function changeOwner() {
-      let memberName = $("#NewGroupOwner :selected").text();
+      let memberName = $("#selectNewGroupOwner :selected").text();
       if (!confirm("Are you sure you want to transfer ownership to " + memberName + "? This action cannot be undone!")) {
         return;
       }
-      let member = $('#NewGroupOwner :selected').val();
+      let member = $('#selectNewGroupOwner :selected').val();
       member = encodeURIComponent(member);
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
-      let url = '/change_ownership?group=' + '{{ this_group.id }}'
+      let url = '/change_ownership?group=' + thisGroup
       url += '&member=' + member
   
       if (changeOwnershipRequest != null)
@@ -109,34 +80,69 @@
         {
           type: 'POST',
           url: url,
+          success: function(success) {
+            document.location.reload();
+          }
         }
       );
     }
     // TODO: Lu Make this not add owner to options
     function addMemberToSelection(memberid, membernetid) {
-      if (!$("#NewGroupOwner option[value='" + memberid + "']").length) {
-        $('#NewGroupOwner').append($('<option>').val(memberid).text(membernetid));
+      if (!$("#selectNewGroupOwner option[value='" + memberid + "']").length) {
+        $('#selectNewGroupOwner').append($('<option>').val(memberid).text(membernetid));
       }
-      if (!$("#NewGroupAdmin option[value=" + memberid + "]").length) {
-        $('#NewGroupAdmin').append($('<option>').val(memberid).text(membernetid));
+      if (!$("#selectNewGroupAdmin option[value=" + memberid + "]").length) {
+        $('#selectNewGroupAdmin').append($('<option>').val(memberid).text(membernetid));
       }
     }
 
     function removeMemberFromSelection(memberid) {
-      if ($("#NewGroupOwner option[value=" + memberid + "]").length) {
-        $("#NewGroupOwner option[value=" + memberid + "]").remove();
+      if ($("#selectNewGroupOwner option[value=" + memberid + "]").length) {
+        $("#selectNewGroupOwner option[value=" + memberid + "]").remove();
       }
-      if ($("#NewGroupAdmin option[value=" + memberid + "]").length) {
-        $("#NewGroupAdmin option[value=" + memberid + "]").remove();
+      if ($("#selectNewGroupAdmin option[value=" + memberid + "]").length) {
+        $("#selectNewGroupAdmin option[value=" + memberid + "]").remove();
       }
+    }
+
+    function addAdminTableRow(adminName, adminNetid, adminId) {
+      let tableRow = $('<tr>');
+      if (adminName === null) {
+          adminName = "None";
+      }
+      tableRow.append($('<td>', { text: adminName }));
+      tableRow.append($('<td>', { text: adminNetid }));
+      tableRow.attr('id', "adminRow" + adminId);
+      let deleteAdminTd = $('<td>');
+      let deleteAdminButton = $('<a>', { text: "Remove admin privileges"});
+      deleteAdminButton.attr('onclick', "removeAdmin(" + adminId + ")");
+      deleteAdminButton.attr('class', "btn btn-outline-default btn-sm mb-0")
+      deleteAdminButton.attr('style', "margin: 9px 0 5px;")
+      deleteAdminTd.append(deleteAdminButton);
+      tableRow.append(deleteAdminTd);
+      $('#adminTable').append(tableRow);
+    }
+
+    function addAdminBanner(message, success) {
+      let banner = $('<div>', { text: message });
+      banner.addClass("alert alert-" + (successs ? "success" : "warning"));
+      banner.appendTo("#addAdminResponse");
+      setTimeout(function () {
+        banner.hide(1000);
+        setTimeout(function () {
+          banner.remove()
+        }, 1000);
+      }, 3000);
+      return;
     }
 
     let addAdminRequest = null;
     function addGroupAdmin() {
-      let member = $('#NewGroupAdmin :selected').val();
+      let member = $('#selectNewGroupAdmin :selected').val();
       member = encodeURIComponent(member);
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
-      let url = '/add_group_admin?group=' + '{{ this_group.id }}'
+      let url = '/add_group_admin?group=' + thisGroup
       url += '&member=' + member
   
       if (addAdminRequest != null)
@@ -145,8 +151,43 @@
       // TODO: Ajax to update the admin table without refresh, banners
       addAdminRequest = $.ajax(
         {
+          type: 'GET',
+          url: url,
+          success: function(response) {
+            if (!response.success) {
+              addAdminBanner("An error occurred.", false);
+            }
+            if (response.admin.name === null) { response.admin.name = "None"; }
+            addAdminTableRow(response.admin.name, response.admin.netid, response.admin.id);
+            addAdminBanner("Success!", true);
+          }
+        }
+      );
+    }
+
+    let removeAdminRequest = null;
+    function removeAdmin(adminId) {
+      let thisGroup = $('#thisGroupHeader').attr('value');
+      adminId = encodeURIComponent(adminId);
+  
+      let url = '/remove_group_admin?group=' + thisGroup
+      url += '&member=' + adminId
+  
+      if (removeAdminRequest != null)
+        removeAdminRequest.abort();
+  
+      // TODO: Ajax to update the admin table without refresh, banners
+      removeAdminRequest = $.ajax(
+        {
           type: 'POST',
           url: url,
+          success: function(response) {
+            if (!response.success) {
+              addAdminBanner("An error occurred.", false);
+            }
+            $('#adminRow' + adminId).remove();
+            addAdminBanner("Success! Admin was removed.", true);
+          }
         }
       );
     }
@@ -155,8 +196,9 @@
     function changeName() {
       let name = $('#UpdateGroupName').val();
       name = encodeURIComponent(name);
+      let thisGroup = $('#thisGroupHeader').attr('value');
   
-      let url = '/change_group_name?group=' + '{{ this_group.id }}'
+      let url = '/change_group_name?group=' + thisGroup
       url += '&name=' + name
   
       if (updateGroupNameRequest != null)
@@ -166,14 +208,37 @@
         {
           type: 'POST',
           url: url,
+          success: function(response) {
+            document.location.reload();
+          }
         }
       );
+    }
+
+    let removeGroupRequest = null;
+    function removeGroup() {
+      let thisGroup = $('#thisGroupHeader').attr('value');
+      let url = '/del_group?group=' + thisGroup
+
+      if (removeGroupRequest != null)
+        removeGroupRequest.abort();
+
+      removeGroupRequest = $.ajax(
+        {
+          type: 'POST',
+          url: url,
+          success: function(response) {
+            document.location.reload()
+          }
+        }
+      )
     }
   
     function setup() {
       $('#changeOwner').on('click', changeOwner);
       $('#changeGroupName').on('click', changeName);
       $('#addAdmin').on('click', addGroupAdmin)
+      $('#deleteGroupButton').on('click', removeGroup);
     }
   
     $('document').ready(setup);
