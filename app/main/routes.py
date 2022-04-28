@@ -373,8 +373,12 @@ def add_new_member():
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
             member_id = request.args.get('member')
+            if (member_id is None): 
+                raise Exception("New member not specified")
             redudant = not add_member(id=group_id, memberId=member_id)
             member = get_user_from_id(member_id)
+            if (member is None):
+                raise Exception("User does not exist")
             response_json = json.dumps({"success": True,
                 "redundant": redudant,
                 "memberNetid": member.netid, 
@@ -384,7 +388,7 @@ def add_new_member():
             return response
         except Exception as ex:
             print("An exception occured at '/add_new_member':", ex)
-            response_json = json.dumps({"success":False})
+            response_json = json.dumps({"success":False, "error": ex})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response

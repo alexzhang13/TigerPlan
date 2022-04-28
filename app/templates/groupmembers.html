@@ -110,7 +110,7 @@
               }
             }
           } else {
-            addMemberBanner("Error fetching group", false);
+            addMemberBanner(response.ex, false);
           }
         },
         error: function (error) {
