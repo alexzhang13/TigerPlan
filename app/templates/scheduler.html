@@ -297,7 +297,7 @@
                                             <p class="card-text">Which group are you creating the event for?</p>
                                             <form>
                                                 <select id="NewEventGroupId"
-                                                    class="custom-select custom-select-lg mb-3" style="width:100%">
+                                                    class="form-select form-select-md">
                                                     {% if groups is defined and groups != '' %}
                                                     {% for group in groups %}
                                                     <option value="{{ group.id }}">{{ group.name }}</option>
@@ -309,7 +309,9 @@
                                                     </option>
                                                     {% endfor %}
                                                     {% endif %}
-                                                </select> <span>Add Event Details</span>
+                                                </select> 
+                                                <br>
+                                                <p class="card-text">Add Event Details</p>
                                                 <input type="text" name="newEventName" id="NewEventName"
                                                     class="form-control" placeholder="Event Name" style="margin: 3px 0px 3px" autofocus>
                                                 <input type="text" name="newEventLocation" id="NewEventLocation"
