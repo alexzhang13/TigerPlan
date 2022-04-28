@@ -315,7 +315,7 @@
                                                     {% else %}
                                                     <a class="btn btn-outline-secondary btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
-                                                        onclick="eventViewDetails('{{event.id}}')">
+                                                        onclick="eventViewDetails('{{event.id}}', '{{event.name}}')">
                                                         {% if event.finalized %}
                                                         View Finalized Time
                                                         {% else %}
@@ -337,6 +337,7 @@
                     </div>
                 </div>
                 <div class="col-xl-8 col-sm-6 mb-xl-8 mb-8">
+                    <h3 id="groupHeader" value="1" class="px-4 py-2"></h3>
                     <button class="btn btn-success btn-sm w-100" id="finalizeEventButton" style="display: none;">Finalize</button>
                     <div id="finalizeEventReponse"></div>
                     <div id="calendarMenu" style="display: none;">
@@ -428,7 +429,7 @@
             });
         }
 
-        function eventViewDetails(eventId) {
+        function eventViewDetails(eventId, eventName) {
             if (currentlyViewedEventId) {
                 destroyDetailCalendar();
             }
@@ -442,9 +443,11 @@
                 type: "GET",
                 url: timesUrl,
                 success: function (response) {
+                    
                     if (!response.success) {
                         addBanner("finalizeEventResponse", "an error occurred", false);
                     }
+                    document.getElementById("groupHeader").innerHTML = eventName;
                     if (!response.finalized) {
                         $('#finalizeEventButton').show();
                         renderDetailCalendar();
@@ -454,6 +457,7 @@
                         renderDetailCalendar(true);
                         renderChosenTime(response);
                     }
+                
                     $("#calendarMenu").show();
                     setRenderRangeText();
                 },
