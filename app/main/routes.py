@@ -6,7 +6,7 @@ from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
 from flask_login import login_user, logout_user, login_required 
 from cas import CASClient
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 from app import db
@@ -137,8 +137,8 @@ def encodeEvent(eventObj):
             output['finalized'] = event.finalized
             chosen_time = event.times[0]
             chosen_time_json = { 
-                "start": chosen_time.start.strftime('%B %d, %Y %I:%M %p'),
-                "end": chosen_time.end.strftime('%B %d, %Y %I:%M %p') if chosen_time.start.date() != chosen_time.end.date() else chosen_time.end.strftime('%I:%M %p'),
+                "start": (chosen_time.start - timedelta(hours=4)).strftime('%B %d, %Y %I:%M %p'),
+                "end": (chosen_time.end - timedelta(hours=4)).strftime('%B %d, %Y %I:%M %p') if (chosen_time.start - timedelta(hours=4)).date() != (chosen_time.end - timedelta(hours=4)).date() else (chosen_time.end - timedelta(hours=4)).strftime('%I:%M %p'),
                 "id": chosen_time.id
             }
             output['final_time'] =chosen_time_json
@@ -152,8 +152,8 @@ def encodeEvent(eventObj):
         output['finalized'] = event.finalized
         chosen_time = eventObj.times[0]
         chosen_time_json = { 
-            "start": chosen_time.start.strftime('%B %d, %Y %I:%M %p'),
-            "end": chosen_time.end.strftime('%B %d, %Y %I:%M %p') if chosen_time.start.date() != chosen_time.end.date() else chosen_time.end.strftime('%I:%M %p'),
+            "start": (chosen_time.start - timedelta(hours=4)).strftime('%B %d, %Y %I:%M %p'),
+            "end": (chosen_time.end - timedelta(hours=4)).strftime('%B %d, %Y %I:%M %p') if (chosen_time.start - timedelta(hours=4)).date() != (chosen_time.end - timedelta(hours=4)).date() else (chosen_time.end - timedelta(hours=4)).strftime('%I:%M %p'),
             "id": chosen_time.id
         }
         output['final_time'] =chosen_time_json
