@@ -136,13 +136,27 @@ def encodeEvent(eventObj):
             output['name'] = event.name
             output['location'] = event.location
             output['description'] = event.description
+            chosen_time = event.times[0]
+            chosen_time_json = { 
+                "start": chosen_time.start.strftime('%Y-%m-%d %H:%M'),
+                "end": chosen_time.end.strftime('%Y-%m-%d %H:%M'),
+                "id": chosen_time.id
+            }
+            output['final_time'] =chosen_time_json
             result.append(output)
     elif isinstance(eventObj, models.Event):
         output = {}
-        output['id'] = event.id
-        output['name'] = event.name
-        output['location'] = event.location
-        output['description'] = event.description
+        output['id'] = eventObj.id
+        output['name'] = eventObj.name
+        output['location'] = eventObj.location
+        output['description'] = eventObj.description
+        chosen_time = eventObj.times[0]
+        chosen_time_json = { 
+            "start": chosen_time.start.strftime('%Y-%m-%dT%H:%M:%S'),
+            "end": chosen_time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+            "id": chosen_time.id
+        }
+        output['final_time'] =chosen_time_json
         return output
     return result
 
@@ -414,6 +428,8 @@ def add_group_admin():
             member = request.args.get('member')
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
+            if (group.owner_id == member):
+                raise Exception("Group owner can not be a group admin.")
             else:
                 success = add_admin(groupid=groupId, newAdminId=member)
                 new_admin = get_user_from_id(member)

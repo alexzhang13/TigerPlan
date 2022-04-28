@@ -415,12 +415,13 @@
 
         function loadEventsInfo(events) {
             $('#eventContainer div').remove()
+            $('#eventContainer p').remove()
             console.log("Cleared event data.")
             let index = 0;
             while (index < events.length) {
                 let event = events[index]
                 let eventCard = $('<div>');
-
+                console.log(event)
                 eventCard.attr('class', "card");
                 eventCard.css('width','100%');
                 let cardHeader = $('<div>', { text: event.name });
@@ -432,15 +433,23 @@
                 location.attr('class', "card-text");
                 let description = $('<div>', { text: "Description: " + event.description });
                 description.attr('class', "card-text");
+                let finalTime = $('<div>', { text: "Finalized Time: " + event.final_time.start + " - " + event.final_time.end });
+                finalTime.attr('class', 'card-text');
 
                 // Construct card
                 cardBody.append(location);
                 cardBody.append(description);
+                cardBody.append(finalTime);
                 eventCard.append(cardHeader);
                 eventCard.append(cardBody);
                 eventCard.css('margin-bottom', '10px');
                 $('#eventContainer').append(eventCard);
                 index += 1;
+            }
+            if (events.length == 0) {
+                let noEvents = $('<p>', { text: 'This group has no scheduled events.'});
+                noEvents.attr('class', 'card-text');
+                $('#eventContainer').append(noEvents);
             }
             console.log("Loaded event data.")
         }
