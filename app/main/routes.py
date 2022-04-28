@@ -117,13 +117,11 @@ def encodeUser(userObj):
             output = {}
             output['id'] = user.id
             output['netid'] = user.netid
-            output['name'] = user.name
             result.append(output)
     elif isinstance(userObj, models.User):
         output = {}
         output['id'] = userObj.id
         output['netid'] = userObj.netid
-        output['name'] = userObj.name
         return output
     return result
 
@@ -378,7 +376,7 @@ def add_new_member():
             redudant = not add_member(id=group_id, memberId=member_id)
             member = get_user_from_id(member_id)
             response_json = json.dumps({"success": True,
-                "redundant": redudant, "memberName": member.name, 
+                "redundant": redudant,
                 "memberNetid": member.netid, 
                 "exclude_id": member.id == group.owner_id})
             response = make_response(response_json)

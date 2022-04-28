@@ -1,4 +1,3 @@
-from email.policy import default
 from app import db, login
 from flask_login import UserMixin
 
@@ -8,7 +7,6 @@ class User(UserMixin, db.Model):
 
     # primitive fields
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
     netid = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64))
 
@@ -55,11 +53,6 @@ class Event(db.Model):
     description = db.Column(db.String(64))
     finalized = db.Column(db.Boolean, default=False)
     is_recurring = db.Column(db.Boolean, default=False)
-    
-    # 1-to-1 relation fields
-    # chosen_time_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'))
-    # chosen_time = db.relationship("TimeBlock",
-    #     foreign_keys = "Event.chosen_time_id", uselist=False)
    
     # 1-to-n relation fields
     invitations = db.relationship("Invitation", backref="event")
@@ -87,9 +80,6 @@ class TimeBlock(db.Model): #DONE
     # n-to-1 relation fields
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
-
-    # n-to-n 
-    # invitee_responses = db.relationship("Invitation_Timeblock", backref='timeblock')
 
     def __repr__(self):
         return '<TimeBlock {}>'.format(self.id)
