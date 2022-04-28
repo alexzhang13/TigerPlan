@@ -134,10 +134,11 @@ def encodeEvent(eventObj):
             output['name'] = event.name
             output['location'] = event.location
             output['description'] = event.description
+            output['finalized'] = event.finalized
             chosen_time = event.times[0]
             chosen_time_json = { 
-                "start": chosen_time.start.strftime('%Y-%m-%d %H:%M'),
-                "end": chosen_time.end.strftime('%Y-%m-%d %H:%M'),
+                "start": chosen_time.start.strftime('%B %d, %Y %I:%M %p'),
+                "end": chosen_time.end.strftime('%B %d, %Y %I:%M %p') if chosen_time.start.date() != chosen_time.end.date() else chosen_time.end.strftime('%I:%M %p'),
                 "id": chosen_time.id
             }
             output['final_time'] =chosen_time_json
@@ -148,10 +149,11 @@ def encodeEvent(eventObj):
         output['name'] = eventObj.name
         output['location'] = eventObj.location
         output['description'] = eventObj.description
+        output['finalized'] = event.finalized
         chosen_time = eventObj.times[0]
         chosen_time_json = { 
-            "start": chosen_time.start.strftime('%Y-%m-%dT%H:%M:%S'),
-            "end": chosen_time.end.strftime('%Y-%m-%dT%H:%M:%S'),
+            "start": chosen_time.start.strftime('%B %d, %Y %I:%M %p'),
+            "end": chosen_time.end.strftime('%B %d, %Y %I:%M %p') if chosen_time.start.date() != chosen_time.end.date() else chosen_time.end.strftime('%I:%M %p'),
             "id": chosen_time.id
         }
         output['final_time'] =chosen_time_json

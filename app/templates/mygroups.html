@@ -429,11 +429,21 @@
                 cardHeader.attr('style', " color: black !important; background-color: #ADD8E6 !important;");
                 let cardBody = $('<div>');
                 cardBody.attr('class', "card-body");
-                let location = $('<div>', { text: "Location: " + event.location });
+                let location = $('<div>');
+                location.append("<strong style='color:black'>Location : </strong>")
+                location.append(event.location);
                 location.attr('class', "card-text");
-                let description = $('<div>', { text: "Description: " + event.description });
+                let description = $('<div>');
+                description.append("<strong style='color:black'>Description : </strong>")
+                description.append(event.description);
                 description.attr('class', "card-text");
-                let finalTime = $('<div>', { text: "Finalized Time: " + event.final_time.start + " - " + event.final_time.end });
+                let finalTime = $('<div>');
+                if (event.finalized) {
+                    finalTime.append("<strong style='color:black'>Finalized Time: </strong>")
+                    finalTime.append(event.final_time.start + " - " + event.final_time.end);
+                } else {
+                    finalTime.append("<strong style='color:red'>Event not finalized yet! </strong>")
+                }
                 finalTime.attr('class', 'card-text');
 
                 // Construct card
