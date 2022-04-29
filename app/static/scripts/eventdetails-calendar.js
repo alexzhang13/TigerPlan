@@ -96,17 +96,17 @@ function colorToHex(color) {
     return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
 }
 
-const blue = [68, 74, 198];
-const red = [233, 109, 112];
+const red = [255, 102, 99];
+const green = [142, 206, 134];
 
 function getHexColor(availability, numResponses) {
     if (numResponses === 0) {
         return "#f7349e";
     }
     let ratio = availability / numResponses;
-    let redComp = parseInt(blue[0] + ratio * (red[0] - blue[0]));
-    let greenComp = parseInt(blue[1] + ratio * (red[1] - blue[1]));
-    let blueComp = parseInt(blue[2] + ratio * (red[2] - blue[2]));
+    let redComp = parseInt(red[0] + ratio * (green[0] - red[0]));
+    let greenComp = parseInt(red[1] + ratio * (green[1] - red[1]));
+    let blueComp = parseInt(red[2] + ratio * (green[2] - red[2]));
     console.log(redComp, greenComp, blueComp)
     let str = "#" + colorToHex(redComp) + colorToHex(greenComp) + colorToHex(blueComp);
     console.log(str);
