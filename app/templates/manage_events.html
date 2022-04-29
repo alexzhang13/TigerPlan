@@ -315,7 +315,7 @@
                                                     {% endif %}
                                                     <a class="btn btn-outline-danger btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
-                                                        onclick="deleteEvent('{{event.id}}')">Delete Event</a>
+                                                        onclick="deleteEvent('{{event.id}}', '{{event.name}}')">Delete Event</a>
                                                 </div>
                                             </div>
                                             {% endfor %}
@@ -381,7 +381,11 @@
             });
         }
 
-        function deleteEvent(eventId) {
+        function deleteEvent(eventId, eventName) {
+            let confirmed = confirm("Are you sure you want to delete '" + eventName + "'? This action cannot be undone!");
+            if (!confirmed) {
+                return;
+            }
             let url = "/del_event/" + eventId;
 
             $.ajax({
