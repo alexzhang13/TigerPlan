@@ -96,17 +96,17 @@ function colorToHex(color) {
     return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
 }
 
-const blue = [68, 74, 198];
-const red = [233, 109, 112];
+const low_avail = [46, 137, 200];
+const high_avail = [60, 204, 42];
 
 function getHexColor(availability, numResponses) {
     if (numResponses === 0) {
         return "#f7349e";
     }
     let ratio = availability / numResponses;
-    let redComp = blue[0] + ratio * (red[0] - blue[0]);
-    let greenComp = blue[1] + ratio * (red[1] - blue[1]);
-    let blueComp = blue[2] + ratio * (red[2] - blue[2]);
+    let redComp = parseInt(low_avail[0] + ratio * (high_avail[0] - low_avail[0]));
+    let greenComp = parseInt(low_avail[1] + ratio * (high_avail[1] - low_avail[1]));
+    let blueComp = parseInt(low_avail[2] + ratio * (high_avail[2] - low_avail[2]));
     console.log(redComp, greenComp, blueComp)
     let str = "#" + colorToHex(redComp) + colorToHex(greenComp) + colorToHex(blueComp);
     console.log(str);
@@ -145,7 +145,7 @@ function renderDetailTimeBlocks(response) {
     for (let i = 0; i < eventTimes.length; i++) {
         var d = {
             id: eventTimes[i].id,
-            title: "Available Members: " + eventTimes[i].availability,
+            title: "Available: " + eventTimes[i].availability,
             calendarId: detailCalendarId,
             category: 'time',
             dueDateClass: '',

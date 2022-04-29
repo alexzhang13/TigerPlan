@@ -271,13 +271,11 @@
                             <div class="row">
                                 <div>
                                     <div class="card-body" id="showCreateEventCardButton" style="display: none;">
-                                        Your event has been successfully created, but invitations have not yet been sent
-                                        out!
+                                        <p class="card-text">Your event has been successfully created, but invitations have not yet been sent
+                                        out!</p>
                                         <br>
-                                        <a href="manage_events">Go to the manage events tab</a>
-                                        <br>
-                                        to send out invitations, or
-                                        <br>
+                                        <p class="card-text">Go to the manage events tab to send out invitations.</p>
+
                                         <button class="btn btn-outline-primary btn-sm w-100 mb-0" onclick="showCreateEventCard(true)">
                                             Click here to create another event!
                                         </button>
@@ -446,30 +444,28 @@
                         });
                         banner.addClass("alert alert-warning");
                         banner.appendTo("#eventCreationResponse");
-
-                        $("createNewEventButton").prop("disabled", false);
                         setTimeout(function () {
                             banner.hide(1000);
                             setTimeout(function () {
                                 banner.remove()
                             }, 1000);
                         }, 3000);
-                        return;
+                    } else {
+                        $("#createNewEventButton").prop("disabled", false);
+                        showCreateEventCard(false);
+                        $('#select-box').prop('selectedIndex', 0);
+                        $('#NewEventName').val('');
+                        $('#NewEventLocation').val('');
+                        $('#NewEventDescription').val('');
+                        $('#isRecurringCheckbox').prop('checked', false);
+
+                        let banner = $('<div>', {
+                            text: "Event successfully created!"
+                        });
+                        banner.addClass("alert alert-success");
+                        banner.appendTo("#eventCreationResponse");
+                        $("#createNewEventButton").prop("disabled", true);
                     }
-
-                    $("#createNewEventButton").prop("disabled", false);
-                    showCreateEventCard(false);
-                    $('#select-box').prop('selectedIndex', 0);
-                    $('#NewEventName').val('');
-                    $('#NewEventLocation').val('');
-                    $('#NewEventDescription').val('');
-                    $('#isRecurringCheckbox').prop('checked', false);
-
-                    let banner = $('<div>', {
-                        text: "Event successfully created!"
-                    });
-                    banner.addClass("alert alert-success");
-                    banner.appendTo("#eventCreationResponse");
                 },
                 error: function (error) {
                     console.log(error);
@@ -483,9 +479,8 @@
                         }, 1000);
                     }, 3000);
                     $("createNewEventButton").prop("disabled", false);
-                }
+                },
             });
-            $("#createNewEventButton").prop("disabled", true);
         }
 
         function setRenderRangeText() {
