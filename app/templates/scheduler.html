@@ -452,30 +452,28 @@
                         });
                         banner.addClass("alert alert-warning");
                         banner.appendTo("#eventCreationResponse");
-
-                        $("createNewEventButton").prop("disabled", false);
                         setTimeout(function () {
                             banner.hide(1000);
                             setTimeout(function () {
                                 banner.remove()
                             }, 1000);
                         }, 3000);
-                        return;
+                    } else {
+                        $("#createNewEventButton").prop("disabled", false);
+                        showCreateEventCard(false);
+                        $('#select-box').prop('selectedIndex', 0);
+                        $('#NewEventName').val('');
+                        $('#NewEventLocation').val('');
+                        $('#NewEventDescription').val('');
+                        $('#isRecurringCheckbox').prop('checked', false);
+
+                        let banner = $('<div>', {
+                            text: "Event successfully created!"
+                        });
+                        banner.addClass("alert alert-success");
+                        banner.appendTo("#eventCreationResponse");
+                        $("#createNewEventButton").prop("disabled", true);
                     }
-
-                    $("#createNewEventButton").prop("disabled", false);
-                    showCreateEventCard(false);
-                    $('#select-box').prop('selectedIndex', 0);
-                    $('#NewEventName').val('');
-                    $('#NewEventLocation').val('');
-                    $('#NewEventDescription').val('');
-                    $('#isRecurringCheckbox').prop('checked', false);
-
-                    let banner = $('<div>', {
-                        text: "Event successfully created!"
-                    });
-                    banner.addClass("alert alert-success");
-                    banner.appendTo("#eventCreationResponse");
                 },
                 error: function (error) {
                     console.log(error);
@@ -489,9 +487,8 @@
                         }, 1000);
                     }, 3000);
                     $("createNewEventButton").prop("disabled", false);
-                }
+                },
             });
-            $("#createNewEventButton").prop("disabled", true);
         }
 
         function setRenderRangeText() {

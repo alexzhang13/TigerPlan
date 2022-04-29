@@ -513,41 +513,38 @@ def add_event():
             user = get_user_from_netid(session['username'])
             schedule = json.loads(request.get_data())
             group_id = schedule['groupId']
-            # TODO: Make sure group_id is valid?
-            group_id = int(group_id)
-            group = get_group(group_id)
-            # TODO: Make this error handling more precise; probably specialized exceptions
-            if (len(group.members) == 0):
-                response_json = json.dumps({"success": False, 
-                    "message": "Cannot create event for group with 0 members"
-                    })
-                response = make_response(response_json)
-                response.headers['Content-Type'] = 'application/json'
-                return response
             name = schedule['name']
-            if (name is None or name.strip() == ""):
-                raise Exception("Name is absent")
             location = schedule['location']
             description = schedule['description']
             timeblocks = schedule['timeblocks']
-            if (len(timeblocks) == 0):
-                raise Exception("No timeblocks included")
             is_recurring = schedule['isRecurring']
+
+            group = get_group(group_id)
+            if group is None:
+                raise Exception("Group not found.")
+            if (len(group.members) == 0):
+                raise Exception("Cannot create event for group with no members.")
+            if (name is None or name.strip() == ""):
+                raise Exception("Please specify a name for the event.")
+            if (len(timeblocks) == 0):
+                raise Exception("Please specify at least one time.")
+            
             new_event = create_event(groupid=group_id, name=name,
                                     owner=user, location=location, 
                                     description=description,
                                     timeblocks=timeblocks,
                                     is_recurring=is_recurring)
-            response_json = json.dumps({"success":True, 
+            response_json = json.dumps({
+                "success":True, 
                 "newEventId":new_event.id,
                 "groupName":new_event.group.name
-                })
+            })
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
         except Exception as ex:
             print("An exception occured at '/add_event':", ex)
-            response_json = json.dumps({"success":False})
+            response_json = json.dumps({"success":False, "message": str(ex)})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
