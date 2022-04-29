@@ -390,7 +390,7 @@ def add_new_member():
             return response
         except Exception as ex:
             print("An exception occured at '/add_new_member':", ex)
-            response_json = json.dumps({"success":False, "error": ex})
+            response_json = json.dumps({"success":False, "error": str(ex)})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
             return response
