@@ -750,7 +750,14 @@ def update_conflict():
             end = datetime.strptime(schedule['end'][5:], '%d %b %Y %H:%M:%S GMT')
 
          # retrieve database datetime
-        update_timeblock(schedule['id'], schedule['title'], start, end)
+        try:
+            conflict = get_timeblock(schedule['id'])
+            if conflict.user_id != user.id:
+                raise Exception("User is not conflict owner")
+            update_timeblock(schedule['id'], schedule['title'], start, end)
+        except Exception as ex:
+            print("An error occured at /update_conflict:", ex)
+            return make_response(jsonify(success=False))
 
         return make_response(jsonify(success=True))
     return render_template("login.html", 

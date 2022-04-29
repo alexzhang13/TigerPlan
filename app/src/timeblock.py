@@ -36,7 +36,10 @@ def get_timeblock(id: int) -> TimeBlock:
 
 def update_timeblock(id: int, name: str, start: TimeBlock, end: TimeBlock) -> TimeBlock:
     """Update a time block. Returns updated time block."""
-    updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).one()
+    updated_tb = db.session.query(TimeBlock).filter(TimeBlock.id == id).first()
+
+    if updated_tb is None:
+        raise ValueError("No time block with id:", id)
     if name is not None:
         updated_tb.name = name
     if start is not None:
