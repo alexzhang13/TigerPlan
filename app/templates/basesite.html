@@ -332,8 +332,16 @@
                     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
                         <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark"
                                 href="javascript:;">
-                            {% if (page == "index" or page == "memberships" or page == "editconflicts" or page == "dashboard" or "about")%}
-                                Dashboard 
+                            {% if page == "index" %}
+                            Dashboard
+                            {% elif page == "memberships" %}
+                            Dashboard
+                            {% elif page == "editconflicts" %}
+                            Dashboard
+                            {% elif page == "dashboard" %}
+                            Dashboard
+                            {% elif page == "about" %}
+                            About
                             {% else %}
                                 Scheduler
                             {% endif %}
