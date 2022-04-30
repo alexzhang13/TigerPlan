@@ -45,7 +45,7 @@ def index():
         events = get_user_events(user.id)
         return render_template("index.html",
             title='TigerPlan Homepage', user=session['username'],
-            groups=groups, events=events)
+            groups=groups, events=events, page='index')
     return render_template("login.html",
         title='Login to TigerPlan')
 
@@ -58,7 +58,7 @@ def dashboard():
         invitations = get_member_invitations(user.id)
         return render_template("dashboard.html",
             title='TigerPlan User Dashboard', user=session['username'], 
-            conflicts=conflicts, invitations=invitations)
+            conflicts=conflicts, invitations=invitations, page='dashboard')
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -70,7 +70,7 @@ def memberships():
         membergroups = get_member_groups(user.id)
         return render_template("memberships.html",
             title='TigerPlan User Dashboard', user=session['username'], 
-            memberships = membergroups)
+            memberships = membergroups, page='memberships')
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -80,7 +80,7 @@ def about():
     if check_user_validity():
         user = get_user_from_netid(session['username'])
         return render_template("about.html",
-            title='TigerPlan User Dashboard', user=session['username'])
+            title='TigerPlan User Dashboard', user=session['username'], page='about')
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -93,7 +93,7 @@ def editconflicts():
         events = get_user_events(user.id)
         return render_template("editconflicts.html",
             title='TigerPlan Conflicts', user=session['username'],
-            groups=groups, events=events)
+            groups=groups, events=events, page='editconflicts')
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -117,17 +117,17 @@ def groups():
             except:
                 return render_template("mygroups.html", 
                     title='TigerPlan Manage Groups',
-                    user=session['username'], groups=groups)
+                    user=session['username'], groups=groups, page='groups')
             return render_template("mygroups.html", 
                 title='TigerPlan Manage Groups', 
                 user=session['username'],
                 groups=groups, admin_groups=admin_groups, 
                 admins=admins, users=users, members=members, 
-                this_group=group, events=events)
+                this_group=group, events=events, page='groups')
         return render_template("mygroups.html", 
             title='TigerPlan Manage Groups', 
             user=session['username'], groups=groups, 
-            admin_groups=admin_groups)
+            admin_groups=admin_groups, page='groups')
     return render_template("login.html",
         title='Login to TigerResearch')
 
@@ -230,7 +230,7 @@ def scheduler():
             title='TigerPlan Scheduler', 
             user=session['username'], 
             groups=groups, events=events,
-            admin_groups = admin_groups)
+            admin_groups = admin_groups, page='scheduler')
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
@@ -246,7 +246,7 @@ def manage_events():
             title='TigerPlan Scheduler', 
             user=session['username'], 
             groups=groups, events=events,
-            admin_groups = admin_groups)
+            admin_groups = admin_groups, page='manage_events')
     return render_template("login.html", 
         title='Login to TigerResearch') 
 
