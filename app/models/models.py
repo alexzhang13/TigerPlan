@@ -36,7 +36,7 @@ class Group(db.Model):
     # n-to-1 relation fields
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # n-to-n relation fields TODO: FIX
+    # n-to-n relation fields 
     members = db.relationship("Member_Group", backref="group")
 
     def __repr__(self):

@@ -306,15 +306,15 @@
         </nav>
 
         <!-- End Navbar -->
-        <div id="chooseCalendarButtons">
-            <center>
-                <button id="recurButton" class="btn btn-primary btn-lg w-30">
-                    Edit Recurring Conflicts
-                </button>
-                <button id="onetimeButton" class="btn btn-info btn-lg w-30">
-                    Edit One-time Conflicts
-                </button>
-            </center> 
+        <div class="m-3 px-3" id="chooseCalendarButtons">
+            <a id="recurButton" class="btn btn-primary btn-lg w-30" style="display: none;">
+                Edit Recurring Conflicts
+            </a>
+            <a id="onetimeButton" class="btn btn-info btn-lg w-30" style="display: none;">
+                Edit One-time Conflicts
+            </a>
+            <br>
+            <h2>Currently Viewing <span id="calendarType"></span> Conflicts</h2>
         </div>
         <br>
         <span id="recurSpan" style="display: none;">
