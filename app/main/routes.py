@@ -74,6 +74,16 @@ def memberships():
     return render_template("login.html", 
         title='Login to TigerResearch')
 
+# ---------------------------- DASHBOARD ---------------------------- #
+@bp.route("/about", methods=['GET'])
+def about():
+    if check_user_validity():
+        user = get_user_from_netid(session['username'])
+        return render_template("about.html",
+            title='TigerPlan User Dashboard', user=session['username'])
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
 # -------------------------- EDIT CONFLICTS ------------------------- #
 @bp.route("/editconflicts", methods=['GET'])
 def editconflicts():
@@ -239,15 +249,6 @@ def manage_events():
             admin_groups = admin_groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
-
-# ----------------------------- ABOUT ------------------------------- #
-@bp.route("/about", methods=['GET', 'POST'])
-def about():
-    if check_user_validity():
-        return render_template("about.html",
-        title='TigerPlan About', user=session['username'])
-    return render_template("login.html", 
-        title='Login to TigerResearch')
 
 # ------------------------- EVENT DETAILS --------------------------- #
 
@@ -442,13 +443,15 @@ def leave_group():
             groupId = request.args.get('group')
             success = delete_member(groupId, user.id)
             response_json = json.dumps({"success":success})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
         except Exception as ex:
             print("An exception occured at '/leaveGroup':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
-
-        response.headers['Content-Type'] = 'application/json'
-        return response
+            response.headers['Content-Type'] = 'application/json'
+            return response
 
     return render_template("login.html", 
         title='Login to TigerResearch')
