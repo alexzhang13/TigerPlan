@@ -1,6 +1,6 @@
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
-from app.src.user import get_admin_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_user_onetime_conflicts, get_user_recurring_conflicts, get_users
+from app.src.user import get_admin_groups, get_member_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_user_onetime_conflicts, get_user_recurring_conflicts, get_users
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -59,6 +59,28 @@ def dashboard():
         return render_template("dashboard.html",
             title='TigerPlan User Dashboard', user=session['username'], 
             conflicts=conflicts, invitations=invitations)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ---------------------------- DASHBOARD ---------------------------- #
+@bp.route("/memberships", methods=['GET'])
+def memberships():
+    if check_user_validity():
+        user = get_user_from_netid(session['username'])
+        membergroups = get_member_groups(user.id)
+        return render_template("memberships.html",
+            title='TigerPlan User Dashboard', user=session['username'], 
+            memberships = membergroups)
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ---------------------------- DASHBOARD ---------------------------- #
+@bp.route("/about", methods=['GET'])
+def about():
+    if check_user_validity():
+        user = get_user_from_netid(session['username'])
+        return render_template("about.html",
+            title='TigerPlan User Dashboard', user=session['username'])
     return render_template("login.html", 
         title='Login to TigerResearch')
 
@@ -227,15 +249,6 @@ def manage_events():
             admin_groups = admin_groups)
     return render_template("login.html", 
         title='Login to TigerResearch') 
-
-# ----------------------------- ABOUT ------------------------------- #
-@bp.route("/about", methods=['GET', 'POST'])
-def about():
-    if check_user_validity():
-        return render_template("about.html",
-        title='TigerPlan About', user=session['username'])
-    return render_template("login.html", 
-        title='Login to TigerResearch')
 
 # ------------------------- EVENT DETAILS --------------------------- #
 
@@ -413,6 +426,28 @@ def change_ownership():
             return redirect("/mygroups?groupId=" + groupId)
         except Exception as ex:
             print("An exception occured at '/change_ownership':", ex)
+            response_json = json.dumps({"success":False})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+    return render_template("login.html", 
+        title='Login to TigerResearch')
+
+# ----------------------- TRANSFER OWNERSHIP ------------------------- #
+@bp.route("/leaveGroup", methods=['POST'])
+def leave_group():
+    if check_user_validity():
+        try:
+            user = get_user_from_netid(session['username'])
+            groupId = request.args.get('group')
+            success = delete_member(groupId, user.id)
+            response_json = json.dumps({"success":success})
+            response = make_response(response_json)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        except Exception as ex:
+            print("An exception occured at '/leaveGroup':", ex)
             response_json = json.dumps({"success":False})
             response = make_response(response_json)
             response.headers['Content-Type'] = 'application/json'
