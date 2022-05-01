@@ -62,7 +62,6 @@
                 </div>
                 <div id="calendarMenu">
                     <span id="menu-navi">
-                        <!-- TODO: UI -->
                         <button type="button" class="btn btn-default btn-sm" id="calendarMenuPrev">
                             &lt;
                         </button>
@@ -172,10 +171,8 @@
 
     }
 
-    // TODO: Make more descriptive (show banner?)
     function errorWhileFetchingTimeBlocks(error) {
         console.log(error);
-        // addBanner(error, false);
     }
 
     function getAndRenderTimeBlocks(invitationId) {
@@ -197,14 +194,6 @@
                 errorWhileFetchingTimeBlocks("Error while fetching time blocks");
             }
         });
-
-        // get user conflicts: MUST COME AFTER EVENTS ARE LOADED!
-        // $.ajax({
-        //     type: "GET",
-        //     url: conflictsUrl,
-        //     success: renderUserConflicts,
-        //     error: errorWhileFetchingTimeBlocks
-        // });
 
     }
 

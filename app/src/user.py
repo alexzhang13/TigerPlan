@@ -60,21 +60,18 @@ def get_admin_groups(userid: int) -> Group:
     groups = db.session.query(Group).filter(Group.id == Member_Group.group_id, Member_Group.member_id == userid, Member_Group.is_admin == True).all()
     return groups
 
-# TODO: TEST
 def get_member_groups(memberid: int) -> Group:
     """Get the user(member)'s groups. Returns a list of groups."""
     mem_groups = db.session.query(Group).filter( 
         Member_Group.group_id == Group.id, Member_Group.member_id == memberid).all()
     return mem_groups
 
-# TODO: TEST
 def get_member_events(memberid: int) -> Event:
     """Get the user(member)'s events. Returns a list of events."""
     mem_events = db.session.query(Event).filter(
         Event.group_id == Member_Group.group_id, Member_Group.member_id == memberid).all()
     return mem_events
 
-# TODO: TEST
 def get_member_invitations(memberid: int) -> Invitation:
     """Get the user(member)'s invitations pending response. Returns a list of invitations."""
     mem_invs = db.session.query(Invitation).filter(

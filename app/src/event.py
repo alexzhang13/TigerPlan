@@ -60,6 +60,8 @@ def delete_event(id: int) -> bool:
         db.session.delete(del_response)
     for del_invitation in del_invitations:
         db.session.delete(del_invitation)
+        for response in del_invitation.responses:
+            db.session.delete(response)
     for timeblock in del_event.times:
         db.session.delete(timeblock)
 
@@ -91,35 +93,22 @@ def event_finalize(eventid: int, timeid: int) -> Invitation:
     if event.finalized:
         raise Exception("Event is already finalized")
     
-    # TODO: Should make sure timeblock exists/exists in event (although
-    # could just add back if not in event)
-
-
+    selected_timeblock = get_timeblock(timeid)
+    if selected_timeblock.event_id != event.id:
+        raise Exception("TimeBlock does not belong to event!")
 
     # throw out all invitation responses
     for invitation in event.invitations:
         for response in invitation.responses:
             db.session.delete(response)
     # throw out all timeblocks except matching timeblock
-    selected_timeblock = get_timeblock(timeid)
     for tb in event.times:
-        print(tb.id)
         if (tb == selected_timeblock):
-            print("not deleting", tb)
             continue
-        print("deleting", tb)
         db.session.delete(tb)
 
     event.finalized = True
 
-    db.session.add(event)
-    db.session.commit()
-    return event
-
-def event_set_chosen_time(id: int, timeblockid: int) -> Event:
-    """Sets the chosen time for the event. Returns the updated event."""
-    event = get_event(id)
-    event.chosen_time = timeblockid
     db.session.add(event)
     db.session.commit()
     return event
@@ -170,6 +159,5 @@ def get_invitation_response_times(id: int) -> dict:
         }
 
         response_times.append(block)
-    print("Response times!:", response_times)
 
     return response_times, num_responses

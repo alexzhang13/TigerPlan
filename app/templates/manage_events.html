@@ -67,10 +67,9 @@
                 <div class="col-xl-8 col-sm-6 mb-xl-8 mb-8">
                     <h3 id="groupHeader" value="1" class="px-4 py-2"></h3>
                     <button class="btn btn-success btn-sm w-100" id="finalizeEventButton" style="display: none;">Finalize</button>
-                    <div id="finalizeEventReponse"></div>
+                    <div id="finalizeEventResponse"></div>
                     <div id="calendarMenu" style="display: none;">
                         <span id="menu-navi">
-                            <!-- TODO: UI -->
                             <button type="button" class="btn btn-default btn-sm" id="calendarMenuPrev">
                                 &lt;
                             </button>
@@ -117,8 +116,14 @@
                 type: "POST",
                 url: url,
                 success: function (response) {
-                    console.log("Success");
-                    document.location.reload();
+                    if (response.success) {
+                        document.location.reload();
+                    } else {
+                        addBanner("#eventCard" + eventId, "An error occurred", false);
+                    }
+                },
+                error: function(response) {
+                    addBanner("#eventCard" + eventId, "An error occurred", false);
                 }
             });
         }
@@ -137,32 +142,24 @@
                 success: function (response) {
                     console.log(response);
                     if (response.success) {
-                        let html = "<div class='alert alert-success'>";
-                        html += "Event deleted!</div>"
-                        $("#eventCard" + eventId).html(html);
+                        $("#eventCard" + eventId).empty();
+                        addBanner("#eventCard" + eventId, "Event deleted!", true);
 
-                        setTimeout(function () {
-                            $("#eventCard" + eventId).hide(1000);
-                            setTimeout(function () {
-                                $("#eventCard" + eventId).remove();
-                            }, 1000);
-                        }, 3000);
+                        if (currentlyViewedEventId == eventId) {
+                            destroyDetailCalendar();
+                            currentlyViewedEventId = null;
+                            $("#groupHeader").empty();
+                            $("#calendarMenu").hide();
+                            $('#finalizeEventButton').hide();                        
+                        }
                         return;
                     } else {
-                        let banner = $('<div>',
-                            { text: "An error occured" });
-                        banner.addClass("alert alert-warning");
-
-                        $("#eventCard" + eventId).append(banner);
-                        setTimeout(function () {
-                            banner.hide(1000);
-                            setTimeout(function () {
-                                banner.remove()
-                            }, 1000);
-                        }, 3000);
+                        addBanner("#eventCard" + eventId, "An error occured", false);
                         return;
                     }
-                },
+                }, error: function(response) {
+                    addBanner("#eventCard" + eventId, "An error occured", false);
+                }
             });
         }
 
@@ -183,7 +180,7 @@
                 success: function (response) {
                     
                     if (!response.success) {
-                        addBanner("finalizeEventResponse", "an error occurred", false);
+                        addBanner("#finalizeEventResponse", "an error occurred", false);
                     }
                     document.getElementById("groupHeader").innerHTML = eventName;
                     if (!response.finalized) {
@@ -201,7 +198,7 @@
                 },
                 error: function (response) {
                     console.log(response);
-                    addBanner("finalizeEventResponse", "an error occurred", false);
+                    addBanner("#finalizeEventResponse", "an error occurred", false);
                 }
             });
         }
@@ -234,6 +231,8 @@
                         setTimeout(function () {
                             document.location.reload();
                         }, 1000);
+                    } else {
+                        addBanner('#finalizeEventReponse', "An error occured", false);
                     }
                     $('#finalizeEventButton').prop('disabled', false);
                 },

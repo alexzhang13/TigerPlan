@@ -21,7 +21,7 @@ def update_group(id: int, name: str, members: User) -> Group:
     updated_group = db.session.query(Group).filter(Group.id == id).one()
     if name is not None:
         updated_group.name = name
-    if members is not None:                         #TODO: Test
+    if members is not None:
         for member in members:
             add_member(id=id, member=member)
     db.session.add(updated_group)

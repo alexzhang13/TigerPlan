@@ -85,7 +85,7 @@
         }
       );
     }
-    // TODO: Lu Make this not add owner to options
+    
     function addMemberToSelection(memberid, membernetid) {
       if (!$("#selectNewGroupOwner option[value='" + memberid + "']").length) {
         $('#selectNewGroupOwner').append($('<option>').val(memberid).text(membernetid));
@@ -143,7 +143,6 @@
       if (addAdminRequest != null)
         addAdminRequest.abort();
       
-      // TODO: Ajax to update the admin table without refresh, banners
       addAdminRequest = $.ajax(
         {
           type: 'POST',
@@ -176,7 +175,6 @@
       if (removeAdminRequest != null)
         removeAdminRequest.abort();
   
-      // TODO: Ajax to update the admin table without refresh, banners
       removeAdminRequest = $.ajax(
         {
           type: 'POST',
