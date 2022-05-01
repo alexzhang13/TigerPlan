@@ -16,7 +16,7 @@
                                             <div class="card my-3" id="eventCard{{event.id}}">
                                                 <div class="card-header p-2 text-center"
                                                     style="color: white !important; background-color:{% if event.finalized %}#1d0b85{% else %}#850b68{% endif %} !important;">
-                                                    {{ event.name }} ({{ event.group.name }}) {% if event.finalized %} -
+                                                    <span id="eventName{{event.id}}">{{ event.name }}</span> ({{ event.group.name }}) {% if event.finalized %} -
                                                     Finalized {% endif %}</div>
                                                 <div class="card-body">
 
@@ -43,7 +43,7 @@
                                                     {% else %}
                                                     <a class="btn btn-outline-secondary btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
-                                                        onclick="eventViewDetails('{{event.id}}', '{{event.name}}')">
+                                                        onclick="eventViewDetails('{{event.id}}')">
                                                         {% if event.finalized %}
                                                         View Finalized Time
                                                         {% else %}
@@ -53,7 +53,7 @@
                                                     {% endif %}
                                                     <a class="btn btn-outline-danger btn-sm w-100 mb-0"
                                                         style="margin: 9px 0 5px;"
-                                                        onclick="deleteEvent('{{event.id}}', '{{event.name}}')">Delete Event</a>
+                                                        onclick="deleteEvent('{{event.id}}')">Delete Event</a>
                                                 </div>
                                             </div>
                                             {% endfor %}
@@ -106,6 +106,10 @@
             }, 3000);
         }
 
+        function getEventNameFromId(id) {
+            return $("#eventName" + id).text();
+        }
+
         function createEventInvitations(eventId) {
             $(this).prop("disabled", true);
             let url = "cr_event_invitations/" + eventId;
@@ -119,7 +123,8 @@
             });
         }
 
-        function deleteEvent(eventId, eventName) {
+        function deleteEvent(eventId) {
+            let eventName = getEventNameFromId(eventId);
             let confirmed = confirm("Are you sure you want to delete '" + eventName + "'? This action cannot be undone!");
             if (!confirmed) {
                 return;
@@ -161,13 +166,14 @@
             });
         }
 
-        function eventViewDetails(eventId, eventName) {
+        function eventViewDetails(eventId) {
             if (currentlyViewedEventId) {
                 destroyDetailCalendar();
             }
             currentlyViewedEventId = eventId;
             eventId = encodeURIComponent(eventId);
             let timesUrl = '/view_event_details/' + eventId;
+            let eventName = getEventNameFromId(eventId);
 
 
             // get event times
