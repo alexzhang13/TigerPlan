@@ -97,6 +97,7 @@
             renderTimeSelectionCalendar();
             setRenderRangeText();
             $("#calendarMenu").show();
+            $("#createNewEventButton").prop("disabled", false);
         } else {
             $("#createEventCard").hide(500);
             $("#showCreateEventCardButton").show();
@@ -189,6 +190,7 @@
                             banner.remove()
                         }, 1000);
                     }, 3000);
+                    $("#createNewEventButton").prop("disabled", false);
                 } else {
                     $("#createNewEventButton").prop("disabled", false);
                     showCreateEventCard(false);
@@ -203,7 +205,6 @@
                     });
                     banner.addClass("alert alert-success");
                     banner.appendTo("#eventCreationResponse");
-                    $("#createNewEventButton").prop("disabled", true);
                 }
             },
             error: function (error) {
