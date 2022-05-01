@@ -11,7 +11,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64))
 
     # 1-to-n relation fields
-    owned_groups = db.relationship("Group")
+    owned_groups = db.relationship("Group", backref='owner')
     owned_events = db.relationship("Event")
     conflicts = db.relationship("TimeBlock")
     invitations = db.relationship("Invitation")
