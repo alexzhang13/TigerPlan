@@ -559,10 +559,10 @@ def add_event():
             description = schedule['description']
             timeblocks = schedule['timeblocks']
             is_recurring = schedule['isRecurring']
-
-            group = get_group(group_id)
-            if group is None:
-                raise Exception("Group not found.")
+            try:
+                group = get_group(group_id)
+            except Exception as ex:
+                raise Exception("Group not found.") from ex
             if check_event_priviliges(group, user) == False:
                 raise Exception("User is not authorized to create an event for this group.")
             if (len(group.members) == 0):
