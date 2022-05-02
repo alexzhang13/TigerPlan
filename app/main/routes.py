@@ -32,6 +32,10 @@ def check_user_validity():
         return False
     return True
 
+def check_int(val):
+    if isinstance(val, int): return True
+    raise Exception("Invalid integer value.")
+
 # ------------------------------------------------------------------- #
 #                           PAGE ROUTES                               #
 # ------------------------------------------------------------------- #
@@ -78,7 +82,6 @@ def memberships():
 @bp.route("/about", methods=['GET'])
 def about():
     if check_user_validity():
-        user = get_user_from_netid(session['username'])
         return render_template("about.html",
             title='TigerPlan User Dashboard', user=session['username'], page='about')
     return render_template("login.html", 
@@ -105,7 +108,7 @@ def groups():
         groups = get_user_groups(user.id)
         admin_groups = get_admin_groups(user.id)
         users = get_users()
-        groupId = request.args.get("groupId")
+        groupId = check_int(request.args.get("groupId"))
         if (groupId):
             try:
                 group = get_group(groupId)
@@ -188,7 +191,7 @@ def groupinfo():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('groupId')
+            groupId = check_int(request.args.get('groupId'))
             group = get_group(groupId)
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
@@ -331,7 +334,7 @@ def del_group():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            group_id = request.args.get('group')
+            group_id = check_int(request.args.get('group'))
             group = get_group(group_id)
             if user.id != group.owner_id:
                 raise Exception("User is not group owner.")
@@ -354,8 +357,8 @@ def remove_member():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            group_id = request.args.get('groupId')
-            member_id = request.args.get('memberId')
+            group_id = check_int(request.args.get('groupId'))
+            member_id = check_int(request.args.get('memberId'))
             group = get_group(group_id)
             if (user.id != group.owner_id):
                 raise Exception("User is not group owner.")
@@ -382,11 +385,11 @@ def add_new_member():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            group_id = request.args.get('group')
-            group = get_group(group_id)
+            group_id = check_int(request.args.get('group'))
+            group = check_int(get_group(group_id))
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
-            member_id = request.args.get('member')
+            member_id = check_int(request.args.get('member'))
             if (member_id is None): 
                 raise Exception("New member not specified")
             redudant = not add_member(id=group_id, memberId=member_id)
@@ -416,9 +419,9 @@ def change_ownership():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('group')
+            groupId = check_int(request.args.get('group'))
             group = get_group(groupId)
-            member = request.args.get('member')
+            member = check_int(request.args.get('member'))
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
             update_owner(groupid=groupId, newOwnerId=member)
@@ -439,7 +442,7 @@ def leave_group():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('group')
+            groupId = check_int(request.args.get('group'))
             success = delete_member(groupId, user.id)
             response_json = json.dumps({"success":success})
             response = make_response(response_json)
@@ -461,9 +464,9 @@ def add_group_admin():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('group')
+            groupId = check_int(request.args.get('group'))
             group = get_group(groupId)
-            member = request.args.get('member')
+            member = check_int(request.args.get('member'))
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
             if (group.owner_id == member):
@@ -491,9 +494,9 @@ def remove_group_admin():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('group')
+            groupId = check_int(request.args.get('group'))
             group = get_group(groupId)
-            memberId = request.args.get('member')
+            memberId = check_int(request.args.get('member'))
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
             old_admin = get_user_from_id(memberId)
@@ -518,7 +521,7 @@ def change_group_name():
     if check_user_validity():
         try:
             user = get_user_from_netid(session['username'])
-            groupId = request.args.get('group')
+            groupId = check_int(request.args.get('group'))
             group = get_group(groupId)
             name = request.args.get('name')
             if (group.owner_id != user.id):
@@ -598,8 +601,8 @@ def add_event():
 @bp.route("/finalize_event_time", methods=['POST'])
 def finalize_event():
     if check_user_validity():
-        eventid = request.args.get('eventid')
-        timeid = request.args.get('timeid')
+        eventid = check_int(request.args.get('eventid'))
+        timeid = check_int(request.args.get('timeid'))
         try:
             user = get_user_from_netid(session['username'])
             event = get_event(eventid)
