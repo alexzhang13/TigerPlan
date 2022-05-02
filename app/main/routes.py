@@ -21,6 +21,12 @@ cas_client = CASClient(
 
 # ----------------------- HELPER FUNCTIONS -------------------------- #
 
+@bp.before_request
+def before_request():
+    if not request.is_secure:
+        url = request.url.replace('http://', 'https://', 1)
+        return redirect(url, code=301)
+
 def check_user_validity():
     if not 'username' in session:
         return False
@@ -746,7 +752,7 @@ def finalize_invitation(invitationid):
 # ------------------------------------------------------------------- #
 
 # --------------------- ADD DEFAULT CONFLICT ------------------------ #
-@bp.route("/saveNewSchedule/", methods=["GET", "POST"])
+@bp.route("/saveNewSchedule", methods=["GET", "POST"])
 def saveNewSchedule():
     if check_user_validity():
         user = get_user_from_netid(session['username'])
@@ -762,7 +768,7 @@ def saveNewSchedule():
         title='Login to TigerResearch') 
 
 # ------------------------------------------------------------------- #
-@bp.route("/update_conflict/", methods=["GET", "POST"])
+@bp.route("/update_conflict", methods=["GET", "POST"])
 def update_conflict():
     if check_user_validity():
         user = get_user_from_netid(session['username'])
@@ -790,7 +796,7 @@ def update_conflict():
         title='Login to TigerResearch') 
 
 # ------------------------------------------------------------------- #
-@bp.route("/add_conflict/", methods=['GET', 'POST'])
+@bp.route("/add_conflict", methods=['GET', 'POST'])
 def add_conflict():
     if check_user_validity():
         user = get_user_from_netid(session['username'])

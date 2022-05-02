@@ -195,8 +195,9 @@ function renderUserConflicts(conflicts) {
         let startTime = new Date(conflicts[i].start + 'Z');
         let endTime = new Date(conflicts[i].end + 'Z');
         if (conflicts[i].is_recurring) {
+            let origDiff = endTime.getTime() - startTime.getTime();
             startTime = getInRange(startTime, calStart, calEnd);
-            endTime = getInRange(endTime, calStart, calEnd);
+            endTime.setTime(startTime.getTime() + origDiff);
         }
         var d = {
             id: conflicts[i].id,

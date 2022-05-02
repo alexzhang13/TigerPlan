@@ -236,8 +236,9 @@ function renderUserConflicts(response) {
         let startTime = new Date(response[i].start + 'Z');
         let endTime = new Date(response[i].end + 'Z');
         if (response[i].is_recurring) {
+            let origDiff = endTime.getTime() - startTime.getTime();
             startTime = getInRange(startTime, calStart, calEnd);
-            endTime = getInRange(endTime, calStart, calEnd);
+            endTime.setTime(startTime.getTime() + origDiff);
         }
         var d = {
             id: response[i].id,

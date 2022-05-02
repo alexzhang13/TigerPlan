@@ -275,8 +275,9 @@ function renderUserRecurringConflicts(conflicts) {
     for (let i = 0; i < conflicts.length; i++) {
         let startTime = new Date(conflicts[i].start + 'Z');
         let endTime = new Date(conflicts[i].end + 'Z');
+        let origDiff = endTime.getTime() - startTime.getTime();
         startTime = getInRange(startTime, calStart, calEnd);
-        endTime = getInRange(endTime, calStart, calEnd);
+        endTime.setTime(startTime.getTime() + origDiff);
         var d = {
             id: conflicts[i].id,
             calendarId: recurringCalId,
@@ -404,6 +405,7 @@ $(document).ready(function () {
 
 /********** HELPER FUNCTIONS: SHOULD BE MOVED TO UTILITIES **********/
 function getInRange(dt, start, end) {
+    console.log("getting in range", dt, start, end)
     if (dt < start) {
         let diff = daysBetween(dt, start);
         diff = Math.ceil(diff / 7) * 7;
