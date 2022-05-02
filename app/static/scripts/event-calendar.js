@@ -92,6 +92,10 @@ function renderTimeSelectionCalendar(calendarDivId) {
             if (e.event.ctrlKey) {
                 deleteSchedule(e);
             }
+            // TODO: test this fix for macs
+            if (e.metaKey) {
+                deleteSchedule(e);
+            }
         },
         'clickDayname': function (date) {
             console.log('clickDayname', date);
