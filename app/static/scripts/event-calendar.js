@@ -93,7 +93,7 @@ function renderTimeSelectionCalendar(calendarDivId) {
                 deleteSchedule(e);
             }
             // TODO: test this fix for macs
-            if (e.metaKey) {
+            if (e.event.metaKey) {
                 deleteSchedule(e);
             }
         },
