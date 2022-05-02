@@ -1,6 +1,6 @@
 from app.src.group import add_admin, add_member, create_group, delete_admin, delete_group, delete_member, get_group, get_group_admin, get_group_events, get_members, update_group_name, update_owner
 from app.src.timeblock import create_timeblock, delete_timeblock, get_timeblock, update_timeblock
-from app.src.user import get_admin_groups, get_member_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_user_onetime_conflicts, get_user_recurring_conflicts, get_users
+from app.src.user import get_admin_groups, get_member_groups, get_member_invitations, get_user_conflicts, get_user_events, get_user_from_id, get_user_groups, get_user_from_netid, get_user_member_finalized_event_times, get_user_onetime_conflicts, get_user_recurring_conflicts, get_users, is_admin
 from app.src.event import create_event, create_event_invitations, delete_event, event_finalize, get_event, get_invitation_response_times
 from app.src.invitation import get_invitation, invitation_finalize
 from flask import render_template, current_app, redirect, url_for, session, request, make_response, jsonify
@@ -258,7 +258,6 @@ def view_event_details(id):
         try:
             user = get_user_from_netid(session['username'])
             event = get_event(id)
-            # TODO: Lu Make sure user is an owner or an admin?
 
             if (event.owner_id != user.id):
                 raise Exception("User is not event owner") 
@@ -540,6 +539,13 @@ def change_group_name():
 #                         EVENT MUTATIONS                             #
 # ------------------------------------------------------------------- #
 
+def check_event_priviliges(group, user):
+    if group.owner_id == user.id:
+        return True
+    elif is_admin(user.id, group.id):
+        return True
+    return False
+
 # --------------------- CREATE CUSTOM EVENT ------------------------- # TODO: Lu Review Authorization - admins?
 @bp.route("/add_event", methods=['POST'])
 def add_event():
@@ -557,6 +563,8 @@ def add_event():
             group = get_group(group_id)
             if group is None:
                 raise Exception("Group not found.")
+            if check_event_priviliges(group, user) == False:
+                raise Exception("User is not authorized to create an event for this group.")
             if (len(group.members) == 0):
                 raise Exception("Cannot create event for group with no members.")
             if (name is None or name.strip() == ""):

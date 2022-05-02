@@ -57,7 +57,8 @@ def get_user_member_finalized_event_times(userid: int) -> TimeBlock:
 
 def get_admin_groups(userid: int) -> Group:
     '''Get the user(admin)'s groups. Returns a list of groups.'''
-    groups = db.session.query(Group).filter(Group.id == Member_Group.group_id, Member_Group.member_id == userid, Member_Group.is_admin == True).all()
+    groups = db.session.query(Group).filter(
+        Group.id == Member_Group.group_id, Member_Group.member_id == userid, Member_Group.is_admin == True).all()
     return groups
 
 def get_member_groups(memberid: int) -> Group:
@@ -78,3 +79,8 @@ def get_member_invitations(memberid: int) -> Invitation:
         Invitation.user_id == memberid).all()
     return mem_invs
 
+def is_admin(userid: int, groupid: int) -> bool:
+    """Check if the user is an admin of the group. Returns true if the user is an admin."""
+    result = db.session.query(Member_Group).filter(
+        Member_Group.group_id == groupid, Member_Group.member_id == userid, Member_Group.is_admin == True).first()
+    return result != None
