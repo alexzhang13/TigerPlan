@@ -15,17 +15,19 @@ from app.models import models
 
 cas_client = CASClient(
     version=3,
-    service_url='https://tigerplan.herokuapp.com/login',
+    service_url='http://tigerplan.herokuapp.com/login',
     server_url='https://fed.princeton.edu/cas/login'
 )
 
 # ----------------------- HELPER FUNCTIONS -------------------------- #
 
+'''
 @bp.before_request
 def before_request():
     if not request.is_secure:
         url = request.url.replace('http://', 'https://', 1)
         return redirect(url, code=301)
+'''
 
 def check_user_validity():
     if not 'username' in session:
