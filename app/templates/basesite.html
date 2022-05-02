@@ -43,8 +43,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 
-<body class="g-sidenav-show  bg-gray-100">
-    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 "
+<body id="nav-nav-nav" class="g-sidenav-show  bg-gray-100">
+    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gray-100"
         id="sidenav-main">
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
@@ -348,25 +348,38 @@
                         {% endif %}
                     </h6>
                 </nav>
-                <div class="nav-item btn-group dropdown">
-                    {% if user is defined and user != '' %}
-                    <a class="btn dropdown-toggle" id="login" data-bs-toggle="dropdown" style="color:#000">
-                        {{ user }}
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="login">
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
-                        </li>
-                    </ul>
-                    {% else %}
-                    <a href="{{ url_for('main.login') }}">
-                        <button class="btn btn-primary navbar-btn navbar-right" type="button"
-                            style="background-color:rgb(185, 176, 187);">
-                            Login
-                        </button>
-                    </a>
-                    {% endif %}
-                </div>
+                <ul class = "list-group list-group-horizontal justify-content-end">
+                    <li class="d-flex align-items-center">
+                        <a onclick="menuToggle()" class="nav-link text-body p-3 d-lg-none" id="iconNavbarSidenav">
+                            <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <div class="nav-item btn-group dropdown">
+                            {% if user is defined and user != '' %}
+                            <a class="btn dropdown-toggle" id="login" data-bs-toggle="dropdown" style="color:#000">
+                                {{ user }}
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="login">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
+                                </li>
+                            </ul>
+                            {% else %}
+                            <a href="{{ url_for('main.login') }}">
+                                <button class="btn btn-primary navbar-btn navbar-right" type="button"
+                                    style="background-color:rgb(185, 176, 187);">
+                                    Login
+                                </button>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
             </div>
         </nav>
         <!-- End Navbar -->
@@ -384,6 +397,13 @@
         <script src="{{ url_for('static', filename='scripts/soft-ui-dashboard.min.js') }}"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
+
+        <!-- Script for Pinning the Navigation on Small Screens -->
+        <script>
+            function menuToggle() {
+                $('#nav-nav-nav').toggleClass('g-sidenav-pinned')
+            }
+        </script>
 </body>
 
 </html>
