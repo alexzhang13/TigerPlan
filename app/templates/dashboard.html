@@ -18,6 +18,7 @@
                                 <div class="card mt-3 p-3" id="invitationCard{{invite.id}}">
                                     {% if invite.event is not none %}
                                     <h6 class="text-dark text-sm font-weight-bold mb-0">{{ invite.event.name }}
+                                        {% if invite.event.is_recurring %} (Recurring) {% endif %} 
                                     </h6>
                                     {% if invite.event.group is not none %}
                                     <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{
