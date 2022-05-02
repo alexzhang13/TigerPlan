@@ -33,8 +33,10 @@ def check_user_validity():
     return True
 
 def check_int(val):
-    if isinstance(val, int): return True
-    raise Exception("Invalid integer value.")
+    if isinstance(val, str) and val.isdigit(): return int(val)
+    elif isinstance(val, int): return val
+    elif val is None: return None
+    raise Exception("Invalid integer value.", val, type(val))
 
 # ------------------------------------------------------------------- #
 #                           PAGE ROUTES                               #
@@ -386,7 +388,7 @@ def add_new_member():
         try:
             user = get_user_from_netid(session['username'])
             group_id = check_int(request.args.get('group'))
-            group = check_int(get_group(group_id))
+            group = get_group(group_id)
             if (group.owner_id != user.id):
                 raise Exception("User is not group owner")
             member_id = check_int(request.args.get('member'))
