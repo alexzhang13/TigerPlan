@@ -207,9 +207,9 @@
             let selectedId = getSelectedTimeblockId();
             if (selectedId === null || currentlyViewedEventId === null) {
                 if (selectedId === null) {
-                    addBanner("#finalizeEventReponse", "Must select a time (click on one of the timeblocks in the calendar)", false);
+                    addBanner("#finalizeEventResponse", "Must select a time (click on one of the timeblocks in the calendar)", false);
                 } else {
-                    addBanner("#finalizeEventReponse", "error processing request", false);
+                    addBanner("#finalizeEventResponse", "error processing request", false);
                 }
                 return;
             }
@@ -227,12 +227,12 @@
                         destroyDetailCalendar();
                         $('#calendarMenu').hide();
                         $('#finalizeEventButton').hide();
-                        addBanner('#finalizeEventReponse', "Success!", true);
+                        addBanner('#finalizeEventResponse', "Success!", true);
                         setTimeout(function () {
                             document.location.reload();
                         }, 1000);
                     } else {
-                        addBanner('#finalizeEventReponse', "An error occured", false);
+                        addBanner('#finalizeEventResponse', "An error occured", false);
                     }
                     $('#finalizeEventButton').prop('disabled', false);
                 },
