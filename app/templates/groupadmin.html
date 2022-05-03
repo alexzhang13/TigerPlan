@@ -217,6 +217,11 @@
 
     let removeGroupRequest = null;
     function removeGroup() {
+      let groupName = $('#thisGroupHeader').text();
+      if (!confirm("Are you sure you want to delete " + groupName + "? This action cannot be undone!")) {
+        return;
+      }
+      
       let thisGroup = $('#thisGroupHeader').attr('value');
       let url = '/del_group?group=' + thisGroup
 
